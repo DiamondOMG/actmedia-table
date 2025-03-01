@@ -1,6 +1,8 @@
-// app/test/dynamic-hydration/page.tsx
-"use client"
+// app/test/hydration-dynamic/page.tsx
+"use client";
 import dynamic from "next/dynamic";
+import { Button, Container, Typography, Paper } from "@mui/material";
+import { motion } from "framer-motion";
 
 // ดีที่สุดสำหรับ landing page: Hybrid Approach (แยก Server + Client) เพราะได้ทั้ง SEO และ animation
 // ดีที่สุดสำหรับความเร็ว/ง่าย: dynamic ถ้าไม่สนใจ SSR
@@ -9,6 +11,7 @@ import dynamic from "next/dynamic";
 const Page = dynamic(
   () =>
     Promise.resolve(() => {
+      console.log(" render");
       return (
         <Container
           maxWidth="md"
@@ -43,7 +46,3 @@ const Page = dynamic(
 );
 
 export default Page;
-
-// Import statements (move these inside if needed, but ideally outside)
-import { Button, Container, Typography, Paper } from "@mui/material";
-import { motion } from "framer-motion";

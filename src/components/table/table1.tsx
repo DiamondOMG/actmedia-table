@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react"; // นำเข้า React.memo
+import { memo, useState, useMemo } from "react";
 import {
   MaterialReactTable,
   type MRT_ColumnDef,
@@ -19,38 +19,43 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  state: string;
-}
+import { type User2,User } from "@/types/user";
 
 interface Table1Props {
-  columns: MRT_ColumnDef<User>[];
+  columns: MRT_ColumnDef<User2>[];
   initialData: User[];
 }
 
-// ห่อ Table1 ด้วย React.memo
-const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
-  const [data, setData] = useState(initialData);
 
-  const handleCreateUser: MRT_TableOptions<User>["onCreatingRowSave"] = ({
+const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
+  const env = typeof window === "undefined" ? "Server" : "Client";
+  console.log(`${env} render at ${new Date().toISOString()}`);
+
+  // แปลง data โดยใช้ useMemo เพื่อให้ date เป็น MM/DD/YYYY
+  const formattedData: User2[] = useMemo(() => {
+    return initialData.map((item) => ({
+      ...item,
+      date: new Date(item.date).toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      }), // MM/DD/YYYY
+    }));
+  }, [initialData]);
+
+  const handleCreateUser: MRT_TableOptions<User2>["onCreatingRowSave"] = ({
     values,
     table,
   }) => {
-    const newUser = { ...values, id: Math.random().toString() };
-    setData([...data, newUser]);
+    console.log(formattedData);
     table.setCreatingRow(null);
   };
 
-  const handleSaveUser: MRT_TableOptions<User>["onEditingRowSave"] = ({
+  const handleSaveUser: MRT_TableOptions<User2>["onEditingRowSave"] = ({
     values,
     table,
   }) => {
-    console.log(data);
+    console.log(initialData);
     table.setEditingRow(null);
   };
 
@@ -62,9 +67,8 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
 
   const table = useMaterialReactTable({
     columns,
-    data,
+    data: formattedData, // ใช้ formattedData ที่มี dateFormatted
     createDisplayMode: "modal",
-    editDisplayMode: "modal",
     enableEditing: true,
     getRowId: (row) => row.id,
     muiTableContainerProps: { sx: { minHeight: "500px" } },
@@ -112,7 +116,7 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
     ),
     renderTopToolbarCustomActions: ({ table }) => (
       <Button variant="contained" onClick={() => table.setCreatingRow(true)}>
-        สร้างผู้ใช้ใหม่
+        สร้าง
       </Button>
     ),
   });
@@ -120,7 +124,5 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
   return <MaterialReactTable table={table} />;
 });
 
-// กำหนด displayName เพื่อช่วยในการ debug (optional แต่แนะนำ)
 Table1.displayName = "Table1";
-
 export default Table1;

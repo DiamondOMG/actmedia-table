@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import Table1 from "@/components/table/Table1";
 import { type MRT_ColumnDef } from "material-react-table";
-import { type User } from "@/types/user";
+import { type User, User2 } from "@/types/user";
 
-// Mock data
+// Mock data (เพิ่ม date เป็น Unix timestamp)
 const fakeData: User[] = [
   {
     id: "1",
@@ -13,6 +13,7 @@ const fakeData: User[] = [
     lastName: "Doe",
     email: "john.doe@example.com",
     state: "CA",
+    date: 1709341200000, // 2025-03-01 (ตัวอย่าง)
   },
   {
     id: "2",
@@ -20,6 +21,7 @@ const fakeData: User[] = [
     lastName: "Smith",
     email: "jane.smith@example.com",
     state: "TX",
+    date: 1709427600000, // 2025-03-02
   },
   {
     id: "3",
@@ -27,6 +29,7 @@ const fakeData: User[] = [
     lastName: "Johnson",
     email: "alice.johnson@example.com",
     state: "NY",
+    date: 1709514000000, // 2025-03-03
   },
   {
     id: "4",
@@ -34,6 +37,7 @@ const fakeData: User[] = [
     lastName: "Brown",
     email: "bob.brown@example.com",
     state: "FL",
+    date: 1709600400000, // 2025-03-04
   },
 ];
 
@@ -92,13 +96,7 @@ const usStates = [
 ];
 
 export default function Page() {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const columns = useMemo<MRT_ColumnDef<User>[]>(
+  const columns = useMemo<MRT_ColumnDef<User2>[]>(
     () => [
       { accessorKey: "id", header: "Id", enableEditing: false, size: 80 },
       {
@@ -123,13 +121,18 @@ export default function Page() {
         editSelectOptions: usStates,
         muiEditTextFieldProps: { select: true },
       },
+      {
+        accessorKey: "date",
+        header: "วันที่",
+        muiEditTextFieldProps: {
+          type: "date",
+          InputLabelProps: { shrink: true }, // หด label เพื่อไม่ให้ซ้อน
+          placeholder: "", // ✅ ซ่อน placeholder (mm/dd/yyyy)
+        },
+      },
     ],
     []
   );
-
-  if (!isMounted) {
-    return <div>กำลังโหลด...</div>;
-  }
 
   return <Table1 columns={columns} initialData={fakeData} />;
 }
