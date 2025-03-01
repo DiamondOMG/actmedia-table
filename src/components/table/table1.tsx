@@ -19,13 +19,12 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { type User2,User } from "@/types/user";
+import { type User2, User } from "@/types/user";
 
 interface Table1Props {
   columns: MRT_ColumnDef<User2>[];
   initialData: User[];
 }
-
 
 const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
   const env = typeof window === "undefined" ? "Server" : "Client";
@@ -33,14 +32,21 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
 
   // แปลง data โดยใช้ useMemo เพื่อให้ date เป็น MM/DD/YYYY
   const formattedData: User2[] = useMemo(() => {
-    return initialData.map((item) => ({
-      ...item,
-      date: new Date(item.date).toLocaleDateString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "numeric",
-      }), // MM/DD/YYYY
-    }));
+    return initialData.map((item) => {
+      const date = new Date(item.date);
+      const formattedDate = date.toISOString().split("T")[0]; // yyyy-MM-dd
+      const formattedTime = date.toLocaleTimeString("en-US", {
+        hour12: false, // ใช้รูปแบบ 24 ชั่วโมง
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }); // hh:mm:ss
+
+      return {
+        ...item,
+        date: `${formattedDate} ${formattedTime}`, // yyyy-MM-dd hh:mm:ss
+      };
+    });
   }, [initialData]);
 
   const handleCreateUser: MRT_TableOptions<User2>["onCreatingRowSave"] = ({

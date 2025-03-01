@@ -125,7 +125,7 @@ export default function Page() {
         accessorKey: "date",
         header: "วันที่",
         muiEditTextFieldProps: {
-          type: "date",
+          type: "datetime-local",
           InputLabelProps: { shrink: true }, // หด label เพื่อไม่ให้ซ้อน
           placeholder: "", // ✅ ซ่อน placeholder (mm/dd/yyyy)
         },
