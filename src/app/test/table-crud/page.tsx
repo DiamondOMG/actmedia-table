@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import Table1 from "@/components/table/Table1";
 import { type MRT_ColumnDef } from "material-react-table";
 import { type NewData, RawData } from "@/types/user";
@@ -303,44 +303,51 @@ const usStates = [
   "WY",
 ];
 
+const columns: MRT_ColumnDef<NewData>[] = [
+    { accessorKey: "id", header: "Id", enableEditing: false, size: 80 },
+    {
+      accessorKey: "firstName",
+      header: "ชื่อ",
+      muiEditTextFieldProps: { required: true },
+    },
+    {
+      accessorKey: "lastName",
+      header: "นามสกุล",
+      muiEditTextFieldProps: { required: true },
+    },
+    {
+      accessorKey: "email",
+      header: "อีเมล",
+      muiEditTextFieldProps: { type: "email", required: true },
+    },
+    {
+      accessorKey: "state",
+      header: "รัฐ",
+      editVariant: "select",
+      editSelectOptions: usStates,
+      muiEditTextFieldProps: { select: true },
+    },
+    {
+      accessorKey: "date",
+      header: "วันที่",
+      muiEditTextFieldProps: {
+        type: "datetime-local",
+        InputLabelProps: { shrink: true }, // หด label เพื่อไม่ให้ซ้อน
+        placeholder: "", // ✅ ซ่อน placeholder (mm/dd/yyyy)
+      },
+    },
+  ]
+
 export default function Page() {
-  const columns = useMemo<MRT_ColumnDef<NewData>[]>(
-    () => [
-      { accessorKey: "id", header: "Id", enableEditing: false, size: 80 },
-      {
-        accessorKey: "firstName",
-        header: "ชื่อ",
-        muiEditTextFieldProps: { required: true },
-      },
-      {
-        accessorKey: "lastName",
-        header: "นามสกุล",
-        muiEditTextFieldProps: { required: true },
-      },
-      {
-        accessorKey: "email",
-        header: "อีเมล",
-        muiEditTextFieldProps: { type: "email", required: true },
-      },
-      {
-        accessorKey: "state",
-        header: "รัฐ",
-        editVariant: "select",
-        editSelectOptions: usStates,
-        muiEditTextFieldProps: { select: true },
-      },
-      {
-        accessorKey: "date",
-        header: "วันที่",
-        muiEditTextFieldProps: {
-          type: "datetime-local",
-          InputLabelProps: { shrink: true }, // หด label เพื่อไม่ให้ซ้อน
-          placeholder: "", // ✅ ซ่อน placeholder (mm/dd/yyyy)
-        },
-      },
-    ],
-    []
-  );
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+    console.log(` Page render `);
+  }, []);
+  // ถ้ายังไม่ mount (เช่น บน server) ให้ return null หรือ skeleton เพื่อป้องกันการ render
+  if (!isMounted) {
+    return null; // หรือจะใส่ loading state เช่น <div>Loading...</div>
+  }
 
   return <Table1 columns={columns} initialData={fakeData} />;
 }

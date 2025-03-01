@@ -27,9 +27,8 @@ interface Table1Props {
 }
 
 const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
-  //!------------------Environment------------------!//
-  const env = typeof window === "undefined" ? "Server" : "Client";
-  console.log(`${env} render at ${new Date().toISOString()}`);
+  //!------------------Render------------------!//
+  console.log(` Table render `);
 
   //!------------------Data Transformation------------------!//
   // แปลง data โดยใช้ useMemo เพื่อให้ date เป็น MM/DD/YYYY hh:mm:ss
@@ -57,7 +56,7 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
     values,
     table,
   }) => {
-    console.log(newData);
+    console.log("Create");
     table.setCreatingRow(null);
   };
 
@@ -65,7 +64,7 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
     values,
     table,
   }) => {
-    console.log(initialData);
+    console.log("Update");
     table.setEditingRow(null);
   };
 
@@ -87,6 +86,7 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
     enableBottomToolbar: true, // เปิดใช้งาน toolbar ด้านล่าง
     positionPagination: "bottom", // ตำแหน่งของ toolbar ด้านล่าง
     enableStickyHeader: true, // ติด header ด้านบน
+    enableGrouping: true, // สามารถจัดกลุ่มข้อมูลได้
     muiTopToolbarProps: {
       sx: {
         backgroundColor: "#e3f2fd", // สีฟ้าอ่อน
