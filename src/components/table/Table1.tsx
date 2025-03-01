@@ -30,7 +30,7 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
   const env = typeof window === "undefined" ? "Server" : "Client";
   console.log(`${env} render at ${new Date().toISOString()}`);
 
-  // แปลง data โดยใช้ useMemo เพื่อให้ date เป็น MM/DD/YYYY
+  // แปลง data โดยใช้ useMemo เพื่อให้ date เป็น MM/DD/YYYY hh:mm:ss
   const formattedData: User2[] = useMemo(() => {
     return initialData.map((item) => {
       const date = new Date(item.date);
