@@ -19,19 +19,21 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { type User2, User } from "@/types/user";
+import { type NewData, RawData } from "@/types/user";
 
 interface Table1Props {
-  columns: MRT_ColumnDef<User2>[];
-  initialData: User[];
+  columns: MRT_ColumnDef<NewData>[];
+  initialData: RawData[];
 }
 
 const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
+  //!------------------Environment------------------!//
   const env = typeof window === "undefined" ? "Server" : "Client";
   console.log(`${env} render at ${new Date().toISOString()}`);
 
+  //!------------------Data Transformation------------------!//
   // แปลง data โดยใช้ useMemo เพื่อให้ date เป็น MM/DD/YYYY hh:mm:ss
-  const formattedData: User2[] = useMemo(() => {
+  const newData: NewData[] = useMemo(() => {
     return initialData.map((item) => {
       const date = new Date(item.date);
       const formattedDate = date.toISOString().split("T")[0]; // yyyy-MM-dd
@@ -49,15 +51,17 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
     });
   }, [initialData]);
 
-  const handleCreateUser: MRT_TableOptions<User2>["onCreatingRowSave"] = ({
+  //!------------------CRUD Functions------------------!//
+
+  const handleCreateUser: MRT_TableOptions<NewData>["onCreatingRowSave"] = ({
     values,
     table,
   }) => {
-    console.log(formattedData);
+    console.log(newData);
     table.setCreatingRow(null);
   };
 
-  const handleSaveUser: MRT_TableOptions<User2>["onEditingRowSave"] = ({
+  const handleSaveUser: MRT_TableOptions<NewData>["onEditingRowSave"] = ({
     values,
     table,
   }) => {
@@ -71,13 +75,23 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
     }
   };
 
+  //!-------------------------- Table --------------------------------
   const table = useMaterialReactTable({
     columns,
-    data: formattedData, // ใช้ formattedData ที่มี dateFormatted
+    data: newData, // ใช้ newData ที่มี dateFormatted
     createDisplayMode: "modal",
     enableEditing: true,
     getRowId: (row) => row.id,
     muiTableContainerProps: { sx: { minHeight: "500px" } },
+    enableColumnOrdering: true, // สามารถจัดเรียง column ได้
+    enableBottomToolbar: true, // เปิดใช้งาน toolbar ด้านล่าง
+    positionPagination: "bottom", // ตำแหน่งของ toolbar ด้านล่าง
+    enableStickyHeader: true, // ติด header ด้านบน
+    muiTopToolbarProps: {
+      sx: {
+        backgroundColor: "#e3f2fd", // สีฟ้าอ่อน
+      },
+    },
     onCreatingRowSave: handleCreateUser,
     onEditingRowSave: handleSaveUser,
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (

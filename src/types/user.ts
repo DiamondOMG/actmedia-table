@@ -1,14 +1,15 @@
 // types/user.ts
-export interface User {
+
+export interface RawData {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   state: string;
-  date: number; // เพิ่มฟิลด์ date เป็น Unix timestamp (มิลลิวินาที)
+  date: number;
 }
 
-export interface User2 {
+export interface NewData {
   id: string;
   firstName: string;
   lastName: string;
