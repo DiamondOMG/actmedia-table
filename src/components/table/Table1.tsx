@@ -20,6 +20,8 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { type NewData, RawData } from "@/types/user";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 interface Table1Props {
   columns: MRT_ColumnDef<NewData>[];
@@ -141,7 +143,11 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
     ),
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <MaterialReactTable table={table} />
+    </LocalizationProvider>
+  );
 });
 
 Table1.displayName = "Table1";
