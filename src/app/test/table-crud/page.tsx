@@ -1,5 +1,4 @@
 "use client";
-
 import { useMemo, useEffect, useState } from "react";
 import Table1 from "@/components/table/Table1";
 import { type MRT_ColumnDef } from "material-react-table";
@@ -324,22 +323,20 @@ const columns: MRT_ColumnDef<RawData>[] = [
     editVariant: "select",
     editSelectOptions: usStates,
   },
-  {
+{
     accessorKey: "date",
     header: "วันที่",
     meta: "check",
+    // แปลง Unix timestamp เป็น Date เพื่อใช้กับ filterVariant: 'date-range'
+    accessorFn: (originalRow) => new Date(originalRow.date),
     Cell: ({ cell }) => {
-      const unixTimestamp = cell.getValue();
-      if (
-        typeof unixTimestamp !== "number" &&
-        typeof unixTimestamp !== "string"
-      ) {
-        return null; // Return null if the value is not valid
-      }
-      if (!unixTimestamp) return null; // ถ้าไม่มีค่า ให้ return null
-
-      const date = new Date(unixTimestamp);
-      return format(date, "dd/MM/yyyy HH:mm:ss");
+      const unixTimestamp = cell.getValue<Date>();
+      if (!unixTimestamp) return null;
+      return format(unixTimestamp, "dd/MM/yyyy HH:mm:ss");
+    },
+    filterVariant: "date-range", // ใช้ date-range เพื่อให้ MRT แสดง DatePicker ในส่วนหัว
+    muiFilterDatePickerProps: {
+      format: "dd/MM/yyyy", // กำหนดรูปแบบวันที่เป็น dd/MM/yyyy
     },
   },
 ];

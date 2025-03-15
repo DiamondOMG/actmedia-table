@@ -199,6 +199,8 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
         สร้าง
       </Button>
     ),
+    
+    
   });
 
   return (
