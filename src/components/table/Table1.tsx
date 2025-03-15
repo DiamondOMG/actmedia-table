@@ -7,6 +7,10 @@ import {
   type MRT_TableOptions,
   MRT_EditActionButtons,
   useMaterialReactTable,
+  MRT_PaginationState,
+  MRT_SortingState,
+  MRT_ColumnFiltersState,
+  MRT_GroupingState,
 } from "material-react-table";
 import {
   Box,
@@ -15,100 +19,152 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  TextField,
   Tooltip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { type NewData, RawData } from "@/types/user";
-import { LocalizationProvider } from "@mui/x-date-pickers";
+import { type RawData } from "@/types/user";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
+// Props ที่รับเข้ามาสำหรับตาราง
 interface Table1Props {
-  columns: MRT_ColumnDef<NewData>[];
-  initialData: RawData[];
+  columns: MRT_ColumnDef<RawData>[]; // คอลัมน์ที่จะแสดงในตาราง
+  initialData: RawData[]; // ข้อมูลเริ่มต้นที่จะแสดงในตาราง
 }
 
 const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
-  //!------------------Render------------------!//
+    //!----------------table state------------------!//
+    const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
+      [],
+    );
+    const [globalFilter, setGlobalFilter] = useState('');
+    const [sorting, setSorting] = useState<MRT_SortingState>([]);
+    const [pagination, setPagination] = useState<MRT_PaginationState>({
+      pageIndex: 0,
+      pageSize: 10,
+    });
+    const [grouping, setGrouping] = useState<MRT_GroupingState>([]);
+  //!------------------ ส่วนแสดงผล ------------------!//
   console.log(` Table render `);
 
-  //!------------------Data Transformation------------------!//
-  // แปลง data โดยใช้ useMemo เพื่อให้ date เป็น MM/DD/YYYY hh:mm:ss
-  const newData: NewData[] = useMemo(() => {
-    return initialData.map((item) => {
-      const date = new Date(item.date);
-      const formattedDate = date.toISOString().split("T")[0]; // yyyy-MM-dd
-      const formattedTime = date.toLocaleTimeString("en-US", {
-        hour12: false, // ใช้รูปแบบ 24 ชั่วโมง
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      }); // hh:mm:ss
-
-      return {
-        ...item,
-        date: `${formattedDate} ${formattedTime}`, // yyyy-MM-dd hh:mm:ss
-      };
-    });
+  //!------------------ การแปลงข้อมูล ------------------!//
+  // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า
+  const newData: RawData[] = useMemo(() => {
+    return initialData;
   }, [initialData]);
 
-  //!------------------CRUD Functions------------------!//
+  //!------------------ ฟังก์ชันจัดการ CRUD ------------------!//
 
-  const handleCreateUser: MRT_TableOptions<NewData>["onCreatingRowSave"] = ({
+  // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
+  const handleCreateUser: MRT_TableOptions<RawData>["onCreatingRowSave"] = ({
     values,
     table,
   }) => {
-    console.log("Create");
-    table.setCreatingRow(null);
+    console.log("Create", values);
+    table.setCreatingRow(null); // ปิด modal การสร้าง
   };
 
-  const handleSaveUser: MRT_TableOptions<NewData>["onEditingRowSave"] = ({
+  // ฟังก์ชันจัดการการอัพเดทข้อมูล
+  const handleSaveUser: MRT_TableOptions<RawData>["onEditingRowSave"] = ({
     values,
     table,
   }) => {
-    console.log("Update");
-    table.setEditingRow(null);
+    console.log("Update", values);
+    table.setEditingRow(null); // ปิด modal การแก้ไข
   };
 
+  // ฟังก์ชันแสดง confirm dialog สำหรับการลบข้อมูล
   const openDeleteConfirmModal = () => {
     if (window.confirm("คุณแน่ใจว่าต้องการลบผู้ใช้นี้?")) {
-      // ไม่มีการลบข้อมูลจริง
+      // ส่วนนี้จะเพิ่มโค้ดสำหรับลบข้อมูลจริง
     }
   };
 
-  //!-------------------------- Table --------------------------------
+  //!------------------ การกำหนดค่าตาราง ------------------!//
   const table = useMaterialReactTable({
     columns,
-    data: newData, // ใช้ newData ที่มี dateFormatted
-    createDisplayMode: "modal",
-    enableEditing: true,
-    getRowId: (row) => row.id,
-    muiTableContainerProps: { sx: { minHeight: "500px" } },
-    enableColumnOrdering: true, // สามารถจัดเรียง column ได้
-    enableBottomToolbar: true, // เปิดใช้งาน toolbar ด้านล่าง
+    data: newData,
+    createDisplayMode: "modal", // กำหนดให้การสร้างข้อมูลแสดงเป็น modal
+    enableEditing: true, // เปิดใช้การแก้ไขข้อมูล
+    muiTableContainerProps: { sx: { minHeight: "500px" } }, // กำหนดความสูงของ table
+    enableColumnOrdering: true, // เปิดใช้การเรียงลำดับคอลัมน์
+    enableBottomToolbar: true, // แสดง toolbar ด้านล่าง
     positionPagination: "bottom", // ตำแหน่งของ toolbar ด้านล่าง
-    enableStickyHeader: true, // ติด header ด้านบน
-    enableGrouping: true, // สามารถจัดกลุ่มข้อมูลได้
+    enableStickyHeader: true, // ให้ส่วนหัวตารางติดอยู่ด้านบนเสมอ
+    enableGrouping: true, // เปิดใช้การจัดกลุ่มข้อมูล
+    // กำหนดสไตล์ให้ toolbar ด้านบน
     muiTopToolbarProps: {
-      sx: {
-        backgroundColor: "#e3f2fd", // สีฟ้าอ่อน
-      },
+      sx: { backgroundColor: "#e3f2fd" },
     },
-    onCreatingRowSave: handleCreateUser,
-    onEditingRowSave: handleSaveUser,
-    renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
-      <>
-        <DialogTitle variant="h3">สร้างผู้ใช้ใหม่</DialogTitle>
-        <DialogContent
-          sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-        >
-          {internalEditComponents}
-        </DialogContent>
-        <DialogActions>
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
-        </DialogActions>
-      </>
-    ),
+    onColumnFiltersChange: setColumnFilters,// ฟังชั่นเมื่อมีการเปลี่ยนแปลงคอลัมน์
+    onGlobalFilterChange: setGlobalFilter,// ฟังชั่นเมื่อมีการเปลี่ยนแปลงคอลัมน์
+    onPaginationChange: setPagination,// ฟังชั่นเมื่อมีการเปลี่ยนแปลงหน้า
+    onSortingChange: setSorting,// ฟังชั่นเมื่อมีการเปลี่ยนแปลงการ Sort
+    onGroupingChange: setGrouping,// ฟังชั่นเมื่อมีการเปลี่ยนแปลงการจัดกลุ่ม
+    state: {
+      columnFilters,
+      globalFilter,
+      pagination,
+      sorting,
+      grouping,
+    },
+    onCreatingRowSave: handleCreateUser, // ฟังชั่นปุ่มเพิ่ม
+    onEditingRowSave: handleSaveUser, // ฟังชั่นปุ่มแก้ไข
+    renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => {
+      // สร้างหน้าต่าง modal สำหรับเพิ่มข้อมูล
+      return (
+        <>
+          <DialogTitle variant="h3">สร้างผู้ใช้ใหม่</DialogTitle>
+          <DialogContent
+            sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          >
+            {internalEditComponents.map((component) => {
+              // วนลูป component ที่สร้างขึ้นมา
+              // console.log(component);ใช้เช็ค meta ของ column ว่ามี check หรือไม่
+              if (
+                (component as any).props.cell.column.columnDef.meta === "check"
+              ) {
+                // แทนที่ด้วย DatePicker
+                return (
+                  <LocalizationProvider
+                    dateAdapter={AdapterDateFns}
+                    key="date-picker"
+                  >
+                    <DatePicker
+                      label="Date Activated"
+                      value={
+                        row._valuesCache.lastPlayerCommsMillis
+                          ? new Date(row._valuesCache.lastPlayerCommsMillis)
+                          : null
+                      }
+                      onChange={(newValue) => {
+                        row._valuesCache.lastPlayerCommsMillis = newValue
+                          ? newValue.getTime()
+                          : null; // อัปเดตค่าใน row
+                      }}
+                      format="dd/MM/yyyy"
+                      slots={{
+                        // กำหนดช่องว่าง
+                        textField: (params) => (
+                          <TextField {...params} fullWidth />
+                        ),
+                      }}
+                    />
+                  </LocalizationProvider>
+                );
+              }
+              // คืนค่า component เดิมสำหรับ key อื่นๆ
+              return component;
+            })}
+          </DialogContent>
+          <DialogActions>
+            <MRT_EditActionButtons variant="text" table={table} row={row} />
+          </DialogActions>
+        </>
+      );
+    },
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
         <DialogTitle variant="h3">แก้ไขผู้ใช้</DialogTitle>
@@ -136,6 +192,8 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
         </Tooltip>
       </Box>
     ),
+
+    // ปุ่มสร้างข้อมูลใหม่ที่ด้านบนตาราง
     renderTopToolbarCustomActions: ({ table }) => (
       <Button variant="contained" onClick={() => table.setCreatingRow(true)}>
         สร้าง

@@ -4,6 +4,7 @@ import { useMemo, useEffect, useState } from "react";
 import Table1 from "@/components/table/Table1";
 import { type MRT_ColumnDef } from "material-react-table";
 import { type NewData, RawData } from "@/types/user";
+import { format } from "date-fns";
 
 // Mock data (เพิ่ม date เป็น Unix timestamp)
 const fakeData: RawData[] = [
@@ -303,40 +304,46 @@ const usStates = [
   "WY",
 ];
 
-const columns: MRT_ColumnDef<NewData>[] = [
-    { accessorKey: "id", header: "Id", enableEditing: false, size: 80 },
-    {
-      accessorKey: "firstName",
-      header: "ชื่อ",
-      muiEditTextFieldProps: { required: true },
+const columns: MRT_ColumnDef<RawData>[] = [
+  { accessorKey: "id", header: "Id", enableEditing: false, size: 80 },
+  {
+    accessorKey: "firstName",
+    header: "ชื่อ",
+  },
+  {
+    accessorKey: "lastName",
+    header: "นามสกุล",
+  },
+  {
+    accessorKey: "email",
+    header: "อีเมล",
+  },
+  {
+    accessorKey: "state",
+    header: "รัฐ",
+    editVariant: "select",
+    editSelectOptions: usStates,
+  },
+  {
+    accessorKey: "date",
+    header: "วันที่",
+    meta: "check",
+    Cell: ({ cell }) => {
+      const unixTimestamp = cell.getValue();
+      if (
+        typeof unixTimestamp !== "number" &&
+        typeof unixTimestamp !== "string"
+      ) {
+        return null; // Return null if the value is not valid
+      }
+      if (!unixTimestamp) return null; // ถ้าไม่มีค่า ให้ return null
+
+      const date = new Date(unixTimestamp);
+      return format(date, "dd/MM/yyyy HH:mm:ss");
     },
-    {
-      accessorKey: "lastName",
-      header: "นามสกุล",
-      muiEditTextFieldProps: { required: true },
-    },
-    {
-      accessorKey: "email",
-      header: "อีเมล",
-      muiEditTextFieldProps: { type: "email", required: true },
-    },
-    {
-      accessorKey: "state",
-      header: "รัฐ",
-      editVariant: "select",
-      editSelectOptions: usStates,
-      muiEditTextFieldProps: { select: true },
-    },
-    {
-      accessorKey: "date",
-      header: "วันที่",
-      muiEditTextFieldProps: {
-        type: "datetime-local",
-        InputLabelProps: { shrink: true }, // หด label เพื่อไม่ให้ซ้อน
-        placeholder: "", // ✅ ซ่อน placeholder (mm/dd/yyyy)
-      },
-    },
-  ]
+  },
+];
+
 
 export default function Page() {
   const [isMounted, setIsMounted] = useState(false);
