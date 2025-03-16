@@ -135,12 +135,12 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
                     <DatePicker
                       label="Date Activated"
                       value={
-                        row._valuesCache.lastPlayerCommsMillis
-                          ? new Date(row._valuesCache.lastPlayerCommsMillis)
+                        row._valuesCache.date
+                          ? new Date(row._valuesCache.date)
                           : null
                       }
                       onChange={(newValue) => {
-                        row._valuesCache.lastPlayerCommsMillis = newValue
+                        row._valuesCache.date = newValue
                           ? newValue.getTime()
                           : null; // อัปเดตค่าใน row
                       }}
