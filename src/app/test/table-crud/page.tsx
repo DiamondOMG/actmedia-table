@@ -13,7 +13,7 @@ const fakeData: RawData[] = [
     lastName: "Doe",
     email: "john.doe@example.com",
     state: "CA",
-    date: 1709341200000, // 2025-03-01
+    dateRegist: 1709341200000, // 2025-03-01
   },
   {
     id: "2",
@@ -21,7 +21,7 @@ const fakeData: RawData[] = [
     lastName: "Smith",
     email: "jane.smith@example.com",
     state: "TX",
-    date: 1709427600000, // 2025-03-02
+    dateRegist: 1709427600000, // 2025-03-02
   },
   {
     id: "3",
@@ -29,7 +29,7 @@ const fakeData: RawData[] = [
     lastName: "Johnson",
     email: "alice.johnson@example.com",
     state: "NY",
-    date: 1709514000000, // 2025-03-03
+    dateRegist: 1709514000000, // 2025-03-03
   },
   {
     id: "4",
@@ -37,7 +37,7 @@ const fakeData: RawData[] = [
     lastName: "Brown",
     email: "bob.brown@example.com",
     state: "FL",
-    date: 1709600400000, // 2025-03-04
+    dateRegist: 1709600400000, // 2025-03-04
   },
   {
     id: "5",
@@ -45,7 +45,7 @@ const fakeData: RawData[] = [
     lastName: "Davis",
     email: "charlie.davis@example.com",
     state: "WA",
-    date: 1709686800000, // 2025-03-05
+    dateRegist: 1709686800000, // 2025-03-05
   },
   {
     id: "6",
@@ -53,7 +53,7 @@ const fakeData: RawData[] = [
     lastName: "Martinez",
     email: "eva.martinez@example.com",
     state: "AZ",
-    date: 1709773200000, // 2025-03-06
+    dateRegist: 1709773200000, // 2025-03-06
   },
   {
     id: "7",
@@ -61,7 +61,7 @@ const fakeData: RawData[] = [
     lastName: "Garcia",
     email: "frank.garcia@example.com",
     state: "CO",
-    date: 1709859600000, // 2025-03-07
+    dateRegist: 1709859600000, // 2025-03-07
   },
   {
     id: "8",
@@ -69,7 +69,7 @@ const fakeData: RawData[] = [
     lastName: "Rodriguez",
     email: "grace.rodriguez@example.com",
     state: "IL",
-    date: 1709946000000, // 2025-03-08
+    dateRegist: 1709946000000, // 2025-03-08
   },
   {
     id: "9",
@@ -77,7 +77,7 @@ const fakeData: RawData[] = [
     lastName: "Wilson",
     email: "henry.wilson@example.com",
     state: "OH",
-    date: 1710032400000, // 2025-03-09
+    dateRegist: 1710032400000, // 2025-03-09
   },
   {
     id: "10",
@@ -85,7 +85,7 @@ const fakeData: RawData[] = [
     lastName: "Anderson",
     email: "ivy.anderson@example.com",
     state: "GA",
-    date: 1710118800000, // 2025-03-10
+    dateRegist: 1710118800000, // 2025-03-10
   },
   {
     id: "11",
@@ -93,7 +93,7 @@ const fakeData: RawData[] = [
     lastName: "Thomas",
     email: "jack.thomas@example.com",
     state: "NC",
-    date: 1710205200000, // 2025-03-11
+    dateRegist: 1710205200000, // 2025-03-11
   },
   {
     id: "12",
@@ -101,7 +101,7 @@ const fakeData: RawData[] = [
     lastName: "Lee",
     email: "karen.lee@example.com",
     state: "MI",
-    date: 1710291600000, // 2025-03-12
+    dateRegist: 1710291600000, // 2025-03-12
   },
   {
     id: "13",
@@ -109,7 +109,7 @@ const fakeData: RawData[] = [
     lastName: "Harris",
     email: "leo.harris@example.com",
     state: "PA",
-    date: 1710378000000, // 2025-03-13
+    dateRegist: 1710378000000, // 2025-03-13
   },
   {
     id: "14",
@@ -117,7 +117,7 @@ const fakeData: RawData[] = [
     lastName: "Clark",
     email: "mona.clark@example.com",
     state: "VA",
-    date: 1710464400000, // 2025-03-14
+    dateRegist: 1710464400000, // 2025-03-14
   },
   {
     id: "15",
@@ -125,7 +125,7 @@ const fakeData: RawData[] = [
     lastName: "Lewis",
     email: "nina.lewis@example.com",
     state: "MA",
-    date: 1710550800000, // 2025-03-15
+    dateRegist: 1710550800000, // 2025-03-15
   },
   {
     id: "16",
@@ -133,7 +133,7 @@ const fakeData: RawData[] = [
     lastName: "Walker",
     email: "oscar.walker@example.com",
     state: "NJ",
-    date: 1710637200000, // 2025-03-16
+    dateRegist: 1710637200000, // 2025-03-16
   },
   {
     id: "17",
@@ -141,7 +141,7 @@ const fakeData: RawData[] = [
     lastName: "Hall",
     email: "paul.hall@example.com",
     state: "WA",
-    date: 1710723600000, // 2025-03-17
+    dateRegist: 1710723600000, // 2025-03-17
   },
   {
     id: "18",
@@ -149,7 +149,7 @@ const fakeData: RawData[] = [
     lastName: "Allen",
     email: "quinn.allen@example.com",
     state: "OR",
-    date: 1710810000000, // 2025-03-18
+    dateRegist: 1710810000000, // 2025-03-18
   },
   {
     id: "19",
@@ -157,7 +157,7 @@ const fakeData: RawData[] = [
     lastName: "Young",
     email: "rachel.young@example.com",
     state: "UT",
-    date: 1710896400000, // 2025-03-19
+    dateRegist: 1710896400000, // 2025-03-19
   },
   {
     id: "20",
@@ -165,7 +165,7 @@ const fakeData: RawData[] = [
     lastName: "King",
     email: "steve.king@example.com",
     state: "MN",
-    date: 1710982800000, // 2025-03-20
+    dateRegist: 1710982800000, // 2025-03-20
   },
   {
     id: "21",
@@ -173,7 +173,7 @@ const fakeData: RawData[] = [
     lastName: "Wright",
     email: "tina.wright@example.com",
     state: "IN",
-    date: 1711069200000, // 2025-03-21
+    dateRegist: 1711069200000, // 2025-03-21
   },
   {
     id: "22",
@@ -181,7 +181,7 @@ const fakeData: RawData[] = [
     lastName: "Scott",
     email: "uma.scott@example.com",
     state: "TN",
-    date: 1711155600000, // 2025-03-22
+    dateRegist: 1711155600000, // 2025-03-22
   },
   {
     id: "23",
@@ -189,7 +189,7 @@ const fakeData: RawData[] = [
     lastName: "Green",
     email: "victor.green@example.com",
     state: "MO",
-    date: 1711242000000, // 2025-03-23
+    dateRegist: 1711242000000, // 2025-03-23
   },
   {
     id: "24",
@@ -197,7 +197,7 @@ const fakeData: RawData[] = [
     lastName: "Adams",
     email: "wendy.adams@example.com",
     state: "MD",
-    date: 1711328400000, // 2025-03-24
+    dateRegist: 1711328400000, // 2025-03-24
   },
   {
     id: "25",
@@ -205,7 +205,7 @@ const fakeData: RawData[] = [
     lastName: "Baker",
     email: "xander.baker@example.com",
     state: "WI",
-    date: 1711414800000, // 2025-03-25
+    dateRegist: 1711414800000, // 2025-03-25
   },
   {
     id: "26",
@@ -213,7 +213,7 @@ const fakeData: RawData[] = [
     lastName: "Gonzalez",
     email: "yara.gonzalez@example.com",
     state: "LA",
-    date: 1711501200000, // 2025-03-26
+    dateRegist: 1711501200000, // 2025-03-26
   },
   {
     id: "27",
@@ -221,7 +221,7 @@ const fakeData: RawData[] = [
     lastName: "Nelson",
     email: "zack.nelson@example.com",
     state: "KY",
-    date: 1711587600000, // 2025-03-27
+    dateRegist: 1711587600000, // 2025-03-27
   },
   {
     id: "28",
@@ -229,7 +229,7 @@ const fakeData: RawData[] = [
     lastName: "Carter",
     email: "amy.carter@example.com",
     state: "AL",
-    date: 1711674000000, // 2025-03-28
+    dateRegist: 1711674000000, // 2025-03-28
   },
   {
     id: "29",
@@ -237,7 +237,7 @@ const fakeData: RawData[] = [
     lastName: "Mitchell",
     email: "ben.mitchell@example.com",
     state: "SC",
-    date: 1711760400000, // 2025-03-29
+    dateRegist: 1711760400000, // 2025-03-29
   },
   {
     id: "30",
@@ -245,7 +245,7 @@ const fakeData: RawData[] = [
     lastName: "Perez",
     email: "cara.perez@example.com",
     state: "OK",
-    date: 1711846800000, // 2025-03-30
+    dateRegist: 1711846800000, // 2025-03-30
   },
 ];
 
@@ -324,11 +324,11 @@ const columns: MRT_ColumnDef<RawData>[] = [
     editSelectOptions: usStates,
   },
 {
-    accessorKey: "date",
+    accessorKey: "dateRegist",
     header: "วันที่",
-    meta: "check",
+    meta: "date",
     // แปลง Unix timestamp เป็น Date เพื่อใช้กับ filterVariant: 'date-range'
-    accessorFn: (originalRow) => new Date(originalRow.date),
+    accessorFn: (originalRow) => new Date(originalRow.dateRegist),
     Cell: ({ cell }) => {
       const unixTimestamp = cell.getValue<Date>();
       if (!unixTimestamp) return null;

@@ -6,7 +6,7 @@ export interface RawData {
   lastName: string;
   email: string;
   state: string;
-  date: number;
+  dateRegist: number;
 }
 
 export interface NewData {
@@ -15,5 +15,5 @@ export interface NewData {
   lastName: string;
   email: string;
   state: string;
-  date: string;
+  dateRegist: string;
 }

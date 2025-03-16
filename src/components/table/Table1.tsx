@@ -35,17 +35,17 @@ interface Table1Props {
 }
 
 const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
-    //!----------------table state------------------!//
-    const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
-      [],
-    );
-    const [globalFilter, setGlobalFilter] = useState('');
-    const [sorting, setSorting] = useState<MRT_SortingState>([]);
-    const [pagination, setPagination] = useState<MRT_PaginationState>({
-      pageIndex: 0,
-      pageSize: 10,
-    });
-    const [grouping, setGrouping] = useState<MRT_GroupingState>([]);
+  //!----------------table state------------------!//
+  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
+    []
+  );
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [sorting, setSorting] = useState<MRT_SortingState>([]);
+  const [pagination, setPagination] = useState<MRT_PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [grouping, setGrouping] = useState<MRT_GroupingState>([]);
   //!------------------ ส่วนแสดงผล ------------------!//
   console.log(` Table render `);
 
@@ -98,11 +98,11 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
     muiTopToolbarProps: {
       sx: { backgroundColor: "#e3f2fd" },
     },
-    onColumnFiltersChange: setColumnFilters,// ฟังชั่นเมื่อมีการเปลี่ยนแปลงคอลัมน์
-    onGlobalFilterChange: setGlobalFilter,// ฟังชั่นเมื่อมีการเปลี่ยนแปลงคอลัมน์
-    onPaginationChange: setPagination,// ฟังชั่นเมื่อมีการเปลี่ยนแปลงหน้า
-    onSortingChange: setSorting,// ฟังชั่นเมื่อมีการเปลี่ยนแปลงการ Sort
-    onGroupingChange: setGrouping,// ฟังชั่นเมื่อมีการเปลี่ยนแปลงการจัดกลุ่ม
+    onColumnFiltersChange: setColumnFilters, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงคอลัมน์
+    onGlobalFilterChange: setGlobalFilter, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงคอลัมน์
+    onPaginationChange: setPagination, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงหน้า
+    onSortingChange: setSorting, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงการ Sort
+    onGroupingChange: setGrouping, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงการจัดกลุ่ม
     state: {
       columnFilters,
       globalFilter,
@@ -121,32 +121,31 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
             sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}
           >
             {internalEditComponents.map((component) => {
-              // วนลูป component ที่สร้างขึ้นมา
-              // console.log(component);ใช้เช็ค meta ของ column ว่ามี check หรือไม่
-              if (
-                (component as any).props.cell.column.columnDef.meta === "check"
-              ) {
-                // แทนที่ด้วย DatePicker
+              const columnDef = (component as any).props.cell.column
+                .columnDef as MRT_ColumnDef<RawData>;
+              if (columnDef.meta === "date") {
+                // สร้างตัวแปร day เพื่อเก็บ accessorKey
+                const day = columnDef.accessorKey as keyof RawData;
                 return (
                   <LocalizationProvider
                     dateAdapter={AdapterDateFns}
-                    key="date-picker"
+                    key={`date-picker-${day}`} // ใช้ day เป็นส่วนหนึ่งของ key เพื่อความ unique
                   >
                     <DatePicker
-                      label="Date Activated"
+                      label={columnDef.header} // ใช้ header จาก columnDef เป็น label
                       value={
-                        row._valuesCache.date
-                          ? new Date(row._valuesCache.date)
+                        row._valuesCache[day]
+                          ? new Date(row._valuesCache[day] as number)
                           : null
                       }
                       onChange={(newValue) => {
-                        row._valuesCache.date = newValue
+                        // อัปเดตค่าใน row._valuesCache โดยใช้ day แทน date
+                        row._valuesCache[day] = newValue
                           ? newValue.getTime()
-                          : null; // อัปเดตค่าใน row
+                          : null;
                       }}
                       format="dd/MM/yyyy"
                       slots={{
-                        // กำหนดช่องว่าง
                         textField: (params) => (
                           <TextField {...params} fullWidth />
                         ),
@@ -155,7 +154,6 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
                   </LocalizationProvider>
                 );
               }
-              // คืนค่า component เดิมสำหรับ key อื่นๆ
               return component;
             })}
           </DialogContent>
@@ -171,7 +169,42 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
         >
-          {internalEditComponents}
+          {internalEditComponents.map((component) => {
+            const columnDef = (component as any).props.cell.column
+              .columnDef as MRT_ColumnDef<RawData>;
+            if (columnDef.meta === "date") {
+              // สร้างตัวแปร day เพื่อเก็บ accessorKey
+              const day = columnDef.accessorKey as keyof RawData;
+              return (
+                <LocalizationProvider
+                  dateAdapter={AdapterDateFns}
+                  key={`date-picker-${day}`} // ใช้ day เป็นส่วนหนึ่งของ key เพื่อความ unique
+                >
+                  <DatePicker
+                    label={columnDef.header} // ใช้ header จาก columnDef เป็น label
+                    value={
+                      row._valuesCache[day]
+                        ? new Date(row._valuesCache[day] as number)
+                        : null
+                    }
+                    onChange={(newValue) => {
+                      // อัปเดตค่าใน row._valuesCache โดยใช้ day แทน date
+                      row._valuesCache[day] = newValue
+                        ? newValue.getTime()
+                        : null;
+                    }}
+                    format="dd/MM/yyyy"
+                    slots={{
+                      textField: (params) => (
+                        <TextField {...params} fullWidth />
+                      ),
+                    }}
+                  />
+                </LocalizationProvider>
+              );
+            }
+            return component;
+          })}
         </DialogContent>
         <DialogActions>
           <MRT_EditActionButtons variant="text" table={table} row={row} />
@@ -199,8 +232,6 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
         สร้าง
       </Button>
     ),
-    
-    
   });
 
   return (
