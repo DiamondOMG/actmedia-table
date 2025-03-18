@@ -1,4 +1,4 @@
-// app/test-dynamic-export/page.tsx
+// app/test/hydration-useeffect/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,7 +14,7 @@ export default function Page() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
+  console.log(" render");
   // ถ้ายังไม่ mount (เช่น บน server) ให้ return null หรือ skeleton เพื่อป้องกันการ render
   if (!isMounted) {
     return null; // หรือจะใส่ loading state เช่น <div>Loading...</div>
