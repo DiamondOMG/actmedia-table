@@ -353,5 +353,5 @@ export default function Page() {
     return null; // หรือจะใส่ loading state เช่น <div>Loading...</div>
   }
 
-  return <Table1 columns={columns} initialData={fakeData} />;
+  return <><Table1 columns={columns} initialData={fakeData} /></>
 }
