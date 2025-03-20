@@ -1,8 +1,8 @@
 "use client";
-import { useMemo, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Table1 from "@/components/table/Table1";
 import { type MRT_ColumnDef } from "material-react-table";
-import { type NewData, RawData } from "@/types/user";
+import { type RawData } from "@/types/user";
 import { format } from "date-fns";
 
 // Mock data (เพิ่ม date เป็น Unix timestamp)
@@ -323,7 +323,7 @@ const columns: MRT_ColumnDef<RawData>[] = [
     editVariant: "select",
     editSelectOptions: usStates,
   },
-{
+  {
     accessorKey: "dateRegist",
     header: "วันที่",
     meta: "date",
@@ -341,7 +341,6 @@ const columns: MRT_ColumnDef<RawData>[] = [
   },
 ];
 
-
 export default function Page() {
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
@@ -353,5 +352,9 @@ export default function Page() {
     return null; // หรือจะใส่ loading state เช่น <div>Loading...</div>
   }
 
-  return <><Table1 columns={columns} initialData={fakeData} /></>
+  return (
+    <>
+      <Table1 columns={columns} initialData={fakeData} />
+    </>
+  );
 }
