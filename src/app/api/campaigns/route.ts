@@ -9,7 +9,10 @@ const password = process.env.PASSWORDOMG;
 const THAI_TIME_OFFSET = 7 * 60 * 60 * 1000; // UTC+7 hours in milliseconds
 const CACHE_DURATION = 1 * 1 * 1000; // 1 วินาที (ปรับค่าใหม่ให้เหมาะสม)
 
-let cache: { data: any[] | null; timestamp: number } = { data: null, timestamp: 0 };
+let cache: { data: any[] | null; timestamp: number } = {
+  data: null,
+  timestamp: 0,
+};
 
 function formatTimestamp(timestamp: number) {
   const date = new Date(Number(timestamp) + THAI_TIME_OFFSET);
@@ -86,7 +89,7 @@ function normalizeItems(items: any[]) {
 
       return {
         itemId: item.data?.itemId || "No Item ID",
-        "label-items": item.data?.label,
+        labelItems: item.data?.label,
         durationMillis: item.data?.durationMillis,
         startMillis: item.data?.startMillis,
         endMillis: item.data?.endMillis,

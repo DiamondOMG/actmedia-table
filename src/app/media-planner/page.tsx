@@ -1,93 +1,90 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "material-react-table";
+import { useEffect, useState } from "react";
+import Table2 from "@/components/table/Table2";
+import { type MRT_ColumnDef } from "material-react-table";
+import { format } from "date-fns";
+import { useCampaigns } from "@/hook/useCampaigns";
+import { type Campaign } from "@/types/campaigns";
 
-const App = () => {
-  const [data, setData] = useState<any[]>([]);
+const columns: MRT_ColumnDef<Campaign>[] = [
+  { accessorKey: "sequenceId", header: "ID", enableEditing: false, size: 80 },
+  {
+    accessorKey: "label",
+    header: "Label",
+  },
+  {
+    accessorKey: "thumbnail",
+    header: "Image",
+    Cell: ({ cell }: any) => (
+      <img
+        src={cell.getValue() || ""}
+        alt="Thumbnail"
+        style={{
+          height: "auto",
+          width: "auto",
+          maxHeight: "50px",
+          objectFit: "contain",
+        }}
+      />
+    ),
+  },
+  {
+    accessorKey: "version",
+    header: "Version",
+  },
+  {
+    accessorKey: "itemId",
+    header: "Item ID",
+  },
+  {
+    accessorKey: "labelItems",
+    header: "Label Items",
+  },
+  {
+    accessorKey: "startMillis",
+    header: "Start Date",
+    meta: "date",
+    accessorFn: (row) => new Date(parseInt(row.startMillis)),
+    Cell: ({ cell }) => {
+      const value = cell.getValue<Date>();
+      return value ? format(value, "dd/MM/yyyy HH:mm:ss") : "";
+    },
+    filterVariant: "date-range",
+    muiFilterDatePickerProps: {
+      format: "dd/MM/yyyy",
+    },
+  },
+  {
+    accessorKey: "endMillis",
+    header: "End Date",
+    meta: "date",
+    accessorFn: (row) => new Date(parseInt(row.endMillis)),
+    Cell: ({ cell }) => {
+      const value = cell.getValue<Date>();
+      return value ? format(value, "dd/MM/yyyy HH:mm:ss") : "";
+    },
+    filterVariant: "date-range",
+    muiFilterDatePickerProps: {
+      format: "dd/MM/yyyy",
+    },
+  },
+];
 
-  const [isMounted, setIsMounted] = useState<boolean>(false);
+export default function Page() {
+  const [isMounted, setIsMounted] = useState(false);
+  const { data: campaigns = [], isLoading } = useCampaigns();
 
   useEffect(() => {
-    setIsMounted(true); // ป้องกันปัญหา hydration
-
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("/api/sequence-bigc-targetr");
-        setData(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
+    setIsMounted(true);
   }, []);
 
+  if (!isMounted) return null;
 
-  // Define columns without useMemo
-  const columns = [
-    {
-      accessorKey: "sequenceId",
-      header: "Sequence ID",
-    },
-    {
-      accessorKey: "label",
-      header: "Label",
-    },
-    {
-      accessorKey: "version",
-      header: "Version",
-    },
-    {
-      accessorKey: "itemId",
-      header: "Item ID",
-    },
-    {
-      accessorKey: "label-items",
-      header: "Item Label",
-    },
-    {
-      accessorKey: "durationMillis",
-      header: "Duration (ms)",
-    },
-    {
-      accessorKey: "startMillis",
-      header: "Start Time",
-    },
-    {
-      accessorKey: "endMillis",
-      header: "End Time",
-    },
-    {
-      accessorKey: "thumbnail",
-      header: "Image",
-      Cell: ({ cell }: any) => (
-        <img
-          src={cell.getValue() || ""}
-          alt="Thumbnail"
-          style={{
-            height: "auto",
-            width: "auto",
-            maxHeight: "50px",
-            objectFit: "contain",
-          }}
-        />
-      ),
-    },
-  ];
+  if (isLoading) return <div>Loading campaigns...</div>;
 
-  // Set up the table instance
-  const table = useMaterialReactTable({
-    columns,
-    data,
-  });
-
-  if (!isMounted) return <div>Loading...</div>;
-  
-  return <MaterialReactTable table={table} />;
-};
-
-export default App;
+  return (
+    <>
+      <Table2 columns={columns} initialData={campaigns} />
+    </>
+  );
+}
