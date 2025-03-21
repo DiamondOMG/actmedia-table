@@ -1,16 +1,25 @@
 "use client";
-import { useEffect, useState } from "react";
 import Table2 from "@/components/table/Table2";
 import { type MRT_ColumnDef } from "material-react-table";
 import { format } from "date-fns";
 import { useCampaigns } from "@/hook/useCampaigns";
 import { type Campaign } from "@/types/campaigns";
+import { Box } from "@mui/material"; // ✅ ใช้ Box ของ MUI
 
 const columns: MRT_ColumnDef<Campaign>[] = [
-  { accessorKey: "sequenceId", header: "ID", enableEditing: false, size: 80 },
   {
-    accessorKey: "label",
-    header: "Label",
+    accessorKey: "labelItems",
+    header: "Label Items",
+    muiTableHeadCellProps: {
+      sx: {
+        maxWidth: 200, // หรือค่าที่คุณต้องการ
+      },
+    },
+    muiTableBodyCellProps: {
+      sx: {
+        maxWidth: 200,
+      },
+    },
   },
   {
     accessorKey: "thumbnail",
@@ -29,17 +38,63 @@ const columns: MRT_ColumnDef<Campaign>[] = [
     ),
   },
   {
-    accessorKey: "version",
-    header: "Version",
+    accessorKey: "status",
+    header: "Status",
+    enableEditing: false,
+    size: 220,
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string>();
+
+      // ✅ ปรับสีให้เข้มขึ้น และเพิ่มเงา + มุมโค้ง
+      let bgColor = "transparent";
+      if (value.includes("Error")) bgColor = "#ffcccc"; // 🔴 แดง
+      else if (value.includes("Start")) bgColor = "#66bb6a"; // 🟢 เขียวเข้ม
+      else if (value.includes("End")) bgColor = "#fdd835"; // 🟡 เหลืองเข้ม
+
+      return (
+        <Box
+          sx={{
+            backgroundColor: bgColor,
+            padding: "8px 12px",
+            borderRadius: "8px", // โค้งมนมากขึ้น
+            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)", // เพิ่มเงา
+            fontWeight: "bold",
+            color: "#000", // สีข้อความ
+            display: "inline-block",
+          }}
+        >
+          {value}
+        </Box>
+      );
+    },
+  },
+  {
+    accessorKey: "label",
+    header: "Label",
+  },
+  {
+    accessorKey: "retailer",
+    header: "Retailer",
+    enableEditing: false,
+    size: 80,
+  },
+  {
+    accessorKey: "mediaType",
+    header: "Media Type",
+    enableEditing: false,
+    size: 80,
+  },
+  {
+    accessorKey: "sequenceId",
+    header: "Sequence Id",
+    enableEditing: false,
+    size: 80,
   },
   {
     accessorKey: "itemId",
     header: "Item ID",
   },
-  {
-    accessorKey: "labelItems",
-    header: "Label Items",
-  },
+
   {
     accessorKey: "startMillis",
     header: "Start Date",
@@ -71,14 +126,8 @@ const columns: MRT_ColumnDef<Campaign>[] = [
 ];
 
 export default function Page() {
-  const [isMounted, setIsMounted] = useState(false);
   const { data: campaigns = [], isLoading } = useCampaigns();
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) return null;
 
   if (isLoading) return <div>Loading campaigns...</div>;
 

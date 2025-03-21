@@ -43,9 +43,12 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
   const [pagination, setPagination] = useState<MRT_PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 30,
   });
-  const [grouping, setGrouping] = useState<MRT_GroupingState>([]);
+  const [grouping, setGrouping] = useState<MRT_GroupingState>([
+    "retailer",
+    "mediaType",
+  ]);
   const [isEditing, setIsEditing] = useState(false);
   //!------------------ ส่วนแสดงผล ------------------!//
   console.log(` Table render `);
@@ -110,6 +113,10 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
       pagination,
       sorting,
       grouping,
+    },
+    initialState: {
+      density: "compact",
+      expanded: true, // ปิดการขยายกรุ๊ปเริ่มต้น
     },
     onCreatingRowSave: handleCreateUser, // ฟังชั่นปุ่มเพิ่ม
     onEditingRowSave: handleSaveUser, // ฟังชั่นปุ่มแก้ไข

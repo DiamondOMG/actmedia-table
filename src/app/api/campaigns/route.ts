@@ -14,18 +14,13 @@ let cache: { data: any[] | null; timestamp: number } = {
   timestamp: 0,
 };
 
-function formatTimestamp(timestamp: number) {
-  const date = new Date(Number(timestamp) + THAI_TIME_OFFSET);
-  return date.toISOString().replace("T", " ").substring(0, 19); // Convert to 'YYYY-MM-DD HH:mm:ss'
-}
-
 async function fetchSequences() {
-  const filterQuery = seqCampaigns
-    .map((label) => `label==\"${label}\"`)
+  const labels = seqCampaigns
+    .map((item) => `label=="${item.label}"`)
     .join("||");
 
   const apiUrl = `https://stacks.targetr.net/rest-api/v1/sequences?filter=${encodeURIComponent(
-    filterQuery
+    labels
   )}`;
 
   const options = {
@@ -45,6 +40,7 @@ function normalizeSequences(rawData: any) {
     .map((sequence: any) => {
       const stacks = normalizeStacks(sequence.stacks || []);
       if (stacks.length === 0) return null;
+
       return {
         sequenceId: sequence.id,
         label: sequence.data?.label || "Unknown",
@@ -62,6 +58,7 @@ function normalizeStacks(stacks: any[]) {
     .map((stack: any) => {
       const items = normalizeItems(stack.items || []);
       if (items.length === 0) return null;
+
       return {
         label: stack.data?.label || "No Label",
         maxDuration: stack.data?.maxDuration || 0,
@@ -102,18 +99,57 @@ function normalizeItems(items: any[]) {
 }
 
 function summarizeData(normalizedData: any[]) {
-  return normalizedData.flatMap((sequence) =>
-    sequence.stacks.flatMap((stack: any) =>
-      stack.items.map((item: any) => ({
-        sequenceId: sequence.sequenceId,
-        label: sequence.label,
-        version: sequence.version,
-        createdMillis: sequence.createdMillis,
-        modifiedMillis: sequence.modifiedMillis,
-        ...item,
-      }))
-    )
-  );
+  const seenItemIds = new Set<string>();
+  const nowDate = Date.now();
+
+  return normalizedData
+    .flatMap((sequence) => {
+      // หา retailer & mediaType ตาม label
+      const campaignInfo = seqCampaigns.find(
+        (item) => item.label === sequence.label
+      );
+
+      return sequence.stacks.flatMap((stack: any) =>
+        stack.items.map((item: any) => {
+          if (seenItemIds.has(item.itemId)) return null; // ❌ ข้าม itemId ที่ซ้ำ
+          seenItemIds.add(item.itemId);
+
+          // คำนวณ status
+          let status = "";
+          const startMillis = item.startMillis;
+          const endMillis = item.endMillis;
+
+          if (startMillis >= endMillis) {
+            status = "Error Start Date >= End Date";
+          } else if (nowDate < startMillis) {
+            const daysUntilOnline = Math.ceil(
+              (startMillis - nowDate) / (1000 * 60 * 60 * 24)
+            );
+            status = `Content Start in ${daysUntilOnline} days`;
+          } else if (nowDate >= startMillis && nowDate <= endMillis) {
+            const daysUntilOffline = Math.ceil(
+              (endMillis - nowDate) / (1000 * 60 * 60 * 24)
+            );
+            status = `Content End in ${daysUntilOffline} days`;
+          } else {
+            return null; // ❌ ถ้าเลย endMillis แล้วให้ข้ามไปเลย
+          }
+
+          return {
+            sequenceId: sequence.sequenceId,
+            label: sequence.label,
+            version: sequence.version,
+            createdMillis: sequence.createdMillis,
+            modifiedMillis: sequence.modifiedMillis,
+            retailer: campaignInfo?.retailer || "Unknown",
+            mediaType: campaignInfo?.mediaType || "Unknown",
+            status, // ✅ เพิ่ม status
+            ...item,
+          };
+        })
+      );
+    })
+    .filter(Boolean); // ลบค่า null ออก
 }
 
 export async function GET() {
