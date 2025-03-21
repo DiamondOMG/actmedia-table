@@ -14,6 +14,7 @@ import {
 } from "material-react-table";
 import {
   Box,
+  Button,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -23,17 +24,18 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { type Campaign } from "@/types/campaigns";
+import { type Sequence } from "@/types/sequences";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { useCreateSequence, useUpdateSequence, useDeleteSequence } from "@/hook/useSequences"
 
 // Props ที่รับเข้ามาสำหรับตาราง
-interface Table2Props {
-  columns: MRT_ColumnDef<Campaign>[]; // คอลัมน์ที่จะแสดงในตาราง
-  initialData: Campaign[]; // ข้อมูลเริ่มต้นที่จะแสดงในตาราง
+interface Table3Props {
+  columns: MRT_ColumnDef<Sequence>[]; // คอลัมน์ที่จะแสดงในตาราง
+  initialData: Sequence[]; // ข้อมูลเริ่มต้นที่จะแสดงในตาราง
 }
 
-const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
+const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
   //!----------------table state------------------!//
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     []
@@ -45,45 +47,57 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
     pageSize: 30,
   });
   const [grouping, setGrouping] = useState<MRT_GroupingState>([
-    "retailer",
-    "mediaType",
+
   ]);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   //!------------------ ส่วนแสดงผล ------------------!//
   console.log(` Table render `);
 
   //!------------------ การแปลงข้อมูล ------------------!//
   // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า
-  const newData: Campaign[] = useMemo(() => {
+  const newData: Sequence[] = useMemo(() => {
     return initialData;
   }, [initialData]);
 
   //!------------------ ฟังก์ชันจัดการ CRUD ------------------!//
 
   // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
-  const handleCreateUser: MRT_TableOptions<Campaign>["onCreatingRowSave"] = ({
-    values,
-    table,
-  }) => {
+  const createSequence = useCreateSequence();
+  const updateSequence = useUpdateSequence();
+  const deleteSequence = useDeleteSequence();
+
+  // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
+  const handleCreate: MRT_TableOptions<Sequence>["onCreatingRowSave"] = async ({ values, table }) => {
     console.log("Create", values);
+    createSequence.mutate(values);
     table.setCreatingRow(null); // ปิด modal การสร้าง
   };
 
   // ฟังก์ชันจัดการการอัพเดทข้อมูล
-  const handleSaveUser: MRT_TableOptions<Campaign>["onEditingRowSave"] = ({
+  const handleUpdate: MRT_TableOptions<Sequence>["onEditingRowSave"] = async ({
     values,
     table,
+    row,
   }) => {
-    console.log("Update", values);
-    table.setEditingRow(null); // ปิด modal การแก้ไข
+    // ผสานค่าเดิม (id, date) เข้ากับค่าที่ผู้ใช้กรอก
+    const updatedData: Sequence = {
+      ...row.original, // มี id, date อยู่แน่นอน
+      ...values,       // ทับค่าที่แก้ไขใหม่
+    };
+  
+    console.log("Update", updatedData);
+    updateSequence.mutate(updatedData);
+    table.setEditingRow(null);
   };
+  
 
   // ฟังก์ชันแสดง confirm dialog สำหรับการลบข้อมูล
-  const openDeleteConfirmModal = () => {
+  const handleDelete = (id: string) => {
     if (window.confirm("คุณแน่ใจว่าต้องการลบผู้ใช้นี้?")) {
-      // ส่วนนี้จะเพิ่มโค้ดสำหรับลบข้อมูลจริง
+      deleteSequence.mutate(id);
     }
   };
+
 
   //!------------------ การกำหนดค่าตาราง ------------------!//
   const table = useMaterialReactTable({
@@ -117,22 +131,22 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
       density: "compact",
       expanded: true, // ปิดการขยายกรุ๊ปเริ่มต้น
     },
-    onCreatingRowSave: handleCreateUser, // ฟังชั่นปุ่มเพิ่ม
-    onEditingRowSave: handleSaveUser, // ฟังชั่นปุ่มแก้ไข
+    onCreatingRowSave: handleCreate, // ฟังชั่นปุ่มเพิ่ม
+    onEditingRowSave: handleUpdate, // ฟังชั่นปุ่มแก้ไข
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => {
       // สร้างหน้าต่าง modal สำหรับเพิ่มข้อมูล
       return (
         <>
-          <DialogTitle variant="h3">สร้างผู้ใช้ใหม่</DialogTitle>
+          <DialogTitle variant="h3">เพิ่ม Sequence</DialogTitle>
           <DialogContent
             sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}
           >
             {internalEditComponents.map((component) => {
               const columnDef = (component as any).props.cell.column
-                .columnDef as MRT_ColumnDef<Campaign>;
+                .columnDef as MRT_ColumnDef<Sequence>;
               if (columnDef.meta === "date") {
                 // สร้างตัวแปร day เพื่อเก็บ accessorKey
-                const day = columnDef.accessorKey as keyof Campaign;
+                const day = columnDef.accessorKey as keyof Sequence;
                 return (
                   <LocalizationProvider
                     dateAdapter={AdapterDateFns}
@@ -172,16 +186,16 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
     },
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h3">แก้ไขผู้ใช้</DialogTitle>
+        <DialogTitle variant="h3">แก้ไข Sequence</DialogTitle>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
         >
           {internalEditComponents.map((component) => {
             const columnDef = (component as any).props.cell.column
-              .columnDef as MRT_ColumnDef<Campaign>;
+              .columnDef as MRT_ColumnDef<Sequence>;
             if (columnDef.meta === "date") {
               // สร้างตัวแปร day เพื่อเก็บ accessorKey
-              const day = columnDef.accessorKey as keyof Campaign;
+              const day = columnDef.accessorKey as keyof Sequence;
               return (
                 <LocalizationProvider
                   dateAdapter={AdapterDateFns}
@@ -227,7 +241,7 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
             </IconButton>
           </Tooltip>
           <Tooltip title="ลบ">
-            <IconButton color="error" onClick={() => openDeleteConfirmModal()}>
+            <IconButton color="error" onClick={() => handleDelete(row.original.id)}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
@@ -235,6 +249,18 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
       ) : null,
 
     // ปุ่มสร้างข้อมูลใหม่ที่ด้านบนตาราง
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Box sx={{ display: "flex", gap: "1rem" }}>
+        {isEditing && (
+          <Button
+            variant="contained"
+            onClick={() => table.setCreatingRow(true)}
+          >
+            สร้าง
+          </Button>
+        )}
+      </Box>
+    ),
   });
 
   return (
@@ -244,5 +270,5 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
   );
 });
 
-Table2.displayName = "Table2";
-export default Table2;
+Table3.displayName = "Table3";
+export default Table3;

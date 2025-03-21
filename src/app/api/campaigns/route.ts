@@ -1,22 +1,35 @@
 import axios from "axios";
-import { seqCampaigns } from "@/makedata/seqCampaign";
 
 export const dynamic = "force-dynamic";
 
 const username = process.env.USERNAMEOMG;
 const password = process.env.PASSWORDOMG;
 
-const THAI_TIME_OFFSET = 7 * 60 * 60 * 1000; // UTC+7 hours in milliseconds
-const CACHE_DURATION = 1 * 1 * 1000; // 1 วินาที (ปรับค่าใหม่ให้เหมาะสม)
+const CACHE_DURATION = 1 * 1 * 1000;
 
 let cache: { data: any[] | null; timestamp: number } = {
   data: null,
   timestamp: 0,
 };
 
-async function fetchSequences() {
+async function fetchSeqCampaigns() {
+  const url =
+    "https://script.google.com/macros/s/AKfycbzfRMpRmPuLiaQmqDgWiJRTc5hnO0PxXXIXsZTw2AY6tWLplbLq7ARn0BuDcOfuoksb/exec?action=get&all=true";
+
+  const res = await axios.get(url, {
+    headers: { "Cache-Control": "no-store" },
+  });
+
+  if (res.data.status === "success") {
+    return res.data.data;
+  } else {
+    throw new Error("Failed to fetch seqCampaigns");
+  }
+}
+
+async function fetchSequences(seqCampaigns: any[]) {
   const labels = seqCampaigns
-    .map((item) => `label=="${item.label}"`)
+    .map((item: any) => `label=="${item.label}"`)
     .join("||");
 
   const apiUrl = `https://stacks.targetr.net/rest-api/v1/sequences?filter=${encodeURIComponent(
@@ -77,7 +90,6 @@ function normalizeItems(items: any[]) {
         item.data?.startMillis,
         item.data?.endMillis,
       ];
-
       if (requiredFields.some((field) => field === undefined)) return null;
 
       const thumbnail =
@@ -98,23 +110,21 @@ function normalizeItems(items: any[]) {
     .filter(Boolean);
 }
 
-function summarizeData(normalizedData: any[]) {
+function summarizeData(normalizedData: any[], seqCampaigns: any[]) {
   const seenItemIds = new Set<string>();
   const nowDate = Date.now();
 
   return normalizedData
     .flatMap((sequence) => {
-      // หา retailer & mediaType ตาม label
       const campaignInfo = seqCampaigns.find(
-        (item) => item.label === sequence.label
+        (item: any) => item.label === sequence.label
       );
 
       return sequence.stacks.flatMap((stack: any) =>
         stack.items.map((item: any) => {
-          if (seenItemIds.has(item.itemId)) return null; // ❌ ข้าม itemId ที่ซ้ำ
+          if (seenItemIds.has(item.itemId)) return null;
           seenItemIds.add(item.itemId);
 
-          // คำนวณ status
           let status = "";
           const startMillis = item.startMillis;
           const endMillis = item.endMillis;
@@ -132,7 +142,7 @@ function summarizeData(normalizedData: any[]) {
             );
             status = `Content End in ${daysUntilOffline} days`;
           } else {
-            return null; // ❌ ถ้าเลย endMillis แล้วให้ข้ามไปเลย
+            return null;
           }
 
           return {
@@ -143,13 +153,13 @@ function summarizeData(normalizedData: any[]) {
             modifiedMillis: sequence.modifiedMillis,
             retailer: campaignInfo?.retailer || "Unknown",
             mediaType: campaignInfo?.mediaType || "Unknown",
-            status, // ✅ เพิ่ม status
+            status,
             ...item,
           };
         })
       );
     })
-    .filter(Boolean); // ลบค่า null ออก
+    .filter(Boolean);
 }
 
 export async function GET() {
@@ -163,9 +173,10 @@ export async function GET() {
   }
 
   try {
-    const rawData = await fetchSequences();
+    const seqCampaigns = await fetchSeqCampaigns(); // 🔁 ใช้ข้อมูลจาก Google Apps Script
+    const rawData = await fetchSequences(seqCampaigns);
     const normalizedData = normalizeSequences(rawData);
-    const summarizedData = summarizeData(normalizedData);
+    const summarizedData = summarizeData(normalizedData, seqCampaigns);
 
     cache = { data: summarizedData, timestamp: currentTime };
 
