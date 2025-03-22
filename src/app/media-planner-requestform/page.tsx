@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   TextField,
   Button,
@@ -23,19 +23,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import { v4 as uuidv4 } from "uuid"; // นำเข้า v4 จาก uuid
+import { v4 as uuidv4 } from "uuid";
 
-interface RetailerType {
-  id: string;
-  value: string;
-}
-
-interface Booking {
-  id: string;
-  value: string;
-}
-
-interface Campaign {
+// Interfaces
+interface ArrayItem {
   id: string;
   value: string;
 }
@@ -44,8 +35,8 @@ interface FormData {
   requestType: "New" | "Change";
   requesterName: string;
   requesterEmail: string;
-  retailerTypes: RetailerType[];
-  bookings: Booking[];
+  retailerTypes: ArrayItem[];
+  bookings: ArrayItem[];
   existingCampaign: string;
   startDate: Date | null;
   endDate: Date | null;
@@ -53,15 +44,20 @@ interface FormData {
   mediaLinks: string;
   notes: string;
   linkedCampaigns: string;
-  campaigns: Campaign[];
+  campaigns: ArrayItem[];
 }
+
+// Dropdown Options
+const retailerOptions = ["MAKRO", "Other"];
+const bookingOptions = ["1", "2", "3"];
+const campaignOptions = ["1", "2", "3"];
 
 export default function DigitalMediaRequestForm() {
   const [formData, setFormData] = useState<FormData>({
     requestType: "New",
     requesterName: "",
     requesterEmail: "",
-    retailerTypes: [{ id: uuidv4(), value: "" }], // ใช้ uuidv4() ตั้งแต่เริ่มต้น
+    retailerTypes: [{ id: uuidv4(), value: "" }],
     bookings: [{ id: uuidv4(), value: "" }],
     existingCampaign: "",
     startDate: null,
@@ -75,13 +71,7 @@ export default function DigitalMediaRequestForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
 
-  useEffect(() => {
-    performance.mark("initDataLoad:start");
-    return () => {
-      performance.measure("initDataLoad", "initDataLoad:start");
-    };
-  }, []);
-
+  // Handlers
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -105,7 +95,7 @@ export default function DigitalMediaRequestForm() {
   const addArrayItem = (field: "retailerTypes" | "bookings" | "campaigns") => {
     setFormData((prev) => ({
       ...prev,
-      [field]: [...prev[field], { id: uuidv4(), value: "" }], // ใช้ uuidv4() แทน counter
+      [field]: [...prev[field], { id: uuidv4(), value: "" }],
     }));
   };
 
@@ -138,7 +128,6 @@ export default function DigitalMediaRequestForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) {
       setSubmissionStatus("Please fill in all required fields correctly");
       return;
@@ -174,8 +163,8 @@ export default function DigitalMediaRequestForm() {
         requestType: "New",
         requesterName: "",
         requesterEmail: "",
-        retailerTypes: [{ id: "1", value: "" }],
-        bookings: [{ id: "1", value: "" }],
+        retailerTypes: [{ id: uuidv4(), value: "" }],
+        bookings: [{ id: uuidv4(), value: "" }],
         existingCampaign: "",
         startDate: null,
         endDate: null,
@@ -183,7 +172,7 @@ export default function DigitalMediaRequestForm() {
         mediaLinks: "",
         notes: "",
         linkedCampaigns: "",
-        campaigns: [{ id: "1", value: "" }],
+        campaigns: [{ id: uuidv4(), value: "" }],
       });
     } catch (error) {
       setSubmissionStatus("Error submitting form. Please try again.");
@@ -192,6 +181,58 @@ export default function DigitalMediaRequestForm() {
       setIsSubmitting(false);
     }
   };
+
+  // Render Array Field Component
+  const renderArrayField = (
+    field: "retailerTypes" | "bookings" | "campaigns",
+    label: string,
+    options: string[],
+    required = false
+  ) => (
+    <Box sx={{ mb: 6 }}>
+      <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+        {label} {required && <span style={{ color: "#ff0000" }}>*</span>}
+      </Typography>
+      {formData[field].map((item) => (
+        <Box
+          key={item.id}
+          sx={{ display: "flex", alignItems: "center", mb: 2 }}
+        >
+          <FormControl fullWidth margin="normal" sx={{ mr: 2 }}>
+            <InputLabel>Select {label.toLowerCase()}</InputLabel>
+            <Select
+              value={item.value}
+              onChange={(e) =>
+                handleArrayChange(field, item.id, e.target.value)
+              }
+              label={`Select ${label.toLowerCase()}`}
+              sx={{ borderRadius: 1 }}
+            >
+              {options.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <IconButton
+            onClick={() => removeArrayItem(field, item.id)}
+            disabled={formData[field].length === 1}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      ))}
+      <Button
+        startIcon={<AddIcon />}
+        variant="outlined"
+        sx={{ mt: 2, borderRadius: 1 }}
+        onClick={() => addArrayItem(field)}
+      >
+        Add
+      </Button>
+    </Box>
+  );
 
   return (
     <Container maxWidth="md" sx={{ py: 8 }}>
@@ -295,93 +336,13 @@ export default function DigitalMediaRequestForm() {
             />
           </Box>
 
-          <Box sx={{ mb: 6 }}>
-            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-              Retailer & Inventory type{" "}
-              <span style={{ color: "#ff0000" }}>*</span>
-            </Typography>
-            {formData.retailerTypes.map((retailer) => (
-              <Box
-                key={retailer.id}
-                sx={{ display: "flex", alignItems: "center", mb: 2 }}
-              >
-                <FormControl fullWidth margin="normal" sx={{ mr: 2 }}>
-                  <InputLabel>Select the retailer</InputLabel>
-                  <Select
-                    value={retailer.value}
-                    onChange={(e) =>
-                      handleArrayChange(
-                        "retailerTypes",
-                        retailer.id,
-                        e.target.value
-                      )
-                    }
-                    label="Select the retailer"
-                    sx={{ borderRadius: 1 }}
-                  >
-                    <MenuItem value="MAKRO">MAKRO</MenuItem>
-                    <MenuItem value="Other">Other</MenuItem>
-                  </Select>
-                </FormControl>
-                <IconButton
-                  onClick={() => removeArrayItem("retailerTypes", retailer.id)}
-                  disabled={formData.retailerTypes.length === 1}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-            ))}
-            <Button
-              startIcon={<AddIcon />}
-              variant="outlined"
-              sx={{ mt: 2, borderRadius: 1 }}
-              onClick={() => addArrayItem("retailerTypes")}
-            >
-              Add
-            </Button>
-          </Box>
-
-          <Box sx={{ mb: 6 }}>
-            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-              Booking
-            </Typography>
-            {formData.bookings.map((booking) => (
-              <Box
-                key={booking.id}
-                sx={{ display: "flex", alignItems: "center", mb: 2 }}
-              >
-                <FormControl fullWidth margin="normal" sx={{ mr: 2 }}>
-                  <InputLabel>Select booking</InputLabel>
-                  <Select
-                    value={booking.value}
-                    onChange={(e) =>
-                      handleArrayChange("bookings", booking.id, e.target.value)
-                    }
-                    label="Select booking"
-                    sx={{ borderRadius: 1 }}
-                  >
-                    <MenuItem value="1">1</MenuItem>
-                    <MenuItem value="2">2</MenuItem>
-                    <MenuItem value="3">3</MenuItem>
-                  </Select>
-                </FormControl>
-                <IconButton
-                  onClick={() => removeArrayItem("bookings", booking.id)}
-                  disabled={formData.bookings.length === 1}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-            ))}
-            <Button
-              startIcon={<AddIcon />}
-              variant="outlined"
-              sx={{ mt: 2, borderRadius: 1 }}
-              onClick={() => addArrayItem("bookings")}
-            >
-              Add
-            </Button>
-          </Box>
+          {renderArrayField(
+            "retailerTypes",
+            "Retailer & Inventory type",
+            retailerOptions,
+            true
+          )}
+          {renderArrayField("bookings", "Booking", bookingOptions)}
 
           {formData.requestType === "Change" && (
             <Box sx={{ mb: 6 }}>
@@ -412,7 +373,7 @@ export default function DigitalMediaRequestForm() {
                 label="DD/MM/YYYY"
                 value={formData.startDate}
                 onChange={handleDateChange("startDate")}
-                format="DD/MM/YYYY" // เพิ่ม prop นี้เพื่อกำหนด format
+                format="dd/MM/yyyy"
                 slotProps={{
                   textField: {
                     fullWidth: true,
@@ -434,7 +395,7 @@ export default function DigitalMediaRequestForm() {
                 label="DD/MM/YYYY"
                 value={formData.endDate}
                 onChange={handleDateChange("endDate")}
-                format="DD/MM/YYYY" // เพิ่ม prop นี้เพื่อกำหนด format
+                format="dd/MM/yyyy"
                 slotProps={{
                   textField: {
                     fullWidth: true,
@@ -529,51 +490,7 @@ export default function DigitalMediaRequestForm() {
             />
           </Box>
 
-          <Box sx={{ mb: 6 }}>
-            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-              Campaign
-            </Typography>
-            {formData.campaigns.map((campaign) => (
-              <Box
-                key={campaign.id}
-                sx={{ display: "flex", alignItems: "center", mb: 2 }}
-              >
-                <FormControl fullWidth margin="normal" sx={{ mr: 2 }}>
-                  <InputLabel>Select campaign</InputLabel>
-                  <Select
-                    value={campaign.value}
-                    onChange={(e) =>
-                      handleArrayChange(
-                        "campaigns",
-                        campaign.id,
-                        e.target.value
-                      )
-                    }
-                    label="Select campaign"
-                    sx={{ borderRadius: 1 }}
-                  >
-                    <MenuItem value="1">1</MenuItem>
-                    <MenuItem value="2">2</MenuItem>
-                    <MenuItem value="3">3</MenuItem>
-                  </Select>
-                </FormControl>
-                <IconButton
-                  onClick={() => removeArrayItem("campaigns", campaign.id)}
-                  disabled={formData.campaigns.length === 1}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-            ))}
-            <Button
-              startIcon={<AddIcon />}
-              variant="outlined"
-              sx={{ mt: 2, borderRadius: 1 }}
-              onClick={() => addArrayItem("campaigns")}
-            >
-              Add
-            </Button>
-          </Box>
+          {renderArrayField("campaigns", "Campaign", campaignOptions)}
 
           <Box sx={{ mt: 8 }}>
             <Button
