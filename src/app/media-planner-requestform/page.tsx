@@ -23,20 +23,14 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import { v4 as uuidv4 } from "uuid";
 
 // Interfaces
-interface ArrayItem {
-  id: string;
-  value: string;
-}
-
 interface FormData {
   requestType: "New" | "Change";
   requesterName: string;
   requesterEmail: string;
-  retailerTypes: ArrayItem[];
-  bookings: ArrayItem[];
+  retailerTypes: string[];
+  bookings: string[];
   existingCampaign: string;
   startDate: Date | null;
   endDate: Date | null;
@@ -44,7 +38,7 @@ interface FormData {
   mediaLinks: string;
   notes: string;
   linkedCampaigns: string;
-  campaigns: ArrayItem[];
+  campaigns: string[];
 }
 
 // Dropdown Options
@@ -57,8 +51,8 @@ export default function DigitalMediaRequestForm() {
     requestType: "New",
     requesterName: "",
     requesterEmail: "",
-    retailerTypes: [{ id: uuidv4(), value: "" }],
-    bookings: [{ id: uuidv4(), value: "" }],
+    retailerTypes: [""],
+    bookings: [""],
     existingCampaign: "",
     startDate: null,
     endDate: null,
@@ -66,7 +60,7 @@ export default function DigitalMediaRequestForm() {
     mediaLinks: "",
     notes: "",
     linkedCampaigns: "",
-    campaigns: [{ id: uuidv4(), value: "" }],
+    campaigns: [""],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
@@ -81,31 +75,29 @@ export default function DigitalMediaRequestForm() {
 
   const handleArrayChange = (
     field: "retailerTypes" | "bookings" | "campaigns",
-    id: string,
+    index: number,
     value: string
   ) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: prev[field].map((item) =>
-        item.id === id ? { ...item, value } : item
-      ),
+      [field]: prev[field].map((item, i) => (i === index ? value : item)),
     }));
   };
 
   const addArrayItem = (field: "retailerTypes" | "bookings" | "campaigns") => {
     setFormData((prev) => ({
       ...prev,
-      [field]: [...prev[field], { id: uuidv4(), value: "" }],
+      [field]: [...prev[field], ""],
     }));
   };
 
   const removeArrayItem = (
     field: "retailerTypes" | "bookings" | "campaigns",
-    id: string
+    index: number
   ) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: prev[field].filter((item) => item.id !== id),
+      [field]: prev[field].filter((_, i) => i !== index),
     }));
   };
 
@@ -119,7 +111,7 @@ export default function DigitalMediaRequestForm() {
       formData.requesterName.trim() !== "" &&
       formData.requesterEmail.trim() !== "" &&
       emailRegex.test(formData.requesterEmail) &&
-      formData.retailerTypes.every((rt) => rt.value !== "") &&
+      formData.retailerTypes.every((rt) => rt !== "") &&
       formData.startDate !== null &&
       formData.endDate !== null &&
       formData.startDate <= formData.endDate
@@ -163,8 +155,8 @@ export default function DigitalMediaRequestForm() {
         requestType: "New",
         requesterName: "",
         requesterEmail: "",
-        retailerTypes: [{ id: uuidv4(), value: "" }],
-        bookings: [{ id: uuidv4(), value: "" }],
+        retailerTypes: [""],
+        bookings: [""],
         existingCampaign: "",
         startDate: null,
         endDate: null,
@@ -172,7 +164,7 @@ export default function DigitalMediaRequestForm() {
         mediaLinks: "",
         notes: "",
         linkedCampaigns: "",
-        campaigns: [{ id: uuidv4(), value: "" }],
+        campaigns: [""],
       });
     } catch (error) {
       setSubmissionStatus("Error submitting form. Please try again.");
@@ -193,18 +185,13 @@ export default function DigitalMediaRequestForm() {
       <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
         {label} {required && <span style={{ color: "#ff0000" }}>*</span>}
       </Typography>
-      {formData[field].map((item) => (
-        <Box
-          key={item.id}
-          sx={{ display: "flex", alignItems: "center", mb: 2 }}
-        >
+      {formData[field].map((value, index) => (
+        <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <FormControl fullWidth margin="normal" sx={{ mr: 2 }}>
             <InputLabel>Select {label.toLowerCase()}</InputLabel>
             <Select
-              value={item.value}
-              onChange={(e) =>
-                handleArrayChange(field, item.id, e.target.value)
-              }
+              value={value}
+              onChange={(e) => handleArrayChange(field, index, e.target.value)}
               label={`Select ${label.toLowerCase()}`}
               sx={{ borderRadius: 1 }}
             >
@@ -216,7 +203,7 @@ export default function DigitalMediaRequestForm() {
             </Select>
           </FormControl>
           <IconButton
-            onClick={() => removeArrayItem(field, item.id)}
+            onClick={() => removeArrayItem(field, index)}
             disabled={formData[field].length === 1}
           >
             <CloseIcon />
