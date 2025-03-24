@@ -1,16 +1,14 @@
 import axios from "axios";
+import { Redis } from "@upstash/redis";
 
 export const dynamic = "force-dynamic";
 
-const username = process.env.USERNAMEOMG;
-const password = process.env.PASSWORDOMG;
+const redis = Redis.fromEnv();
 
-const CACHE_DURATION = 1 * 1 * 1000;
-
-let cache: { data: any[] | null; timestamp: number } = {
-  data: null,
-  timestamp: 0,
-};
+const username = process.env.USERNAMEOMG!;
+const password = process.env.PASSWORDOMG!;
+const CACHE_KEY = "summarized_data_v1";
+const CACHE_DURATION_SECONDS = 10 * 60; // 10 minutes
 
 async function fetchSeqCampaigns() {
   const url =
@@ -163,22 +161,24 @@ function summarizeData(normalizedData: any[], seqCampaigns: any[]) {
 }
 
 export async function GET() {
-  const currentTime = Date.now();
-
-  if (cache.data && currentTime - cache.timestamp < CACHE_DURATION) {
-    return new Response(JSON.stringify(cache.data), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
   try {
-    const seqCampaigns = await fetchSeqCampaigns(); // 🔁 ใช้ข้อมูลจาก Google Apps Script
+    // Try reading from Redis
+    const cached = await redis.get(CACHE_KEY);
+    if (cached) {
+      return new Response(JSON.stringify(cached), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // If not cached, fetch fresh data
+    const seqCampaigns = await fetchSeqCampaigns();
     const rawData = await fetchSequences(seqCampaigns);
     const normalizedData = normalizeSequences(rawData);
     const summarizedData = summarizeData(normalizedData, seqCampaigns);
 
-    cache = { data: summarizedData, timestamp: currentTime };
+    // Save to Redis with TTL
+    await redis.set(CACHE_KEY, summarizedData, { ex: CACHE_DURATION_SECONDS });
 
     return new Response(JSON.stringify(summarizedData), {
       status: 200,

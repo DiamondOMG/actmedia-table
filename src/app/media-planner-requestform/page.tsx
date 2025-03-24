@@ -23,6 +23,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
+import Swal from "sweetalert2";
 
 // Interfaces
 interface FormData {
@@ -107,15 +108,44 @@ export default function DigitalMediaRequestForm() {
 
   const validateForm = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return (
-      formData.requesterName.trim() !== "" &&
-      formData.requesterEmail.trim() !== "" &&
-      emailRegex.test(formData.requesterEmail) &&
-      formData.retailerTypes.every((rt) => rt !== "") &&
-      formData.startDate !== null &&
-      formData.endDate !== null &&
-      formData.startDate <= formData.endDate
-    );
+    const errors: string[] = [];
+
+    if (formData.requesterName.trim() === "") {
+      errors.push("Requester name is required.");
+    }
+    if (formData.requesterEmail.trim() === "") {
+      errors.push("Requester email is required.");
+    } else if (!emailRegex.test(formData.requesterEmail)) {
+      errors.push("Requester email is invalid.");
+    }
+    if (formData.retailerTypes.some((rt) => rt === "")) {
+      errors.push("All retailer types must be selected.");
+    }
+    if (formData.startDate === null) {
+      errors.push("Start date is required.");
+    }
+    if (formData.endDate === null) {
+      errors.push("End date is required.");
+    }
+    if (
+      formData.startDate &&
+      formData.endDate &&
+      formData.startDate > formData.endDate
+    ) {
+      errors.push("Start date must be before end date.");
+    }
+
+    if (errors.length > 0) {
+      Swal.fire({
+        title: "Validation Errors",
+        text: errors.join("\n"),
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
