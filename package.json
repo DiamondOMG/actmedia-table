@@ -21,6 +21,7 @@
     "date-fns": "^2.30.0",
     "framer-motion": "^12.4.7",
     "googleapis": "^148.0.0",
+    "jose": "^6.0.10",
     "material-react-table": "^3.2.1",
     "next": "15.2.0",
     "react": "^19.0.0",
