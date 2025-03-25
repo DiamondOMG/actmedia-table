@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -24,23 +24,8 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import Swal from "sweetalert2";
-
-// Interfaces
-interface FormData {
-  requestType: "New" | "Change";
-  requesterName: string;
-  requesterEmail: string;
-  retailerTypes: string[];
-  bookings: string[];
-  existingCampaign: string;
-  startDate: Date | null;
-  endDate: Date | null;
-  duration: string;
-  mediaLinks: string;
-  notes: string;
-  linkedCampaigns: string;
-  campaigns: string[];
-}
+import { useSubmitRequestForm } from "@/hook/useRequestForm";
+import { RequestForm } from "@/types/requestform";
 
 // Dropdown Options
 const retailerOptions = ["MAKRO", "Other"];
@@ -48,7 +33,7 @@ const bookingOptions = ["1", "2", "3"];
 const campaignOptions = ["1", "2", "3"];
 
 export default function DigitalMediaRequestForm() {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<RequestForm>({
     requestType: "New",
     requesterName: "",
     requesterEmail: "",
@@ -65,6 +50,9 @@ export default function DigitalMediaRequestForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  const submitRequestForm = useSubmitRequestForm();
 
   // Handlers
   const handleInputChange = (
@@ -151,7 +139,6 @@ export default function DigitalMediaRequestForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
-      setSubmissionStatus("Please fill in all required fields correctly");
       return;
     }
 
@@ -159,28 +146,20 @@ export default function DigitalMediaRequestForm() {
     setSubmissionStatus(null);
 
     try {
-      const submissionData = {
-        fields: {
-          "Request Type": formData.requestType,
-          "Requester Name": formData.requesterName,
-          "Requester Email": formData.requesterEmail,
-          "Retailer Types": JSON.stringify(formData.retailerTypes),
-          Bookings: JSON.stringify(formData.bookings),
-          "Existing Campaign": formData.existingCampaign,
-          "Start Date": formData.startDate?.toISOString(),
-          "End Date": formData.endDate?.toISOString(),
-          Duration: formData.duration,
-          "Media Links": formData.mediaLinks,
-          Notes: formData.notes,
-          "Linked Campaigns": formData.linkedCampaigns,
-          Campaigns: JSON.stringify(formData.campaigns),
-        },
+      // แปลงวันที่เป็น unixtime (milliseconds) โดยตรง
+      const formDataWithUnixTime = {
+        ...formData,
+        startDate: formData.startDate?.valueOf() || null,
+        endDate: formData.endDate?.valueOf() || null,
       };
 
-      console.log("Submitting to Airtable:", submissionData);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log(
+        "Submitting form with unix timestamps:",
+        formDataWithUnixTime
+      );
+      await submitRequestForm.mutateAsync(formDataWithUnixTime);
 
-      setSubmissionStatus("Form submitted successfully!");
+      // รีเซ็ตฟอร์มหลังจากส่งข้อมูลสำเร็จ
       setFormData({
         requestType: "New",
         requesterName: "",
@@ -196,9 +175,6 @@ export default function DigitalMediaRequestForm() {
         linkedCampaigns: "",
         campaigns: [""],
       });
-    } catch (error) {
-      setSubmissionStatus("Error submitting form. Please try again.");
-      console.error("Submission error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -250,6 +226,14 @@ export default function DigitalMediaRequestForm() {
       </Button>
     </Box>
   );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <Container maxWidth="md" sx={{ py: 8 }}>
@@ -388,7 +372,7 @@ export default function DigitalMediaRequestForm() {
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 label="DD/MM/YYYY"
-                value={formData.startDate}
+                value={formData.startDate ? new Date(formData.startDate) : null}
                 onChange={handleDateChange("startDate")}
                 format="dd/MM/yyyy"
                 slotProps={{
@@ -410,7 +394,7 @@ export default function DigitalMediaRequestForm() {
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 label="DD/MM/YYYY"
-                value={formData.endDate}
+                value={formData.endDate ? new Date(formData.endDate) : null}
                 onChange={handleDateChange("endDate")}
                 format="dd/MM/yyyy"
                 slotProps={{
