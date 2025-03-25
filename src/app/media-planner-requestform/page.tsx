@@ -26,6 +26,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Swal from "sweetalert2";
 import { useSubmitRequestForm } from "@/hook/useRequestForm";
 import { RequestForm } from "@/types/requestform";
+import Autocomplete from "@mui/material/Autocomplete";
 
 // Dropdown Options
 const retailerOptions = ["MAKRO", "Other"];
@@ -194,19 +195,21 @@ export default function DigitalMediaRequestForm() {
       {formData[field].map((value, index) => (
         <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <FormControl fullWidth margin="normal" sx={{ mr: 2 }}>
-            <InputLabel>Select {label.toLowerCase()}</InputLabel>
-            <Select
+            <Autocomplete
+              options={options}
               value={value}
-              onChange={(e) => handleArrayChange(field, index, e.target.value)}
-              label={`Select ${label.toLowerCase()}`}
-              sx={{ borderRadius: 1 }}
-            >
-              {options.map((option) => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </Select>
+              onChange={(event, newValue) =>
+                handleArrayChange(field, index, newValue || "")
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={`Select ${label.toLowerCase()}`}
+                  variant="outlined"
+                />
+              )}
+              freeSolo
+            />
           </FormControl>
           <IconButton
             onClick={() => removeArrayItem(field, index)}
