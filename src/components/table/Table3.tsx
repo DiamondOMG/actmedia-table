@@ -1,6 +1,8 @@
+// src/app/components/table/Table3.tsx
+
 "use client";
 
-import { memo, useState, useMemo } from "react";
+import { memo, useState, useMemo, useEffect } from "react";
 import {
   MaterialReactTable,
   type MRT_ColumnDef,
@@ -27,7 +29,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { type Sequence } from "@/types/sequences";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { useCreateSequence, useUpdateSequence, useDeleteSequence } from "@/hook/useSequences"
+import {
+  useCreateSequence,
+  useUpdateSequence,
+  useDeleteSequence,
+} from "@/hook/useSequences";
+import { useViewStore } from "@/zustand/useViewStore";
 
 // Props ที่รับเข้ามาสำหรับตาราง
 interface Table3Props {
@@ -46,10 +53,31 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
     pageIndex: 0,
     pageSize: 30,
   });
-  const [grouping, setGrouping] = useState<MRT_GroupingState>([
-
-  ]);
+  const [grouping, setGrouping] = useState<MRT_GroupingState>([]);
   const [isEditing, setIsEditing] = useState(true);
+
+  // Add view store
+  const view = useViewStore((state) => state.view);
+  const setCurrentView = useViewStore((state) => state.setCurrentView);
+
+  // เพิ่ม useEffect เพื่อติดตามการเปลี่ยนแปลงของ table state
+  useEffect(() => {
+    setCurrentView({
+      filter: columnFilters,
+      sorting: sorting,
+      group: grouping,
+    });
+  }, [columnFilters, sorting, grouping, setCurrentView]);
+
+  // existing useEffect for view
+  useEffect(() => {
+    if (view) {
+      setColumnFilters(view.filter);
+      setSorting(view.sorting);
+      setGrouping(view.group);
+    }
+  }, [view]);
+
   //!------------------ ส่วนแสดงผล ------------------!//
   console.log(` Table render `);
 
@@ -67,7 +95,10 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
   const deleteSequence = useDeleteSequence();
 
   // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
-  const handleCreate: MRT_TableOptions<Sequence>["onCreatingRowSave"] = async ({ values, table }) => {
+  const handleCreate: MRT_TableOptions<Sequence>["onCreatingRowSave"] = async ({
+    values,
+    table,
+  }) => {
     console.log("Create", values);
     createSequence.mutate(values);
     table.setCreatingRow(null); // ปิด modal การสร้าง
@@ -82,14 +113,13 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
     // ผสานค่าเดิม (id, date) เข้ากับค่าที่ผู้ใช้กรอก
     const updatedData: Sequence = {
       ...row.original, // มี id, date อยู่แน่นอน
-      ...values,       // ทับค่าที่แก้ไขใหม่
+      ...values, // ทับค่าที่แก้ไขใหม่
     };
-  
+
     console.log("Update", updatedData);
     updateSequence.mutate(updatedData);
     table.setEditingRow(null);
   };
-  
 
   // ฟังก์ชันแสดง confirm dialog สำหรับการลบข้อมูล
   const handleDelete = (id: string) => {
@@ -97,7 +127,6 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
       deleteSequence.mutate(id);
     }
   };
-
 
   //!------------------ การกำหนดค่าตาราง ------------------!//
   const table = useMaterialReactTable({
@@ -241,7 +270,10 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
             </IconButton>
           </Tooltip>
           <Tooltip title="ลบ">
-            <IconButton color="error" onClick={() => handleDelete(row.original.id)}>
+            <IconButton
+              color="error"
+              onClick={() => handleDelete(row.original.id)}
+            >
               <DeleteIcon />
             </IconButton>
           </Tooltip>
