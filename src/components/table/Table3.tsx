@@ -34,7 +34,7 @@ import {
   useUpdateSequence,
   useDeleteSequence,
 } from "@/hook/useSequences";
-import { useViewStore } from "@/zustand/useViewStore";
+import { useViewStore } from "@/zustand/useViewStore";//view
 
 // Props ที่รับเข้ามาสำหรับตาราง
 interface Table3Props {
@@ -56,20 +56,18 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
   const [grouping, setGrouping] = useState<MRT_GroupingState>([]);
   const [isEditing, setIsEditing] = useState(true);
 
-  // Add view store
+  //!------------------ จัดการ View ------------------!//
   const view = useViewStore((state) => state.view);
   const setCurrentView = useViewStore((state) => state.setCurrentView);
 
-  // เพิ่ม useEffect เพื่อติดตามการเปลี่ยนแปลงของ table state
   useEffect(() => {
     setCurrentView({
       filter: columnFilters,
       sorting: sorting,
       group: grouping,
     });
-  }, [columnFilters, sorting, grouping, setCurrentView]);
+  }, [columnFilters, sorting, grouping]);
 
-  // existing useEffect for view
   useEffect(() => {
     if (view) {
       setColumnFilters(view.filter);
