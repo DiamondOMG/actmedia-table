@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 
-
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Users";
 const redis = Redis.fromEnv();
@@ -42,7 +41,7 @@ export async function GET(req: Request) {
       name: user[3],
       department: user[4],
       position: user[5],
-      level: user[6],
+      permissions: JSON.parse(user[6] || "[]"),
       createdOn: user[7],
     };
 
@@ -64,7 +63,7 @@ export async function GET(req: Request) {
       name: row[3],
       department: row[4],
       position: row[5],
-      level: row[6],
+      permissions: JSON.parse(row[6] || "[]"),
       createdOn: row[7],
     }));
 
@@ -80,7 +79,7 @@ export async function PUT(req: Request) {
   if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
   const body = await req.json();
-  const { name, department, position, password } = body;
+  const { name, department, position, password, permissions } = body;
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
@@ -102,6 +101,7 @@ export async function PUT(req: Request) {
   if (name) updatedUser[3] = name;
   if (department) updatedUser[4] = department;
   if (position) updatedUser[5] = position;
+  if (permissions) updatedUser[6] = JSON.stringify(permissions);
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,

@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
 import { Redis } from "@upstash/redis";
 
-
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Users";
 const redis = Redis.fromEnv();
@@ -16,29 +15,46 @@ export async function POST(req: Request) {
   const sheets = await getSheetsClient();
   const { username, password, name, department, position } = await req.json();
 
+  // ✅ Default permissions
+  const defaultPermissions = [
+    { menu: "user", level: 1 },
+    { menu: "campaign", level: 1 },
+    { menu: "request", level: 1 },
+    { menu: "sequence", level: 1 },
+    { menu: "customer", level: 1 },
+  ];
+
+  // 🔍 ตรวจสอบ username ซ้ำ
   const checkResponse = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A2:I`,
+    range: `${SHEET_NAME}!A2:I`, // 9 columns เท่านั้น
   });
 
   const users = checkResponse.data.values || [];
   if (users.some((row) => row[1] === username && row[8] !== "1")) {
-    return NextResponse.json({ error: "Username already exists" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Username already exists" },
+      { status: 400 }
+    );
   }
 
+  // 🔐 Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
+
+  // 🧾 สร้างผู้ใช้ใหม่
   const newUser = [
-    uuidv4(),
-    username,
-    hashedPassword,
-    name,
-    department,
-    position,
-    "1",
-    Date.now(),
-    "0",
+    uuidv4(), // A: id
+    username, // B
+    hashedPassword, // C
+    name, // D
+    department, // E
+    position, // F
+    JSON.stringify(defaultPermissions), // G: permissions
+    Date.now(), // H: createdOn
+    "0", // I: isDelete
   ];
 
+  // ➕ เพิ่มผู้ใช้ใหม่
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
     range: `${SHEET_NAME}!A2`,
@@ -46,6 +62,8 @@ export async function POST(req: Request) {
     requestBody: { values: [newUser] },
   });
 
+  // ♻️ ลบ cache
   await redis.del(CACHE_KEY);
+
   return NextResponse.json({ message: "User registered successfully" });
 }
