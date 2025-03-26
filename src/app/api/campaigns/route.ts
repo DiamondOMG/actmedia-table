@@ -1,7 +1,7 @@
+export const dynamic = "force-dynamic";
+
 import axios from "axios";
 import { Redis } from "@upstash/redis";
-
-export const dynamic = "force-dynamic";
 
 const redis = Redis.fromEnv();
 
