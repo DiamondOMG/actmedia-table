@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
+import { verifyToken } from "@/lib/auth/verifyToken"; // 👈 เพิ่ม import
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Users";
@@ -116,6 +117,17 @@ export async function PUT(req: Request) {
 
 // ✅ DELETE soft-delete user
 export async function DELETE(req: Request) {
+  // ✅ 1. ตรวจสอบ token และ permission
+  try {
+    const user = await verifyToken(req, "user", 2); // ต้องมี user.level >= 2
+    console.log("Authenticated user:", user.username);
+  } catch (err) {
+    return NextResponse.json(
+      { error: (err as Error).message },
+      { status: 401 }
+    );
+  }
+
   const sheets = await getSheetsClient();
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");

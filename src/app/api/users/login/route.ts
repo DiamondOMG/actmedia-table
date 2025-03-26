@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
   const isValid = await bcrypt.compare(password, user[2]);
   if (!isValid) {
-    return NextResponse.json({ error: "Invalid password" }, { status: 402 });
+    return NextResponse.json({ error: "Invalid password" }, { status: 401 });
   }
 
   // ✅ แปลง permissions จาก JSON string → object
