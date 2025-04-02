@@ -12,7 +12,7 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 
 export async function POST(req: Request) {
   const sheets = await getSheetsClient();
-  const { username, password } = await req.json();
+  const { email, password } = await req.json();
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   });
 
   const users = response.data.values || [];
-  const user = users.find((row) => row[1] === username && row[8] !== "1");
+  const user = users.find((row) => row[1] === email && row[8] !== "1");
 
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 401 });
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   const token = jwt.sign(
     {
       id: user[0],
-      username: user[1],
+      email: user[1],
       permissions, // optional ถ้าอยากเก็บใน token
     },
     JWT_SECRET,
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
   const cookieStore = await cookies();
   cookieStore.set("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "strict",
     maxAge: 86400,
   });
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     message: "Login successful",
     user: {
       id: user[0],
-      username: user[1],
+      email: user[1],
       name: user[3],
       permissions, // ✅ เปลี่ยนจาก level เป็น permissions
     },

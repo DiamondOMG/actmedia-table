@@ -30,7 +30,7 @@ export async function middleware(req: NextRequest) {
 
   try {
     const { payload } = await jwtVerify(token, secret);
-    console.log("✅ Token verified:", payload);
+    console.log("✅ Token verified in Middleware :", payload);
 
     if (payload.exp && Date.now() >= payload.exp * 1000) {
       console.log("⌛ Token expired → redirecting");
@@ -47,7 +47,7 @@ export async function middleware(req: NextRequest) {
 // 🔒 ระบุ path ที่ต้องการปกป้อง
 export const config = {
   matcher: [
-    "/signup",
-    "/signup/:path*",
+    // "/signup",
+    "/form",
   ],
 };

@@ -21,6 +21,8 @@ import {
   FacebookIcon,
   SitemarkIcon,
 } from "./components/CustomIcons";
+import { useAuth } from "@/hook/useAuth";
+import Swal from "sweetalert2";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -65,12 +67,29 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignUp(props: { disableCustomTheme?: boolean }) {
+  const { register } = useAuth();
+  const [formData, setFormData] = React.useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    name: "",
+    department: "",
+    position: "",
+  });
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const validateInputs = () => {
     const email = document.getElementById("email") as HTMLInputElement;
@@ -109,17 +128,24 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
     return isValid;
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (nameError || emailError || passwordError) {
-      event.preventDefault();
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "รหัสผ่านไม่ตรงกัน",
+        text: "กรุณาตรวจสอบรหัสผ่านอีกครั้ง",
+      });
       return;
     }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get("name"),
-      lastName: data.get("lastName"),
-      email: data.get("email"),
-      password: data.get("password"),
+
+    register.mutate({
+      email: formData.email,
+      password: formData.password,
+      name: formData.name,
+      department: formData.department,
+      position: formData.position,
     });
   };
 
@@ -151,9 +177,8 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 fullWidth
                 id="name"
                 placeholder="Jon Snow"
-                error={nameError}
-                helperText={nameErrorMessage}
-                color={nameError ? "error" : "primary"}
+                value={formData.name}
+                onChange={handleChange}
               />
             </FormControl>
             <FormControl>
@@ -162,13 +187,11 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 required
                 fullWidth
                 id="email"
-                placeholder="your@email.com"
                 name="email"
-                autoComplete="email"
-                variant="outlined"
-                error={emailError}
-                helperText={emailErrorMessage}
-                color={passwordError ? "error" : "primary"}
+                placeholder="your@email.com"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
               />
             </FormControl>
             <FormControl>
@@ -180,11 +203,45 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 placeholder="••••••"
                 type="password"
                 id="password"
-                autoComplete="new-password"
-                variant="outlined"
-                error={passwordError}
-                helperText={passwordErrorMessage}
-                color={passwordError ? "error" : "primary"}
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+              <TextField
+                required
+                fullWidth
+                name="confirmPassword"
+                placeholder="••••••"
+                type="password"
+                id="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="department">Department</FormLabel>
+              <TextField
+                required
+                fullWidth
+                name="department"
+                placeholder="Department"
+                id="department"
+                value={formData.department}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="position">Position</FormLabel>
+              <TextField
+                required
+                fullWidth
+                name="position"
+                placeholder="Position"
+                id="position"
+                value={formData.position}
+                onChange={handleChange}
               />
             </FormControl>
             <FormControlLabel

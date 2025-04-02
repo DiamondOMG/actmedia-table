@@ -13,7 +13,7 @@ const CACHE_KEY = "cached_users_data";
 
 export async function POST(req: Request) {
   const sheets = await getSheetsClient();
-  const { username, password, name, department, position } = await req.json();
+  const { email, password, name, department, position } = await req.json();
 
   // ✅ Default permissions
   const defaultPermissions = [
@@ -24,16 +24,16 @@ export async function POST(req: Request) {
     { menu: "customer", level: 1 },
   ];
 
-  // 🔍 ตรวจสอบ username ซ้ำ
+  // 🔍 ตรวจสอบ email ซ้ำ
   const checkResponse = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
     range: `${SHEET_NAME}!A2:I`, // 9 columns เท่านั้น
   });
 
   const users = checkResponse.data.values || [];
-  if (users.some((row) => row[1] === username && row[8] !== "1")) {
+  if (users.some((row) => row[1] === email && row[8] !== "1")) {
     return NextResponse.json(
-      { error: "Username already exists" },
+      { error: "email already exists" },
       { status: 400 }
     );
   }
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
   // 🧾 สร้างผู้ใช้ใหม่
   const newUser = [
     uuidv4(), // A: id
-    username, // B
+    email, // B
     hashedPassword, // C
     name, // D
     department, // E

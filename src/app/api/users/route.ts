@@ -4,12 +4,24 @@ import { NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 import { verifyToken } from "@/lib/auth/verifyToken"; // 👈 เพิ่ม import
+import { cookies } from "next/headers";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Users";
 const redis = Redis.fromEnv();
 const CACHE_KEY = "cached_users_data";
 const CACHE_DURATION = 60 * 10;
+
+interface User {
+  id: string;
+  email: string;
+  password: string;
+  name: string;
+  department: string;
+  position: string;
+  level: number;
+  isDelete: number;
+}
 
 // ✅ GET users (all or by id)
 export async function GET(req: Request) {
