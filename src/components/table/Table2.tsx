@@ -50,7 +50,7 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
   ]);
   const [isEditing, setIsEditing] = useState(false);
   //!------------------ ส่วนแสดงผล ------------------!//
-  console.log(` Table render `);
+  console.log(` Table render 2 `);
 
   //!------------------ การแปลงข้อมูล ------------------!//
   // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า

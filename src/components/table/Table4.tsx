@@ -1,6 +1,8 @@
+// src/app/components/table/Table4.tsx
+
 "use client";
 
-import { memo, useState, useMemo } from "react";
+import { memo, useState, useMemo, useEffect } from "react";
 import {
   MaterialReactTable,
   type MRT_ColumnDef,
@@ -24,17 +26,23 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { type RawData } from "@/types/user";
+import { type RequestForm } from "@/types/requestform";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import {
+  useSubmitRequestForm,
+  useUpdateRequestForm,
+  useDeleteRequestForm,
+} from "@/hook/useRequestForm";
+import { useViewStore } from "@/zustand/useViewStore";//view
 
 // Props ที่รับเข้ามาสำหรับตาราง
-interface Table1Props {
-  columns: MRT_ColumnDef<RawData>[]; // คอลัมน์ที่จะแสดงในตาราง
-  initialData: RawData[]; // ข้อมูลเริ่มต้นที่จะแสดงในตาราง
+interface Table4Props {
+  columns: MRT_ColumnDef<RequestForm>[]; // คอลัมน์ที่จะแสดงในตาราง
+  initialData: RequestForm[]; // ข้อมูลเริ่มต้นที่จะแสดงในตาราง
 }
 
-const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
+const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
   //!----------------table state------------------!//
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     []
@@ -43,42 +51,78 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
   const [pagination, setPagination] = useState<MRT_PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 30,
   });
   const [grouping, setGrouping] = useState<MRT_GroupingState>([]);
+  const [isEditing, setIsEditing] = useState(true);
+
+  //!------------------ จัดการ View ------------------!//
+  const view = useViewStore((state) => state.view);
+  const setCurrentView = useViewStore((state) => state.setCurrentView);
+
+  useEffect(() => {
+    setCurrentView({
+      filter: columnFilters,
+      sorting: sorting,
+      group: grouping,
+    });
+  }, [columnFilters, sorting, grouping]);
+
+  useEffect(() => {
+    if (view) {
+      setColumnFilters(view.filter);
+      setSorting(view.sorting);
+      setGrouping(view.group);
+    }
+  }, [view]);
+
   //!------------------ ส่วนแสดงผล ------------------!//
-  console.log(` Table render 1 `);
+  console.log(` Table4 render `);
 
   //!------------------ การแปลงข้อมูล ------------------!//
-  // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า
-  const newData: RawData[] = useMemo(() => {
+  // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า5
+  const newData: RequestForm[] = useMemo(() => {
     return initialData;
   }, [initialData]);
 
   //!------------------ ฟังก์ชันจัดการ CRUD ------------------!//
 
   // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
-  const handleCreateUser: MRT_TableOptions<RawData>["onCreatingRowSave"] = ({
+  const createRequestForm = useSubmitRequestForm();
+  const updateRequestForm = useUpdateRequestForm();
+  const deleteRequestForm = useDeleteRequestForm();
+
+  // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
+  const handleCreate: MRT_TableOptions<RequestForm>["onCreatingRowSave"] = async ({
     values,
     table,
   }) => {
     console.log("Create", values);
+    createRequestForm.mutate(values);
     table.setCreatingRow(null); // ปิด modal การสร้าง
   };
 
   // ฟังก์ชันจัดการการอัพเดทข้อมูล
-  const handleSaveUser: MRT_TableOptions<RawData>["onEditingRowSave"] = ({
+  const handleUpdate: MRT_TableOptions<RequestForm>["onEditingRowSave"] = async ({
     values,
     table,
+    row,
   }) => {
-    console.log("Update", values);
-    table.setEditingRow(null); // ปิด modal การแก้ไข
+    // ผสานค่าเดิม (id, date) เข้ากับค่าที่ผู้ใช้กรอก
+    const updatedData: RequestForm = {
+      ...row.original, // มี id, date อยู่แน่นอน
+      ...values, // ทับค่าที่แก้ไขใหม่
+    };
+
+    console.log("Update", updatedData);
+    updateRequestForm.mutate(updatedData);
+    table.setEditingRow(null);
   };
 
   // ฟังก์ชันแสดง confirm dialog สำหรับการลบข้อมูล
-  const openDeleteConfirmModal = () => {
+  const handleDelete = (id: string) => {
     if (window.confirm("คุณแน่ใจว่าต้องการลบผู้ใช้นี้?")) {
-      // ส่วนนี้จะเพิ่มโค้ดสำหรับลบข้อมูลจริง
+      deleteRequestForm.mutate(id);
     }
   };
 
@@ -87,7 +131,7 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
     columns,
     data: newData,
     createDisplayMode: "modal", // กำหนดให้การสร้างข้อมูลแสดงเป็น modal
-    enableEditing: true, // เปิดใช้การแก้ไขข้อมูล
+    enableEditing: isEditing, // เปิดใช้การแก้ไขข้อมูล
     muiTableContainerProps: { sx: { minHeight: "500px" } }, // กำหนดความสูงของ table
     enableColumnOrdering: true, // เปิดใช้การเรียงลำดับคอลัมน์
     enableBottomToolbar: true, // แสดง toolbar ด้านล่าง
@@ -110,22 +154,26 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
       sorting,
       grouping,
     },
-    onCreatingRowSave: handleCreateUser, // ฟังชั่นปุ่มเพิ่ม
-    onEditingRowSave: handleSaveUser, // ฟังชั่นปุ่มแก้ไข
+    initialState: {
+      density: "compact",
+      expanded: true, // ปิดการขยายกรุ๊ปเริ่มต้น
+    },
+    onCreatingRowSave: handleCreate, // ฟังชั่นปุ่มเพิ่ม
+    onEditingRowSave: handleUpdate, // ฟังชั่นปุ่มแก้ไข
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => {
       // สร้างหน้าต่าง modal สำหรับเพิ่มข้อมูล
       return (
         <>
-          <DialogTitle variant="h3">สร้างผู้ใช้ใหม่</DialogTitle>
+          <DialogTitle variant="h3">เพิ่ม RequestForm</DialogTitle>
           <DialogContent
             sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}
           >
             {internalEditComponents.map((component) => {
               const columnDef = (component as any).props.cell.column
-                .columnDef as MRT_ColumnDef<RawData>;
+                .columnDef as MRT_ColumnDef<RequestForm>;
               if (columnDef.meta === "date") {
                 // สร้างตัวแปร day เพื่อเก็บ accessorKey
-                const day = columnDef.accessorKey as keyof RawData;
+                const day = columnDef.accessorKey as keyof RequestForm;
                 return (
                   <LocalizationProvider
                     dateAdapter={AdapterDateFns}
@@ -165,16 +213,16 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
     },
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h3">แก้ไขผู้ใช้</DialogTitle>
+        <DialogTitle variant="h3">แก้ไข RequestForm</DialogTitle>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
         >
           {internalEditComponents.map((component) => {
             const columnDef = (component as any).props.cell.column
-              .columnDef as MRT_ColumnDef<RawData>;
+              .columnDef as MRT_ColumnDef<RequestForm>;
             if (columnDef.meta === "date") {
               // สร้างตัวแปร day เพื่อเก็บ accessorKey
-              const day = columnDef.accessorKey as keyof RawData;
+              const day = columnDef.accessorKey as keyof RequestForm;
               return (
                 <LocalizationProvider
                   dateAdapter={AdapterDateFns}
@@ -211,26 +259,37 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
         </DialogActions>
       </>
     ),
-    renderRowActions: ({ row, table }) => (
-      <Box sx={{ display: "flex", gap: "1rem" }}>
-        <Tooltip title="แก้ไข">
-          <IconButton onClick={() => table.setEditingRow(row)}>
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="ลบ">
-          <IconButton color="error" onClick={() => openDeleteConfirmModal()}>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
-    ),
+    renderRowActions: ({ row, table }) =>
+      isEditing ? (
+        <Box sx={{ display: "flex", gap: "1rem" }}>
+          <Tooltip title="แก้ไข">
+            <IconButton onClick={() => table.setEditingRow(row)}>
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="ลบ">
+            <IconButton
+              color="error"
+              onClick={() => handleDelete(row.original.id)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ) : null,
 
     // ปุ่มสร้างข้อมูลใหม่ที่ด้านบนตาราง
     renderTopToolbarCustomActions: ({ table }) => (
-      <Button variant="contained" onClick={() => table.setCreatingRow(true)}>
-        สร้าง
-      </Button>
+      <Box sx={{ display: "flex", gap: "1rem" }}>
+        {isEditing && (
+          <Button
+            variant="contained"
+            onClick={() => table.setCreatingRow(true)}
+          >
+            สร้าง
+          </Button>
+        )}
+      </Box>
     ),
   });
 
@@ -241,5 +300,5 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
   );
 });
 
-Table1.displayName = "Table1";
-export default Table1;
+Table4.displayName = "Table4";
+export default Table4;

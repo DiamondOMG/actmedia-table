@@ -6,11 +6,10 @@ import { Redis } from "@upstash/redis";
 import { v4 as uuidv4 } from "uuid";
 import { RequestForm } from "@/types/requestform";
 
-
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Request Form";
 const redis = Redis.fromEnv();
-const CACHE_KEY = "cached_request_form_data";
+const CACHE_KEY = "cached_request_form_data2";
 const CACHE_DURATION_SECONDS = 60 * 10; // 10 นาที
 
 // ✅ POST - สร้างข้อมูลใหม่
@@ -59,14 +58,54 @@ export async function GET() {
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A2:P`,
+    range: `${SHEET_NAME}!A1:P`,
   });
 
-  const rows = (response.data.values || []).filter((row) => row[15] !== "1");
+  // Get headers from first row
+  const headers = response.data.values?.[0] || [];
+
+  // Filter and transform data rows
+  const rows = (response.data.values || [])
+    .slice(1) // Skip header row
+    .filter((row) => row[15] !== "1") // Filter non-deleted items
+    .map((row) => {
+      const formattedRow: any = {};
+
+      headers.forEach((header, index) => {
+        let value = row[index];
+
+        // Handle array fields
+        if (["retailerTypes", "bookings", "campaigns"].includes(header)) {
+          try {
+            const parsedArray = JSON.parse(value);
+            value = Array.isArray(parsedArray) ? parsedArray.join(", ") : value;
+          } catch {
+            value = value || "";
+          }
+        }
+
+        // Handle date fields
+        if (["startDate", "endDate", "createDate"].includes(header)) {
+          value = value ? Number(value) : null;
+        }
+
+        // Handle isDelete as number
+        if (header === "isDelete") {
+          value = Number(value || 0);
+        }
+
+        formattedRow[header] = value;
+      });
+
+      return formattedRow;
+    });
 
   await redis.set(CACHE_KEY, rows, { ex: CACHE_DURATION_SECONDS });
 
-  return NextResponse.json({ source: "google", data: rows });
+  return NextResponse.json({
+    source: "google",
+    data: rows,
+  });
 }
 
 // ✅ PUT - แก้ไขข้อมูลโดยใช้ id
