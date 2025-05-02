@@ -13,6 +13,7 @@ type SequenceResponse = {
 
 // 🟢 GET (ดึงข้อมูลทั้งหมด)
 export const useSequences = () => {
+  console.log("useSequences called");
   return useQuery({
     queryKey: ["sequences"],
     queryFn: async () => {

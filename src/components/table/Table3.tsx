@@ -77,10 +77,10 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
   }, [view]);
 
   //!------------------ ส่วนแสดงผล ------------------!//
-  console.log(` Table render `);
+  console.log(` Table3 render `);
 
   //!------------------ การแปลงข้อมูล ------------------!//
-  // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า
+  // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า5
   const newData: Sequence[] = useMemo(() => {
     return initialData;
   }, [initialData]);
