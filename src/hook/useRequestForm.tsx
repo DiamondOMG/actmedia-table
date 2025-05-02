@@ -18,7 +18,7 @@ export const useSubmitRequestForm = () => {
       console.log("Response received:", response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       Swal.fire({
         title: "สำเร็จ!",
         text: "บันทึกข้อมูลเรียบร้อยแล้ว",
@@ -26,7 +26,7 @@ export const useSubmitRequestForm = () => {
         confirmButtonText: "ตกลง",
       });
     },
-    onError: (error) => {
+    onError: () => {
       Swal.fire({
         title: "เกิดข้อผิดพลาด!",
         text: "ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง",
