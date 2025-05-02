@@ -30,7 +30,7 @@ const columns: MRT_ColumnDef<Sequence>[] = [
 ];
 
 export default function Page() {
-  const { data: sequence = [], isLoading } = useSequences();
+  const { data: sequence = [], isLoading: isLoadingSequence } = useSequences();
   const setView = useViewStore((state) => state.setView);
   const currentView = useViewStore((state) => state.currentView);
 
@@ -50,7 +50,7 @@ export default function Page() {
     });
   };
 
-  if (isLoading) return <div>Loading Sequencess...</div>;
+  if (isLoadingSequence) return <div>Loading Sequencess...</div>;
 
   return (
     <>
