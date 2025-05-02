@@ -26,20 +26,20 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { type RequestForm } from "@/types/requestform";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import {
   useSubmitRequestForm,
   useUpdateRequestForm,
   useDeleteRequestForm,
+  type Request,
 } from "@/hook/useRequestForm";
-import { useViewStore } from "@/zustand/useViewStore";//view
+import { useViewStore } from "@/zustand/useViewStore"; //view
 
 // Props ที่รับเข้ามาสำหรับตาราง
 interface Table4Props {
-  columns: MRT_ColumnDef<RequestForm>[]; // คอลัมน์ที่จะแสดงในตาราง
-  initialData: RequestForm[]; // ข้อมูลเริ่มต้นที่จะแสดงในตาราง
+  columns: MRT_ColumnDef<Request>[]; // คอลัมน์ที่จะแสดงในตาราง
+  initialData: Request[]; // ข้อมูลเริ่มต้นที่จะแสดงในตาราง
 }
 
 const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
@@ -81,7 +81,7 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
 
   //!------------------ การแปลงข้อมูล ------------------!//
   // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า5
-  const newData: RequestForm[] = useMemo(() => {
+  const newData: Request[] = useMemo(() => {
     return initialData;
   }, [initialData]);
 
@@ -93,7 +93,7 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
   const deleteRequestForm = useDeleteRequestForm();
 
   // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
-  const handleCreate: MRT_TableOptions<RequestForm>["onCreatingRowSave"] = async ({
+  const handleCreate: MRT_TableOptions<Request>["onCreatingRowSave"] = async ({
     values,
     table,
   }) => {
@@ -103,13 +103,13 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
   };
 
   // ฟังก์ชันจัดการการอัพเดทข้อมูล
-  const handleUpdate: MRT_TableOptions<RequestForm>["onEditingRowSave"] = async ({
+  const handleUpdate: MRT_TableOptions<Request>["onEditingRowSave"] = async ({
     values,
     table,
     row,
   }) => {
     // ผสานค่าเดิม (id, date) เข้ากับค่าที่ผู้ใช้กรอก
-    const updatedData: RequestForm = {
+    const updatedData: Request = {
       ...row.original, // มี id, date อยู่แน่นอน
       ...values, // ทับค่าที่แก้ไขใหม่
     };
@@ -170,10 +170,10 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
           >
             {internalEditComponents.map((component) => {
               const columnDef = (component as any).props.cell.column
-                .columnDef as MRT_ColumnDef<RequestForm>;
+                .columnDef as MRT_ColumnDef<Request>;
               if (columnDef.meta === "date") {
                 // สร้างตัวแปร day เพื่อเก็บ accessorKey
-                const day = columnDef.accessorKey as keyof RequestForm;
+                const day = columnDef.accessorKey as keyof Request;
                 return (
                   <LocalizationProvider
                     dateAdapter={AdapterDateFns}
@@ -219,10 +219,10 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
         >
           {internalEditComponents.map((component) => {
             const columnDef = (component as any).props.cell.column
-              .columnDef as MRT_ColumnDef<RequestForm>;
+              .columnDef as MRT_ColumnDef<Request>;
             if (columnDef.meta === "date") {
               // สร้างตัวแปร day เพื่อเก็บ accessorKey
-              const day = columnDef.accessorKey as keyof RequestForm;
+              const day = columnDef.accessorKey as keyof Request;
               return (
                 <LocalizationProvider
                   dateAdapter={AdapterDateFns}

@@ -2,12 +2,11 @@
 "use client";
 import Table4 from "@/components/table/Table4";
 import { type MRT_ColumnDef } from "material-react-table";
-import { useRequestForms } from "@/hook/useRequestForm";
-import { type RequestForm } from "@/types/requestform";
+import { useRequestForms, type Request } from "@/hook/useRequestForm";
 import { Button, Stack } from "@mui/material";
 import { useViewStore } from "@/zustand/useViewStore";
 
-const columns: MRT_ColumnDef<RequestForm>[] = [
+const columns: MRT_ColumnDef<Request>[] = [
   {
     accessorKey: "requestType",
     header: "Request Type",

@@ -1,18 +1,47 @@
 "use client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 import axios from "axios";
-import { type RequestForm, type RequestFormResponse } from "@/types/requestform";
 import Swal from "sweetalert2";
 
-const BASE_URL = "/api/request-form";
+export interface Request {
+  json(): Request | PromiseLike<Request>;
+  url: string | URL;
+  id: string;
+  requestType: string;
+  requesterName: string;
+  requesterEmail: string;
+  retailerTypes: string[];
+  bookings: string[];
+  existingCampaign: string;
+  startDate: number;
+  endDate: number;
+  duration: string;
+  mediaLinks: string;
+  notes: string;
+  linkedCampaigns: string;
+  campaigns: string[];
+  createDate: number;
+  isDelete: number;
+}
+
+export interface Response {
+  status: string;
+  data: Request[] | Request | null;
+  message: string;
+}
 
 // 🟢 GET - Fetch all request forms
 export const useRequestForms = () => {
+  const pathname = usePathname(); // now it's safely inside the hook body
+  const segments = pathname?.split("/").filter(Boolean);
+  const lastSegment = segments?.[segments.length - 1];
+  const BASE_URL = `/api/${lastSegment}`;
   return useQuery({
-    queryKey: ["requestForms"],
+    queryKey: [`${lastSegment}`],
     queryFn: async () => {
-      const response = await axios.get<RequestFormResponse>(BASE_URL);
-      return response.data.data as RequestForm[];
+      const response = await axios.get<Response>(BASE_URL);
+      return response.data.data as Request[];
     },
   });
 };
@@ -20,14 +49,23 @@ export const useRequestForms = () => {
 // 🟡 POST - Create new request form
 export const useSubmitRequestForm = () => {
   const queryClient = useQueryClient();
+  const pathname = usePathname(); // now it's safely inside the hook body
+  const segments = pathname?.split("/").filter(Boolean);
+  const lastSegment = segments?.[segments.length - 1];
+  const BASE_URL = `/api/${lastSegment}`;
 
   return useMutation({
-    mutationFn: async (formData: Omit<RequestForm, "id" | "createDate" | "isDelete">): Promise<RequestFormResponse> => {
-      const response = await axios.post<RequestFormResponse>(BASE_URL, formData);
+    mutationFn: async (
+      formData: Omit<Request, "id" | "createDate" | "isDelete">
+    ): Promise<Response> => {
+      const response = await axios.post<Response>(
+        BASE_URL,
+        formData
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["requestForms"] });
+      queryClient.invalidateQueries({ queryKey: [`${lastSegment}`] });
       Swal.fire({
         title: "สำเร็จ!",
         text: "บันทึกข้อมูลเรียบร้อยแล้ว",
@@ -49,17 +87,21 @@ export const useSubmitRequestForm = () => {
 // 🔵 PUT - Update request form
 export const useUpdateRequestForm = () => {
   const queryClient = useQueryClient();
+  const pathname = usePathname(); // now it's safely inside the hook body
+  const segments = pathname?.split("/").filter(Boolean);
+  const lastSegment = segments?.[segments.length - 1];
+  const BASE_URL = `/api/${lastSegment}`;
 
   return useMutation({
-    mutationFn: async (updatedForm: RequestForm) => {
-      const response = await axios.put<RequestFormResponse>(
+    mutationFn: async (updatedForm: Request) => {
+      const response = await axios.put<Response>(
         `${BASE_URL}/${updatedForm.id}`,
         updatedForm
       );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["requestForms"] });
+      queryClient.invalidateQueries({ queryKey: [`${lastSegment}`] });
       Swal.fire({
         title: "สำเร็จ!",
         text: "อัพเดทข้อมูลเรียบร้อยแล้ว",
@@ -81,14 +123,20 @@ export const useUpdateRequestForm = () => {
 // 🔴 DELETE - Delete request form
 export const useDeleteRequestForm = () => {
   const queryClient = useQueryClient();
+  const pathname = usePathname(); // now it's safely inside the hook body
+  const segments = pathname?.split("/").filter(Boolean);
+  const lastSegment = segments?.[segments.length - 1];
+  const BASE_URL = `/api/${lastSegment}`;
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await axios.delete<RequestFormResponse>(`${BASE_URL}/${id}`);
+      const response = await axios.delete<Response>(
+        `${BASE_URL}/${id}`
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["requestForms"] });
+      queryClient.invalidateQueries({ queryKey: [`${lastSegment}`] });
       Swal.fire({
         title: "สำเร็จ!",
         text: "ลบข้อมูลเรียบร้อยแล้ว",

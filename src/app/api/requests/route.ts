@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 import { v4 as uuidv4 } from "uuid";
-import { RequestForm } from "@/types/requestform";
+import { Request } from "@/hook/useRequestForm";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Request Form";
@@ -15,7 +15,7 @@ const CACHE_DURATION_SECONDS = 60 * 10; // 10 นาที
 // ✅ POST - สร้างข้อมูลใหม่
 export async function POST(req: Request) {
   const sheets = await getSheetsClient();
-  const formData: RequestForm = await req.json();
+  const formData: Request = await req.json();
 
   const submissionData = [
     uuidv4(),
@@ -132,7 +132,7 @@ export async function PUT(req: Request) {
   const existingRow = rows[rowIndex];
   const isDelete = existingRow[15] || "0";
 
-  const formData: RequestForm = await req.json();
+  const formData: Request = await req.json();
 
   const updatedRow = [
     id,
