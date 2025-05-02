@@ -50,70 +50,49 @@ export async function POST(req: Request) {
 // ✅ GET - ดึงข้อมูลที่ยังไม่ลบ (isDelete = 0)
 export async function GET() {
   const sheets = await getSheetsClient();
-
   const cached = await redis.get(CACHE_KEY);
   if (cached) {
-    return NextResponse.json({ source: "cache", data: cached });
+    return NextResponse.json(cached); // return array directly
   }
-
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
     range: `${SHEET_NAME}!A1:P`,
   });
-
-  // Get headers from first row
   const headers = response.data.values?.[0] || [];
-
-  // Filter and transform data rows
   const rows = (response.data.values || [])
-    .slice(1) // Skip header row
-    .filter((row) => row[15] !== "1") // Filter non-deleted items
+    .slice(1)
+    .filter((row) => row[15] !== "1")
     .map((row) => {
       const formattedRow: any = {};
-
       headers.forEach((header, index) => {
         let value = row[index];
-
-        // Handle array fields
         if (["retailerTypes", "bookings", "campaigns"].includes(header)) {
           try {
-            const parsedArray = JSON.parse(value);
-            value = Array.isArray(parsedArray) ? parsedArray.join(", ") : value;
+            value = JSON.parse(value);
           } catch {
-            value = value || "";
+            value = [];
           }
         }
-
-        // Handle date fields
         if (["startDate", "endDate", "createDate"].includes(header)) {
           value = value ? Number(value) : null;
         }
-
-        // Handle isDelete as number
         if (header === "isDelete") {
           value = Number(value || 0);
         }
-
         formattedRow[header] = value;
       });
-
       return formattedRow;
     });
-
   await redis.set(CACHE_KEY, rows, { ex: CACHE_DURATION_SECONDS });
-
-  return NextResponse.json({
-    source: "google",
-    data: rows,
-  });
+  return NextResponse.json(rows); // 👈 return as pure array
 }
 
 // ✅ PUT - แก้ไขข้อมูลโดยใช้ id
 export async function PUT(req: Request) {
   const sheets = await getSheetsClient();
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-
+  const id = (typeof req.url === "string" ? req.url : req.url.toString())
+    .split("/")
+    .pop();
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
   const response = await sheets.spreadsheets.values.get({
@@ -167,8 +146,9 @@ export async function PUT(req: Request) {
 // ✅ DELETE - ลบข้อมูลแบบ soft-delete โดยใช้ id
 export async function DELETE(req: Request) {
   const sheets = await getSheetsClient();
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
+  const id = (typeof req.url === "string" ? req.url : req.url.toString())
+    .split("/")
+    .pop();
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 

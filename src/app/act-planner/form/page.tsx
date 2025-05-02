@@ -21,7 +21,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import Swal from "sweetalert2";
-import { useSubmitRequestForm } from "@/hook/useRequestForm";
+import { useCreateTable } from "@/hook/useRequestForm";
 import { RequestForm } from "@/types/requestform";
 import Autocomplete from "@mui/material/Autocomplete";
 
@@ -50,7 +50,7 @@ export default function DigitalMediaRequestForm() {
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  const submitRequestForm = useSubmitRequestForm();
+  const submitRequestForm = useCreateTable();
 
   // Handlers
   const handleInputChange = (

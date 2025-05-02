@@ -1,6 +1,5 @@
 "use client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { usePathname } from "next/navigation";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -31,41 +30,33 @@ export interface Response {
   message: string;
 }
 
+const BASE_URL = "/api/requests"; // Base URL for the API
+
 // 🟢 GET - Fetch all request forms
-export const useRequestForms = () => {
-  const pathname = usePathname(); // now it's safely inside the hook body
-  const segments = pathname?.split("/").filter(Boolean);
-  const lastSegment = segments?.[segments.length - 1];
-  const BASE_URL = `/api/${lastSegment}`;
+export const useGetTable = () => {
   return useQuery({
-    queryKey: [`${lastSegment}`],
+    queryKey: [`requests`],
     queryFn: async () => {
-      const response = await axios.get<Response>(BASE_URL);
-      return response.data.data as Request[];
+      const { data } = await axios.get<Response>(BASE_URL);
+      console.log("Query All requests");
+      return data;
     },
   });
 };
 
 // 🟡 POST - Create new request form
-export const useSubmitRequestForm = () => {
+export const useCreateTable = () => {
   const queryClient = useQueryClient();
-  const pathname = usePathname(); // now it's safely inside the hook body
-  const segments = pathname?.split("/").filter(Boolean);
-  const lastSegment = segments?.[segments.length - 1];
-  const BASE_URL = `/api/${lastSegment}`;
 
   return useMutation({
     mutationFn: async (
       formData: Omit<Request, "id" | "createDate" | "isDelete">
     ): Promise<Response> => {
-      const response = await axios.post<Response>(
-        BASE_URL,
-        formData
-      );
-      return response.data;
+      const { data } = await axios.post<Response>(BASE_URL, formData);
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${lastSegment}`] });
+      queryClient.invalidateQueries({ queryKey: ["requests"] });
       Swal.fire({
         title: "สำเร็จ!",
         text: "บันทึกข้อมูลเรียบร้อยแล้ว",
@@ -85,23 +76,19 @@ export const useSubmitRequestForm = () => {
 };
 
 // 🔵 PUT - Update request form
-export const useUpdateRequestForm = () => {
+export const useUpdateTable = () => {
   const queryClient = useQueryClient();
-  const pathname = usePathname(); // now it's safely inside the hook body
-  const segments = pathname?.split("/").filter(Boolean);
-  const lastSegment = segments?.[segments.length - 1];
-  const BASE_URL = `/api/${lastSegment}`;
 
   return useMutation({
     mutationFn: async (updatedForm: Request) => {
-      const response = await axios.put<Response>(
+      const { data } = await axios.put<Response>(
         `${BASE_URL}/${updatedForm.id}`,
         updatedForm
       );
-      return response.data;
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${lastSegment}`] });
+      queryClient.invalidateQueries({ queryKey: [`requests`] });
       Swal.fire({
         title: "สำเร็จ!",
         text: "อัพเดทข้อมูลเรียบร้อยแล้ว",
@@ -121,22 +108,16 @@ export const useUpdateRequestForm = () => {
 };
 
 // 🔴 DELETE - Delete request form
-export const useDeleteRequestForm = () => {
+export const useDeleteTable = () => {
   const queryClient = useQueryClient();
-  const pathname = usePathname(); // now it's safely inside the hook body
-  const segments = pathname?.split("/").filter(Boolean);
-  const lastSegment = segments?.[segments.length - 1];
-  const BASE_URL = `/api/${lastSegment}`;
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await axios.delete<Response>(
-        `${BASE_URL}/${id}`
-      );
-      return response.data;
+      const { data } = await axios.delete<Response>(`${BASE_URL}/${id}`);
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${lastSegment}`] });
+      queryClient.invalidateQueries({ queryKey: [`requests`] });
       Swal.fire({
         title: "สำเร็จ!",
         text: "ลบข้อมูลเรียบร้อยแล้ว",

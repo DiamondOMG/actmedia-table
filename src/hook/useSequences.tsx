@@ -13,13 +13,14 @@ type SequenceResponse = {
 
 // 🟢 GET (ดึงข้อมูลทั้งหมด)
 export const useSequences = () => {
-  console.log("useSequences called");
+  
   return useQuery({
     queryKey: ["sequences"],
     queryFn: async () => {
       const response = await axios.get<SequenceResponse>(
         BASE_URL + "?action=get&all=true"
       );
+      console.log("useSequences called");
       return response.data.data as Sequence[];
     },
   });

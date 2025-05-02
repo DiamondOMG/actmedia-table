@@ -2,7 +2,7 @@
 "use client";
 import Table4 from "@/components/table/Table4";
 import { type MRT_ColumnDef } from "material-react-table";
-import { useRequestForms, type Request } from "@/hook/useRequestForm";
+import { useGetTable, type Request } from "@/hook/useRequestForm";
 import { Button, Stack } from "@mui/material";
 import { useViewStore } from "@/zustand/useViewStore";
 
@@ -52,8 +52,7 @@ const columns: MRT_ColumnDef<Request>[] = [
 ];
 
 export default function Page() {
-  const { data: requests = [], isLoading: isLoadingRequests } =
-    useRequestForms();
+  const { data: requests = [], isLoading: isLoadingRequests } = useGetTable();
   const setView = useViewStore((state) => state.setView);
   const currentView = useViewStore((state) => state.currentView);
 

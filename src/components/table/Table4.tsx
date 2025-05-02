@@ -29,9 +29,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import {
-  useSubmitRequestForm,
-  useUpdateRequestForm,
-  useDeleteRequestForm,
+  useCreateTable,
+  useUpdateTable,
+  useDeleteTable,
   type Request,
 } from "@/hook/useRequestForm";
 import { useViewStore } from "@/zustand/useViewStore"; //view
@@ -88,9 +88,9 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
   //!------------------ ฟังก์ชันจัดการ CRUD ------------------!//
 
   // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
-  const createRequestForm = useSubmitRequestForm();
-  const updateRequestForm = useUpdateRequestForm();
-  const deleteRequestForm = useDeleteRequestForm();
+  const createRequestForm = useCreateTable();
+  const updateRequestForm = useUpdateTable();
+  const deleteRequestForm = useDeleteTable();
 
   // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
   const handleCreate: MRT_TableOptions<Request>["onCreatingRowSave"] = async ({
