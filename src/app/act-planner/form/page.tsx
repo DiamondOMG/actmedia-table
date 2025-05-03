@@ -21,7 +21,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import Swal from "sweetalert2";
-import { useCreateTable } from "@/hook/useRequestForm";
+import { useCreateTable, type RequestFormData } from "@/hook/useRequestForm";
 
 import Autocomplete from "@mui/material/Autocomplete";
 
@@ -30,32 +30,17 @@ const retailerOptions = ["MAKRO", "Other"];
 const bookingOptions = ["1", "2", "3"];
 const campaignOptions = ["1", "2", "3"];
 
-export interface RequestForm {
-    requestType: "New" | "Change";
-    requesterName: string;
-    requesterEmail: string;
-    retailerTypes: string[];
-    bookings: string[];
-    existingCampaign: string;
-    startDate: number | null;
-    endDate: number | null;
-    duration: string;
-    mediaLinks: string;
-    notes: string;
-    linkedCampaigns: string;
-    campaigns: string[];
-  }
 
 export default function DigitalMediaRequestForm() {
-  const [formData, setFormData] = useState<RequestForm>({
+  const [formData, setFormData] = useState<RequestFormData>({
     requestType: "New",
     requesterName: "",
     requesterEmail: "",
     retailerTypes: [""],
     bookings: [""],
     existingCampaign: "",
-    startDate: null,
-    endDate: null,
+    startDate: 0,
+    endDate: 0,
     duration: "",
     mediaLinks: "",
     notes: "",
@@ -163,8 +148,8 @@ export default function DigitalMediaRequestForm() {
       // แปลงวันที่เป็น unixtime (milliseconds) โดยตรง
       const formDataWithUnixTime = {
         ...formData,
-        startDate: formData.startDate?.valueOf() || null,
-        endDate: formData.endDate?.valueOf() || null,
+        startDate: formData.startDate?.valueOf() ,
+        endDate: formData.endDate?.valueOf() ,
       };
 
       console.log(
@@ -181,8 +166,8 @@ export default function DigitalMediaRequestForm() {
         retailerTypes: [""],
         bookings: [""],
         existingCampaign: "",
-        startDate: null,
-        endDate: null,
+        startDate: 0,
+        endDate: 0,
         duration: "",
         mediaLinks: "",
         notes: "",

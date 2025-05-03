@@ -3,28 +3,29 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-export interface RequestFormData {
-  id: string;
+export type RequestFormData = {
+  id?: string;
+  createDate?: number;
+  isDelete?: 0 | 1;
   requestType: string;
   requesterName: string;
   requesterEmail: string;
   retailerTypes: string[];
   bookings: string[];
   existingCampaign: string;
-  startDate: number;
-  endDate: number;
+  startDate: number ;
+  endDate: number ;
   duration: string;
   mediaLinks: string;
   notes: string;
   linkedCampaigns: string;
   campaigns: string[];
-  createDate: number;
-  isDelete: number;
-}
+};
+
 
 export interface Response {
   status: string;
-  data: RequestFormData[] | RequestFormData | null;
+  data: RequestFormData[] | null;
   message: string;
 }
 
@@ -35,7 +36,7 @@ export const useGetTable = () => {
   return useQuery({
     queryKey: [`requests`],
     queryFn: async () => {
-      const { data } = await axios.get<Response>(BASE_URL);
+      const { data } = await axios.get<RequestFormData[]>(BASE_URL);
       console.log("Query All requests");
       return data;
     },
