@@ -2,11 +2,12 @@
 "use client";
 import Table4 from "@/components/table/Table4";
 import { type MRT_ColumnDef } from "material-react-table";
-import { useGetTable, type Request } from "@/hook/useRequestForm";
+import { useGetTable, type RequestFormData } from "@/hook/useRequestForm";
 import { Button, Stack } from "@mui/material";
 import { useViewStore } from "@/zustand/useViewStore";
+import { format } from "date-fns";
 
-const columns: MRT_ColumnDef<Request>[] = [
+const columns: MRT_ColumnDef<RequestFormData>[] = [
   {
     accessorKey: "requestType",
     header: "Request Type",
@@ -26,16 +27,30 @@ const columns: MRT_ColumnDef<Request>[] = [
   {
     accessorKey: "startDate",
     header: "Start Date",
-    Cell: ({ cell }) => (
-      <div>{new Date(cell.getValue() as number).toLocaleDateString()}</div>
-    ),
+    meta: "date",
+    accessorFn: (row) => new Date(row.startDate),
+    Cell: ({ cell }) => {
+      const value = cell.getValue<Date>();
+      return value ? format(value, "dd/MM/yyyy") : "";
+    },
+    filterVariant: "date-range",
+    muiFilterDatePickerProps: {
+      format: "dd/MM/yyyy",
+    },
   },
   {
     accessorKey: "endDate",
     header: "End Date",
-    Cell: ({ cell }) => (
-      <div>{new Date(cell.getValue() as number).toLocaleDateString()}</div>
-    ),
+    meta: "date",
+    accessorFn: (row) => new Date(row.startDate),
+    Cell: ({ cell }) => {
+      const value = cell.getValue<Date>();
+      return value ? format(value, "dd/MM/yyyy") : "";
+    },
+    filterVariant: "date-range",
+    muiFilterDatePickerProps: {
+      format: "dd/MM/yyyy",
+    },
   },
   {
     accessorKey: "duration",

@@ -1,9 +1,9 @@
 export const dynamic = "force-dynamic";
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
-import { Request } from "@/hook/useRequestForm";
+import { RequestFormData } from "@/hook/useRequestForm";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Request Form";
@@ -11,11 +11,10 @@ const redis = Redis.fromEnv();
 const CACHE_KEY = "cached_request_form_data2";
 
 // ✅ PUT - แก้ไขข้อมูลโดยใช้ id
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
   const sheets = await getSheetsClient();
-  const id = (typeof req.url === "string" ? req.url : req.url.toString())
-    .split("/")
-    .pop();
+  const id = req.url.split("/").pop(); // Now works because req is NextRequest
+
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
   const response = await sheets.spreadsheets.values.get({
@@ -34,7 +33,7 @@ export async function PUT(req: Request) {
   const existingRow = rows[rowIndex];
   const isDelete = existingRow[15] || "0";
 
-  const formData: Request = await req.json();
+  const formData: RequestFormData = await req.json();
 
   const updatedRow = [
     id,
@@ -67,11 +66,9 @@ export async function PUT(req: Request) {
 }
 
 // ✅ DELETE - ลบข้อมูลแบบ soft-delete โดยใช้ id
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   const sheets = await getSheetsClient();
-  const id = (typeof req.url === "string" ? req.url : req.url.toString())
-    .split("/")
-    .pop();
+  const id = req.url.split("/").pop();
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 

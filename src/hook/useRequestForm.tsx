@@ -3,9 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-export interface Request {
-  json(): Request | PromiseLike<Request>;
-  url: string | URL;
+export interface RequestFormData {
   id: string;
   requestType: string;
   requesterName: string;
@@ -26,7 +24,7 @@ export interface Request {
 
 export interface Response {
   status: string;
-  data: Request[] | Request | null;
+  data: RequestFormData[] | RequestFormData | null;
   message: string;
 }
 
@@ -49,9 +47,7 @@ export const useCreateTable = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (
-      formData: Omit<Request, "id" | "createDate" | "isDelete">
-    ): Promise<Response> => {
+    mutationFn: async (formData: RequestFormData): Promise<Response> => {
       const { data } = await axios.post<Response>(BASE_URL, formData);
       return data;
     },
@@ -80,7 +76,7 @@ export const useUpdateTable = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (updatedForm: Request) => {
+    mutationFn: async (updatedForm: RequestFormData) => {
       const { data } = await axios.put<Response>(
         `${BASE_URL}/${updatedForm.id}`,
         updatedForm

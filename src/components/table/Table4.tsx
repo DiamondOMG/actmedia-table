@@ -32,14 +32,14 @@ import {
   useCreateTable,
   useUpdateTable,
   useDeleteTable,
-  type Request,
+  type RequestFormData,
 } from "@/hook/useRequestForm";
 import { useViewStore } from "@/zustand/useViewStore"; //view
 
 // Props ที่รับเข้ามาสำหรับตาราง
 interface Table4Props {
-  columns: MRT_ColumnDef<Request>[]; // คอลัมน์ที่จะแสดงในตาราง
-  initialData: Request[]; // ข้อมูลเริ่มต้นที่จะแสดงในตาราง
+  columns: MRT_ColumnDef<RequestFormData>[]; // คอลัมน์ที่จะแสดงในตาราง
+  initialData: RequestFormData[]; // ข้อมูลเริ่มต้นที่จะแสดงในตาราง
 }
 
 const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
@@ -81,7 +81,7 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
 
   //!------------------ การแปลงข้อมูล ------------------!//
   // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า5
-  const newData: Request[] = useMemo(() => {
+  const newData: RequestFormData[] = useMemo(() => {
     return initialData;
   }, [initialData]);
 
@@ -93,31 +93,26 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
   const deleteRequestForm = useDeleteTable();
 
   // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
-  const handleCreate: MRT_TableOptions<Request>["onCreatingRowSave"] = async ({
-    values,
-    table,
-  }) => {
-    console.log("Create", values);
-    createRequestForm.mutate(values);
-    table.setCreatingRow(null); // ปิด modal การสร้าง
-  };
-
-  // ฟังก์ชันจัดการการอัพเดทข้อมูล
-  const handleUpdate: MRT_TableOptions<Request>["onEditingRowSave"] = async ({
-    values,
-    table,
-    row,
-  }) => {
-    // ผสานค่าเดิม (id, date) เข้ากับค่าที่ผู้ใช้กรอก
-    const updatedData: Request = {
-      ...row.original, // มี id, date อยู่แน่นอน
-      ...values, // ทับค่าที่แก้ไขใหม่
+  const handleCreate: MRT_TableOptions<RequestFormData>["onCreatingRowSave"] =
+    async ({ values, table }) => {
+      console.log("Create", values);
+      createRequestForm.mutate(values);
+      table.setCreatingRow(null); // ปิด modal การสร้าง
     };
 
-    console.log("Update", updatedData);
-    updateRequestForm.mutate(updatedData);
-    table.setEditingRow(null);
-  };
+  // ฟังก์ชันจัดการการอัพเดทข้อมูล
+  const handleUpdate: MRT_TableOptions<RequestFormData>["onEditingRowSave"] =
+    async ({ values, table, row }) => {
+      // ผสานค่าเดิม (id, date) เข้ากับค่าที่ผู้ใช้กรอก
+      const updatedData: RequestFormData = {
+        ...row.original, // มี id, date อยู่แน่นอน
+        ...values, // ทับค่าที่แก้ไขใหม่
+      };
+
+      console.log("Update", updatedData);
+      updateRequestForm.mutate(updatedData);
+      table.setEditingRow(null);
+    };
 
   // ฟังก์ชันแสดง confirm dialog สำหรับการลบข้อมูล
   const handleDelete = (id: string) => {
@@ -170,10 +165,10 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
           >
             {internalEditComponents.map((component) => {
               const columnDef = (component as any).props.cell.column
-                .columnDef as MRT_ColumnDef<Request>;
+                .columnDef as MRT_ColumnDef<RequestFormData>;
               if (columnDef.meta === "date") {
                 // สร้างตัวแปร day เพื่อเก็บ accessorKey
-                const day = columnDef.accessorKey as keyof Request;
+                const day = columnDef.accessorKey as keyof RequestFormData;
                 return (
                   <LocalizationProvider
                     dateAdapter={AdapterDateFns}
@@ -219,10 +214,10 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
         >
           {internalEditComponents.map((component) => {
             const columnDef = (component as any).props.cell.column
-              .columnDef as MRT_ColumnDef<Request>;
+              .columnDef as MRT_ColumnDef<RequestFormData>;
             if (columnDef.meta === "date") {
               // สร้างตัวแปร day เพื่อเก็บ accessorKey
-              const day = columnDef.accessorKey as keyof Request;
+              const day = columnDef.accessorKey as keyof RequestFormData;
               return (
                 <LocalizationProvider
                   dateAdapter={AdapterDateFns}

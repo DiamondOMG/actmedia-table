@@ -1,10 +1,10 @@
 export const dynamic = "force-dynamic";
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 import { v4 as uuidv4 } from "uuid";
-import { Request } from "@/hook/useRequestForm";
+import { RequestFormData } from "@/hook/useRequestForm";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Request Form";
@@ -13,9 +13,9 @@ const CACHE_KEY = "cached_request_form_data2";
 const CACHE_DURATION_SECONDS = 60 * 10; // 10 นาที
 
 // ✅ POST - สร้างข้อมูลใหม่
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const sheets = await getSheetsClient();
-  const formData: Request = await req.json();
+  const formData: RequestFormData = await req.json();
 
   const submissionData = [
     uuidv4(),
