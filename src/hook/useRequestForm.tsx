@@ -4,7 +4,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 export type RequestFormData = {
-  id?: string;
+  id?: string ;
   createDate?: number;
   isDelete?: 0 | 1;
   requestType: string;

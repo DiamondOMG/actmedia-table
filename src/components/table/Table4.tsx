@@ -115,9 +115,9 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
     };
 
   // ฟังก์ชันแสดง confirm dialog สำหรับการลบข้อมูล
-  const handleDelete = (id: string) => {
+  const handleDelete = (row: any) => {
     if (window.confirm("คุณแน่ใจว่าต้องการลบผู้ใช้นี้?")) {
-      deleteRequestForm.mutate(id);
+      deleteRequestForm.mutate(row.original.id);
     }
   };
 
@@ -265,7 +265,7 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
           <Tooltip title="ลบ">
             <IconButton
               color="error"
-              onClick={() => handleDelete(row.original.id)}
+              onClick={() => handleDelete(row)}
             >
               <DeleteIcon />
             </IconButton>
