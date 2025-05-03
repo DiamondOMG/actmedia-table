@@ -88,15 +88,15 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
   //!------------------ ฟังก์ชันจัดการ CRUD ------------------!//
 
   // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
-  const createRequestForm = useCreateTable();
-  const updateRequestForm = useUpdateTable();
-  const deleteRequestForm = useDeleteTable();
+  const createTabe = useCreateTable();
+  const updateTable = useUpdateTable();
+  const deleteTable = useDeleteTable();
 
   // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
   const handleCreate: MRT_TableOptions<RequestFormData>["onCreatingRowSave"] =
     async ({ values, table }) => {
       console.log("Create", values);
-      createRequestForm.mutate(values);
+      createTabe.mutate(values);
       table.setCreatingRow(null); // ปิด modal การสร้าง
     };
 
@@ -110,14 +110,14 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
       };
 
       console.log("Update", updatedData);
-      updateRequestForm.mutate(updatedData);
+      updateTable.mutate(updatedData);
       table.setEditingRow(null);
     };
 
   // ฟังก์ชันแสดง confirm dialog สำหรับการลบข้อมูล
   const handleDelete = (row: any) => {
     if (window.confirm("คุณแน่ใจว่าต้องการลบผู้ใช้นี้?")) {
-      deleteRequestForm.mutate(row.original.id);
+      deleteTable.mutate(row.original.id);
     }
   };
 
