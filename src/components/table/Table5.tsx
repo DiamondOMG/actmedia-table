@@ -12,19 +12,27 @@ import {
   MRT_SortingState,
   MRT_ColumnFiltersState,
   MRT_GroupingState,
+  MRT_ToggleFiltersButton,
+  MRT_ShowHideColumnsButton,
+  MRT_GlobalFilterTextField,
+  MRT_ToggleFullScreenButton,
+  MRT_ToggleDensePaddingButton,
 } from "material-react-table";
 import {
   Box,
   Button,
+  Chip,
   DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
+  Stack,
   TextField,
   Tooltip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { Search as SearchIcon } from "@mui/icons-material"; // ไอคอนแว่นขยาย
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import {
@@ -126,21 +134,30 @@ const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
     data: newData,
     createDisplayMode: "modal", // กำหนดให้การสร้างข้อมูลแสดงเป็น modal
     enableEditing: isEditing, // เปิดใช้การแก้ไขข้อมูล
-    muiTableContainerProps: { sx: { minHeight: "500px" } }, // กำหนดความสูงของ table
     enableColumnOrdering: true, // เปิดใช้การเรียงลำดับคอลัมน์
     enableBottomToolbar: true, // แสดง toolbar ด้านล่าง
     positionPagination: "bottom", // ตำแหน่งของ toolbar ด้านล่าง
     enableStickyHeader: true, // ให้ส่วนหัวตารางติดอยู่ด้านบนเสมอ
     enableGrouping: true, // เปิดใช้การจัดกลุ่มข้อมูล
-    // กำหนดสไตล์ให้ toolbar ด้านบน
-    muiTopToolbarProps: {
-      sx: { backgroundColor: "#e3f2fd" },
-    },
     onColumnFiltersChange: setColumnFilters, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงคอลัมน์
     onGlobalFilterChange: setGlobalFilter, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงคอลัมน์
     onPaginationChange: setPagination, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงหน้า
     onSortingChange: setSorting, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงการ Sort
     onGroupingChange: setGrouping, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงการจัดกลุ่ม
+    onCreatingRowSave: handleCreate, // ฟังชั่นปุ่มเพิ่ม
+    onEditingRowSave: handleUpdate, // ฟังชั่นปุ่มแก้ไข
+    ///ตารางยืดดด-------------------------------------------------------------------------------------
+    muiTableBodyProps: {
+      sx: {
+        overflow: "auto", // ยกเลิกการเลื่อนอัตโนมัติในแนวตั้ง
+      },
+    },
+    muiTableContainerProps: {
+      sx: {
+        maxHeight: "calc(100vh - 200px)", // Adjust height to leave space for bottom sections
+        overflow: "auto", // ตั้งค่า maxHeight เป็น 'unset' เพื่อให้ตารางไม่จำกัดความสูง
+      },
+    },
     state: {
       columnFilters,
       globalFilter,
@@ -151,9 +168,8 @@ const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
     initialState: {
       density: "compact",
       expanded: true, // ปิดการขยายกรุ๊ปเริ่มต้น
+      showGlobalFilter: true, //show the global filter by default
     },
-    onCreatingRowSave: handleCreate, // ฟังชั่นปุ่มเพิ่ม
-    onEditingRowSave: handleUpdate, // ฟังชั่นปุ่มแก้ไข
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => {
       // สร้างหน้าต่าง modal สำหรับเพิ่มข้อมูล
       return (
@@ -277,18 +293,78 @@ const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
       ) : null,
 
     // ปุ่มสร้างข้อมูลใหม่ที่ด้านบนตาราง
-    renderTopToolbarCustomActions: ({ table }) => (
-      <Box sx={{ display: "flex", gap: "1rem" }}>
-        {isEditing && (
-          <Button
-            variant="contained"
-            onClick={() => table.setCreatingRow(true)}
-          >
-            สร้าง
-          </Button>
-        )}
-      </Box>
-    ),
+    renderTopToolbar: ({ table }) => {
+      const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "2px",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            backgroundColor: "#e3f2fd" 
+          }}
+        >
+          {/* ฝั่งซ้าย: UI */}
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Box sx={{ display: "flex", gap: "1rem" }}>
+              {isEditing && (
+                <Button
+                  variant="contained"
+                  onClick={() => table.setCreatingRow(true)}
+                >
+                  สร้าง
+                </Button>
+              )}
+            </Box>
+            <Box component="span">Group By</Box>
+            {table.getState().grouping.length > 0 && (
+              <>
+                {table.getState().grouping.map((columnId, index) => (
+                  <Chip
+                    key={index} // ใช้ index เป็น key ถ้าไม่มี unique ID อื่น
+                    label={table.getColumn(columnId).columnDef.header}
+                    onDelete={() => {
+                      const newGrouping = table
+                        .getState()
+                        .grouping.filter((id) => id !== columnId);
+                      table.setGrouping(newGrouping);
+                    }}
+                    color="primary"
+                    variant="outlined"
+                    sx={{ backgroundColor: "#e3f2fd", marginRight: "4px" }}
+                  />
+                ))}
+              </>
+            )}
+          </Stack>
+
+          {/* ฝั่งขวา: ปุ่มเครื่องมือและช่องค้นหา */}
+          <Stack direction="row" spacing={1}>
+            {isSearchVisible && (
+              <MRT_GlobalFilterTextField
+                table={table}
+                sx={{ minWidth: "200px" }}
+              />
+            )}
+            <IconButton
+              onClick={() => setIsSearchVisible(!isSearchVisible)}
+              color={isSearchVisible ? "primary" : "default"}
+              aria-label="Toggle search"
+            >
+              <SearchIcon />
+            </IconButton>
+            <MRT_ToggleFiltersButton table={table} />
+            <MRT_ShowHideColumnsButton table={table} />
+            <MRT_ToggleDensePaddingButton table={table} />
+            <MRT_ToggleFullScreenButton table={table} />
+          </Stack>
+        </Box>
+      );
+    },
   });
 
   return (
