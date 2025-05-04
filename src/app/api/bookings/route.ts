@@ -7,9 +7,9 @@ import { v4 as uuidv4 } from "uuid";
 import { BookingData } from "@/hook/useBookings";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
-const SHEET_NAME = "Bookings";
+const SHEET_NAME = "Act Planner - Bookings";
 const redis = Redis.fromEnv();
-const CACHE_KEY = "cached_bookings_data5";
+const CACHE_KEY = "Act Planner - Bookings";
 const CACHE_DURATION_SECONDS = 60 * 10; // 10 minutes
 
 // POST - Create new booking

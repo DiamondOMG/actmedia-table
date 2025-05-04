@@ -6,9 +6,9 @@ import { Redis } from "@upstash/redis";
 import { BookingData } from "@/hook/useBookings";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
-const SHEET_NAME = "Bookings";
+const SHEET_NAME = "Act Planner - Bookings";
 const redis = Redis.fromEnv();
-const CACHE_KEY = "cached_bookings_data5";
+const CACHE_KEY = "Act Planner - Bookings";
 
 // PUT - Update booking by id
 export async function PUT(req: NextRequest) {

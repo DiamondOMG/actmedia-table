@@ -7,9 +7,9 @@ import { v4 as uuidv4 } from "uuid";
 import { RequestFormData } from "@/hook/useRequestForm";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
-const SHEET_NAME = "Request Form";
+const SHEET_NAME = "Act Planner - Requests";
 const redis = Redis.fromEnv();
-const CACHE_KEY = "cached_request_form_data";
+const CACHE_KEY = "Act Planner - Requests";
 const CACHE_DURATION_SECONDS = 60 * 10; // 10 นาที
 
 // ✅ POST - สร้างข้อมูลใหม่

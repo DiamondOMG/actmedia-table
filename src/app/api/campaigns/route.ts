@@ -7,7 +7,7 @@ const redis = Redis.fromEnv();
 
 const username = process.env.USERNAMEOMG!;
 const password = process.env.PASSWORDOMG!;
-const CACHE_KEY = "summarized_data_v1";
+const CACHE_KEY = "Act Planner - Campaigns";
 const CACHE_DURATION_SECONDS = 10 * 60; // 10 minutes
 
 async function fetchSeqCampaigns() {

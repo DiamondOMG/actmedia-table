@@ -49,6 +49,7 @@ const columns: MRT_ColumnDef<BookingData>[] = [
     accessorKey: "bigcCategorySignage",
     header: "BigC Category Signage",
     Cell: ({ cell }) => (cell.getValue<boolean>() ? "Yes" : "No"),
+    size: 250,
   },
   {
     accessorKey: "mbc",
@@ -114,6 +115,7 @@ const columns: MRT_ColumnDef<BookingData>[] = [
   {
     accessorKey: "buttonCustomerReport",
     header: "Button Customer Report",
+    size: 300,
   },
 ];
 
@@ -142,14 +144,14 @@ export default function Page() {
 
   return (
     <>
-      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+      {/* <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
         <Button variant="contained" onClick={handleClick}>
           Set View
         </Button>
         <Button variant="contained" onClick={handlePrintView}>
           Print View
         </Button>
-      </Stack>
+      </Stack> */}
       <Table5 columns={columns} initialData={bookings} />
     </>
   );
