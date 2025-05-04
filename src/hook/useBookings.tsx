@@ -3,41 +3,49 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-export type RequestFormData = {
-  id?: string ;
-  createDate?: number;
-  isDelete?: 0 | 1;
-  requestType: string;
-  requesterName: string;
-  requesterEmail: string;
-  retailerTypes: string[];
-  bookings: string[];
-  existingCampaign: string;
-  startDate: number ;
-  endDate: number ;
-  duration: string;
-  mediaLinks: string;
-  notes: string;
-  linkedCampaigns: string;
-  campaigns: string[];
-};
+export interface BookingData {
+  id?: string;
+  booking: string;
+  bookingCode: string;
+  campaignType: string;
+  customer: string;
+  campaignName: string;
+  status: string;
+  bookingsToMedium: string;
+  bigcTvSignage: boolean;
+  bigcTvKiosk: boolean;
+  bigcCategorySignage: boolean;
+  mbc: boolean;
+  createdBy: string;
+  lastModifiedBy: string;
+  createdOn: number;
+  lastModified?: number;
+  campaignStatus: string;
+  customerRecordId: string;
+  logoURL: string;
+  customerReport: string;
+  requests: string;
+  buttonCustomerReport: string;
+  isDelete: 0 | 1;
+}
+
 
 
 export interface Response {
   status: string;
-  data: RequestFormData[] | null;
+  data: BookingData[] | null;
   message: string;
 }
 
-const BASE_URL = "/api/requests"; // Base URL for the API
+const BASE_URL = "/api/bookings"; // Base URL for the API
 
 // 🟢 GET - Fetch all request forms
 export const useGetTable = () => {
   return useQuery({
-    queryKey: [`requests`],
+    queryKey: [`bookings`],
     queryFn: async () => {
-      const { data } = await axios.get<RequestFormData[]>(BASE_URL);
-      console.log("Query All requests");
+      const { data } = await axios.get<BookingData[]>(BASE_URL);
+      console.log("Query All bookings");
       return data;
     },
   });
@@ -48,12 +56,12 @@ export const useCreateTable = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (formData: RequestFormData): Promise<Response> => {
+    mutationFn: async (formData: BookingData): Promise<Response> => {
       const { data } = await axios.post<Response>(BASE_URL, formData);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
       Swal.fire({
         title: "สำเร็จ!",
         text: "บันทึกข้อมูลเรียบร้อยแล้ว",
@@ -62,7 +70,7 @@ export const useCreateTable = () => {
       });
     },
     onError: () => {
-      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
       Swal.fire({
         title: "เกิดข้อผิดพลาด!",
         text: "ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง",
@@ -78,15 +86,16 @@ export const useUpdateTable = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (updatedForm: RequestFormData) => {
+    mutationFn: async (updatedForm: BookingData) => {
       const { data } = await axios.put<Response>(
         `${BASE_URL}/${updatedForm.id}`,
         updatedForm
       );
+      console.log("Update booking", updatedForm.createdOn);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`requests`] });
+      queryClient.invalidateQueries({ queryKey: [`bookings`] });
       Swal.fire({
         title: "สำเร็จ!",
         text: "อัพเดทข้อมูลเรียบร้อยแล้ว",
@@ -95,7 +104,7 @@ export const useUpdateTable = () => {
       });
     },
     onError: () => {
-      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
       Swal.fire({
         title: "เกิดข้อผิดพลาด!",
         text: "ไม่สามารถอัพเดทข้อมูลได้ กรุณาลองใหม่อีกครั้ง",
@@ -116,7 +125,7 @@ export const useDeleteTable = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`requests`] });
+      queryClient.invalidateQueries({ queryKey: [`bookings`] });
       Swal.fire({
         title: "สำเร็จ!",
         text: "ลบข้อมูลเรียบร้อยแล้ว",
@@ -125,7 +134,7 @@ export const useDeleteTable = () => {
       });
     },
     onError: () => {
-      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
       Swal.fire({
         title: "เกิดข้อผิดพลาด!",
         text: "ไม่สามารถลบข้อมูลได้ กรุณาลองใหม่อีกครั้ง",

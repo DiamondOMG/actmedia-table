@@ -23,6 +23,26 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
   {
     accessorKey: "retailerTypes",
     header: "Retailer Types",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string[]>();
+      return value ? value.join(", ") : "";
+    },
+  },
+  {
+    accessorKey: "bookings",
+    header: "Bookings",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string[]>();
+      return value ? value.join(", ") : "";
+    },
+  },
+  {
+    accessorKey: "campaigns",
+    header: "Campaigns",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string[]>();
+      return value ? value.join(", ") : "";
+    },
   },
   {
     accessorKey: "startDate",
@@ -42,7 +62,7 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
     accessorKey: "endDate",
     header: "End Date",
     meta: "date",
-    accessorFn: (row) => new Date(row.startDate),
+    accessorFn: (row) => new Date(row.endDate),
     Cell: ({ cell }) => {
       const value = cell.getValue<Date>();
       return value ? format(value, "dd/MM/yyyy") : "";
@@ -63,6 +83,14 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
   {
     accessorKey: "notes",
     header: "Notes",
+  },
+  {
+    accessorKey: "linkedCampaigns",
+    header: "Linked Campaigns",
+  },
+  {
+    accessorKey: "mediaLinks",
+    header: "Linked Media",
   },
 ];
 

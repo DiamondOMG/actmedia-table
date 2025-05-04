@@ -1,4 +1,4 @@
-// src/app/components/table/Table4.tsx
+// src/app/components/table/Table5.tsx
 "use client";
 
 import { memo, useState, useMemo, useEffect } from "react";
@@ -31,17 +31,17 @@ import {
   useCreateTable,
   useUpdateTable,
   useDeleteTable,
-  type RequestFormData,
-} from "@/hook/useRequestForm";
+  type BookingData,
+} from "@/hook/useBookings";
 import { useViewStore } from "@/zustand/useViewStore"; //view
 
 // Props ที่รับเข้ามาสำหรับตาราง
-interface Table4Props {
-  columns: MRT_ColumnDef<RequestFormData>[]; // คอลัมน์ที่จะแสดงในตาราง
-  initialData: RequestFormData[]; // ข้อมูลเริ่มต้นที่จะแสดงในตาราง
+interface Table5Props {
+  columns: MRT_ColumnDef<BookingData>[]; // คอลัมน์ที่จะแสดงในตาราง
+  initialData: BookingData[]; // ข้อมูลเริ่มต้นที่จะแสดงในตาราง
 }
 
-const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
+const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
   //!----------------table state------------------!//
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     []
@@ -76,11 +76,11 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
   }, [view]);
 
   //!------------------ ส่วนแสดงผล ------------------!//
-  console.log(` Table4 render `);
+  console.log(` Table5 render `);
 
   //!------------------ การแปลงข้อมูล ------------------!//
   // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า5
-  const newData: RequestFormData[] = useMemo(() => {
+  const newData: BookingData[] = useMemo(() => {
     return initialData;
   }, [initialData]);
 
@@ -92,7 +92,7 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
   const deleteTable = useDeleteTable();
 
   // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
-  const handleCreate: MRT_TableOptions<RequestFormData>["onCreatingRowSave"] =
+  const handleCreate: MRT_TableOptions<BookingData>["onCreatingRowSave"] =
     async ({ values, table }) => {
       console.log("Create", values);
       createTabe.mutate(values);
@@ -100,15 +100,13 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
     };
 
   // ฟังก์ชันจัดการการอัพเดทข้อมูล
-  const handleUpdate: MRT_TableOptions<RequestFormData>["onEditingRowSave"] =
+  const handleUpdate: MRT_TableOptions<BookingData>["onEditingRowSave"] =
     async ({ values, table, row }) => {
       // ผสานค่าเดิม (id, date) เข้ากับค่าที่ผู้ใช้กรอก
-      const updatedData: RequestFormData = {
+      const updatedData: BookingData = {
         ...row.original, // มี id, date อยู่แน่นอน
         ...values, // ทับค่าที่แก้ไขใหม่
       };
-
-      
 
       console.log("Update", updatedData);
       updateTable.mutate(updatedData);
@@ -166,10 +164,10 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
           >
             {internalEditComponents.map((component) => {
               const columnDef = (component as any).props.cell.column
-                .columnDef as MRT_ColumnDef<RequestFormData>;
+                .columnDef as MRT_ColumnDef<BookingData>;
               if (columnDef.meta === "date") {
                 // สร้างตัวแปร day เพื่อเก็บ accessorKey
-                const day = columnDef.accessorKey as keyof RequestFormData;
+                const day = columnDef.accessorKey as keyof BookingData;
                 return (
                   <LocalizationProvider
                     dateAdapter={AdapterDateFns}
@@ -211,48 +209,52 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
       <>
         <DialogTitle variant="h3">แก้ไข RequestForm</DialogTitle>
         <DialogContent
-      sx={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
-    >
-      {internalEditComponents.map((component) => {
-        const columnDef = (component as any).props.cell.column
-          .columnDef as MRT_ColumnDef<RequestFormData>;
-        if (columnDef.meta === "date") {
-          const day = columnDef.accessorKey as keyof RequestFormData;
-          // แปลงค่าเริ่มต้นให้เป็น Unix timestamp ถ้ายังไม่ใช่
-          if (
-            row._valuesCache[day] &&
-            !(typeof row._valuesCache[day] === "number")
-          ) {
-            row._valuesCache[day] = new Date(
-              row._valuesCache[day] as any
-            ).getTime();
-          }
-          return (
-            <LocalizationProvider
-              dateAdapter={AdapterDateFns}
-              key={`date-picker-${day}`}
-            >
-              <DatePicker
-                label={columnDef.header}
-                value={
-                  row._valuesCache[day]
-                    ? new Date(Number(row._valuesCache[day]))
-                    : null
-                }
-                onChange={(newValue) => {
-                  row._valuesCache[day] = newValue ? newValue.getTime() : null;
-                }}
-                format="dd/MM/yyyy"
-                slots={{
-                  textField: (params) => <TextField {...params} fullWidth />,
-                }}
-              />
-            </LocalizationProvider>
-          );
-        }
-        return component;
-      })}
-    </DialogContent>
+          sx={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+        >
+          {internalEditComponents.map((component) => {
+            const columnDef = (component as any).props.cell.column
+              .columnDef as MRT_ColumnDef<BookingData>;
+            if (columnDef.meta === "date") {
+              const day = columnDef.accessorKey as keyof BookingData;
+              // แปลงค่าเริ่มต้นให้เป็น Unix timestamp ถ้ายังไม่ใช่
+              if (
+                row._valuesCache[day] &&
+                !(typeof row._valuesCache[day] === "number")
+              ) {
+                row._valuesCache[day] = new Date(
+                  row._valuesCache[day] as any
+                ).getTime();
+              }
+              return (
+                <LocalizationProvider
+                  dateAdapter={AdapterDateFns}
+                  key={`date-picker-${day}`}
+                >
+                  <DatePicker
+                    label={columnDef.header}
+                    value={
+                      row._valuesCache[day]
+                        ? new Date(Number(row._valuesCache[day]))
+                        : null
+                    }
+                    onChange={(newValue) => {
+                      row._valuesCache[day] = newValue
+                        ? newValue.getTime()
+                        : null;
+                    }}
+                    format="dd/MM/yyyy"
+                    slots={{
+                      textField: (params) => (
+                        <TextField {...params} fullWidth />
+                      ),
+                    }}
+                  />
+                </LocalizationProvider>
+              );
+            }
+            return component;
+          })}
+        </DialogContent>
         <DialogActions>
           <MRT_EditActionButtons variant="text" table={table} row={row} />
         </DialogActions>
@@ -267,10 +269,7 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
             </IconButton>
           </Tooltip>
           <Tooltip title="ลบ">
-            <IconButton
-              color="error"
-              onClick={() => handleDelete(row)}
-            >
+            <IconButton color="error" onClick={() => handleDelete(row)}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
@@ -299,5 +298,5 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
   );
 });
 
-Table4.displayName = "Table4";
-export default Table4;
+Table5.displayName = "Table5";
+export default Table5;

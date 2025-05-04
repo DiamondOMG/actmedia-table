@@ -3,23 +3,23 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
-import { RequestFormData } from "@/hook/useRequestForm";
+import { BookingData } from "@/hook/useBookings";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
-const SHEET_NAME = "Request Form";
+const SHEET_NAME = "Bookings";
 const redis = Redis.fromEnv();
-const CACHE_KEY = "cached_request_form_data";
+const CACHE_KEY = "cached_bookings_data5";
 
-// ✅ PUT - แก้ไขข้อมูลโดยใช้ id
+// PUT - Update booking by id
 export async function PUT(req: NextRequest) {
   const sheets = await getSheetsClient();
-  const id = req.url.split("/").pop(); // Now works because req is NextRequest
+  const id = req.url.split("/").pop();
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A2:P`,
+    range: `${SHEET_NAME}!A2:W`,
   });
 
   const rows = response.data.values || [];
@@ -31,32 +31,40 @@ export async function PUT(req: NextRequest) {
   }
 
   const existingRow = rows[rowIndex];
-  const isDelete = existingRow[15] || "0";
+  const isDelete = existingRow[22] || "0";
 
-  const formData: RequestFormData = await req.json();
+  const formData: BookingData = await req.json();
 
   const updatedRow = [
     id,
-    formData.requestType,
-    formData.requesterName,
-    formData.requesterEmail,
-    JSON.stringify(formData.retailerTypes),
-    JSON.stringify(formData.bookings),
-    formData.existingCampaign,
-    formData.startDate || "",
-    formData.endDate || "",
-    formData.duration,
-    formData.mediaLinks,
-    formData.notes,
-    formData.linkedCampaigns,
-    JSON.stringify(formData.campaigns),
-    Date.now(),
+    formData.booking,
+    formData.bookingCode,
+    formData.campaignType,
+    formData.customer,
+    formData.campaignName,
+    formData.status,
+    formData.bookingsToMedium,
+    formData.bigcTvSignage.toString(),
+    formData.bigcTvKiosk.toString(),
+    formData.bigcCategorySignage.toString(),
+    formData.mbc.toString(),
+    formData.createdBy,
+    formData.lastModifiedBy,
+    formData.createdOn,
+    Date.now().toString(),
+    formData.campaignStatus,
+    formData.customerRecordId,
+    formData.logoURL,
+    formData.customerReport,
+    formData.requests,
+    formData.buttonCustomerReport,
     isDelete,
   ];
 
+
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A${rowNumber}:P${rowNumber}`,
+    range: `${SHEET_NAME}!A${rowNumber}:W${rowNumber}`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [updatedRow] },
   });
@@ -65,7 +73,7 @@ export async function PUT(req: NextRequest) {
   return NextResponse.json({ message: "Updated successfully" });
 }
 
-// ✅ DELETE - ลบข้อมูลแบบ soft-delete โดยใช้ id
+// DELETE - Soft-delete booking by id
 export async function DELETE(req: NextRequest) {
   const sheets = await getSheetsClient();
   const id = req.url.split("/").pop();
@@ -74,7 +82,7 @@ export async function DELETE(req: NextRequest) {
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A2:P`,
+    range: `${SHEET_NAME}!A2:W`,
   });
 
   const rows = response.data.values || [];
@@ -86,11 +94,11 @@ export async function DELETE(req: NextRequest) {
   }
 
   const row = rows[rowIndex];
-  row[15] = "1"; // isDelete = 1
+  row[22] = "1"; // isDelete = 1
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A${rowNumber}:P${rowNumber}`,
+    range: `${SHEET_NAME}!A${rowNumber}:W${rowNumber}`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [row] },
   });

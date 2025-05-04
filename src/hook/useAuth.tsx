@@ -49,7 +49,7 @@ export function useAuth() {
         timer: 1500,
       });
 
-      router.push("/dashboard");
+      router.push("/home");
     },
     onError: (error: Error) => {
       Swal.fire({

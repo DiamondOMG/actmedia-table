@@ -8,7 +8,7 @@ import { RequestFormData } from "@/hook/useRequestForm";
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Request Form";
 const redis = Redis.fromEnv();
-const CACHE_KEY = "cached_request_form_data";
+const CACHE_KEY = "cached_request_form_data2";
 
 // ✅ PUT - แก้ไขข้อมูลโดยใช้ id
 export async function PUT(req: NextRequest) {
