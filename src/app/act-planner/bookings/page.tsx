@@ -2,9 +2,11 @@
 import Table5 from "@/components/table/Table5";
 import { type MRT_ColumnDef } from "material-react-table";
 import { useGetTable, type BookingData } from "@/hook/useBookings";
-import { Button, Stack } from "@mui/material";
+import { Button, Menu, Stack } from "@mui/material";
 import { useViewStore } from "@/zustand/useViewStore";
 import { format } from "date-fns";
+import Navbar from "@/components/navbar/Navbar";
+import MenuBar from "../../../components/navbar/MenuBar";
 
 const columns: MRT_ColumnDef<BookingData>[] = [
   {
@@ -143,16 +145,10 @@ export default function Page() {
   if (isLoadingBookings) return <div>Loading Bookings...</div>;
 
   return (
-    <>
-      {/* <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-        <Button variant="contained" onClick={handleClick}>
-          Set View
-        </Button>
-        <Button variant="contained" onClick={handlePrintView}>
-          Print View
-        </Button>
-      </Stack> */}
+    <div className = "h-screen flex flex-col">
+      <Navbar />
+      <MenuBar className="flex-grow"/>
       <Table5 columns={columns} initialData={bookings} />
-    </>
+    </div>
   );
 }
