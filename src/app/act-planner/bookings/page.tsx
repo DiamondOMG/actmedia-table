@@ -6,7 +6,7 @@ import { Button, Menu, Stack } from "@mui/material";
 import { useViewStore } from "@/zustand/useViewStore";
 import { format } from "date-fns";
 import Navbar from "@/components/navbar/Navbar";
-import MenuBar from "../../../components/navbar/MenuBar";
+import MenuBar from "@/components/navbar/MenuBar";
 
 const columns: MRT_ColumnDef<BookingData>[] = [
   {
@@ -142,7 +142,7 @@ export default function Page() {
     });
   };
 
-  if (isLoadingBookings) return <div>Loading Bookings...</div>;
+  if (isLoadingBookings) return <div className="flex justify-center items-center h-screen">Loading Bookings...</div>;
 
   return (
     <div className = "h-screen flex flex-col">

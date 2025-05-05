@@ -5,6 +5,8 @@ import { format } from "date-fns";
 import { useCampaigns } from "@/hook/useCampaigns";
 import { type Campaign } from "@/types/campaigns";
 import { Box, CircularProgress } from "@mui/material"; // ✅ ใช้ Box ของ MUI
+import Navbar from "@/components/navbar/Navbar";
+import MenuBar from "@/components/navbar/MenuBar";
 
 const columns: MRT_ColumnDef<Campaign>[] = [
   {
@@ -128,12 +130,13 @@ const columns: MRT_ColumnDef<Campaign>[] = [
 export default function Page() {
   const { data: campaigns = [], isLoading } = useCampaigns();
 
-
-  if (isLoading) return <div className="flex justify-center items-center h-screen"><CircularProgress /></div>;
+  if (isLoading) return <div className="flex justify-center items-center h-screen">Loading Campaign...</div>;
 
   return (
-    <>
+    <div className="h-screen flex flex-col">
+      <Navbar />
+      <MenuBar className="flex-grow" />
       <Table2 columns={columns} initialData={campaigns} />
-    </>
+    </div>
   );
 }
