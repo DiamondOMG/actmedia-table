@@ -7,6 +7,7 @@ import { useViewStore } from "@/zustand/useViewStore";
 import { format } from "date-fns";
 import Navbar from "@/components/navbar/Navbar";
 import MenuBar from "@/components/navbar/MenuBar";
+import { useEffect, useState } from "react";
 
 const columns: MRT_ColumnDef<BookingData>[] = [
   {
@@ -125,6 +126,15 @@ export default function Page() {
   const { data: bookings = [], isLoading: isLoadingBookings } = useGetTable();
   const setView = useViewStore((state) => state.setView);
   const currentView = useViewStore((state) => state.currentView);
+  const [isMount, setIsMount] = useState(false); // เพิ่ม state สำหรับตรวจสอบการ mount
+
+  // ตั้งค่า isMount เป็น true เมื่อ component mount เสร็จ
+  useEffect(() => {
+    setIsMount(true);
+    return () => {
+      setIsMount(false); // Cleanup เมื่อ component unmount
+    };
+  }, []);
 
   const handleClick = () => {
     setView({
@@ -142,12 +152,12 @@ export default function Page() {
     });
   };
 
-  if (isLoadingBookings) return <div className="flex justify-center items-center h-screen">Loading Bookings...</div>;
+  if (isLoadingBookings || !isMount) return <div className="flex justify-center items-center h-screen">Loading Bookings...</div>;
 
   return (
-    <div className = "h-screen flex flex-col">
+    <div className="h-screen flex flex-col">
       <Navbar />
-      <MenuBar className="flex-grow"/>
+      <MenuBar className="flex-grow" />
       <Table5 columns={columns} initialData={bookings} />
     </div>
   );
