@@ -11,9 +11,7 @@ const CACHE_KEY = "Act Planner - Campaigns";
 const CACHE_DURATION_SECONDS = 10 * 60; // 10 minutes
 
 async function fetchSeqCampaigns() {
-  const url =
-    "https://script.google.com/macros/s/AKfycbzfRMpRmPuLiaQmqDgWiJRTc5hnO0PxXXIXsZTw2AY6tWLplbLq7ARn0BuDcOfuoksb/exec?action=get&all=true";
-
+  const url ="https://script.google.com/macros/s/AKfycby6U-0jdXynLOtSr751SuOKE6OygtMieLRaPZWYN8V6hZRnXNYNxm1pzPolKvqGq1i9/exec?action=get&all=true"
   const res = await axios.get(url, {
     headers: { "Cache-Control": "no-store" },
   });

@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactStrictMode: false, // ปิด Strict Mode
+  reactStrictMode: true, // ปิด Strict Mode
 };
 
 export default nextConfig;

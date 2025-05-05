@@ -4,7 +4,7 @@ import { type MRT_ColumnDef } from "material-react-table";
 import { format } from "date-fns";
 import { useCampaigns } from "@/hook/useCampaigns";
 import { type Campaign } from "@/types/campaigns";
-import { Box } from "@mui/material"; // ✅ ใช้ Box ของ MUI
+import { Box, CircularProgress } from "@mui/material"; // ✅ ใช้ Box ของ MUI
 
 const columns: MRT_ColumnDef<Campaign>[] = [
   {
@@ -129,7 +129,7 @@ export default function Page() {
   const { data: campaigns = [], isLoading } = useCampaigns();
 
 
-  if (isLoading) return <div>Loading campaigns...</div>;
+  if (isLoading) return <div className="flex justify-center items-center h-screen"><CircularProgress /></div>;
 
   return (
     <>
