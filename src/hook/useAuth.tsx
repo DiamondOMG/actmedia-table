@@ -77,6 +77,15 @@ export function useAuth() {
 
   const register = useMutation({
     mutationFn: async (data: RegisterData) => {
+      Swal.fire({
+        title: "กำลังเข้าสู่ระบบ",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const response = await fetch("/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

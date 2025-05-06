@@ -15,6 +15,13 @@ export async function POST(req: Request) {
   const sheets = await getSheetsClient();
   const { email, password, name, department, position } = await req.json();
 
+  // 🔍 ตรวจสอบ email domain
+  if (!email.endsWith("@omgthailand.com")) {
+    return NextResponse.json(
+      { error: "กรุณาใช้ Email @omgthailand.com ในการสมัครสมาชิก" },
+      { status: 400 }
+    );
+  }
   // ✅ Default permissions
   const defaultPermissions = [
     { menu: "user", level: 1 },
