@@ -4,8 +4,11 @@ import Table3 from "@/components/table/Table3";
 import { type MRT_ColumnDef } from "material-react-table";
 import { useSequences } from "@/hook/useSequences";
 import { type Sequence } from "@/types/sequences";
-import { Button, Stack } from "@mui/material";
+import { Button, CircularProgress, Stack } from "@mui/material";
 import { useViewStore } from "@/zustand/useViewStore";
+import { useEffect, useState } from "react";
+import Navbar from "@/components/navbar/Navbar";
+import PlannerBar from "@/components/navbar/PlannerBar";
 
 const columns: MRT_ColumnDef<Sequence>[] = [
   {
@@ -31,38 +34,26 @@ const columns: MRT_ColumnDef<Sequence>[] = [
 
 export default function Page() {
   const { data: sequence = [], isLoading: isLoadingSequence } = useSequences();
-  const setView = useViewStore((state) => state.setView);
-  const currentView = useViewStore((state) => state.currentView);
+  const [isMount, setIsMount] = useState(false); // เพิ่ม state สำหรับตรวจสอบการ mount
 
-  const handleClick = () => {
-    setView({
-      filter: [{ id: "mediaType", value: "Kiosk" }],
-      sorting: [],
-      group: [],
-    });
-  };
-
-  const handlePrintView = () => {
-    console.log("Current Table State:", {
-      filters: currentView.filter,
-      sorting: currentView.sorting,
-      grouping: currentView.group,
-    });
-  };
-
-  if (isLoadingSequence) return <div>Loading Sequencess...</div>;
-
+  // ตั้งค่า isMount เป็น true เมื่อ component mount เสร็จ
+  useEffect(() => {
+    setIsMount(true);
+    return () => {
+      setIsMount(false); // Cleanup เมื่อ component unmount
+    };
+  }, []);
+  if (isLoadingSequence || !isMount)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <CircularProgress />
+      </div>
+    );
   return (
-    <>
-      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-        <Button variant="contained" onClick={handleClick}>
-          Set View
-        </Button>
-        <Button variant="contained" onClick={handlePrintView}>
-          Print View
-        </Button>
-      </Stack>
+    <div className="h-screen flex flex-col">
+      <Navbar />
+      <PlannerBar className="flex-grow" />
       <Table3 columns={columns} initialData={sequence} />
-    </>
+    </div>
   );
 }

@@ -155,6 +155,7 @@ const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
     muiTableContainerProps: {
       sx: {
         maxHeight: "calc(100vh - 200px)", // Adjust height to leave space for bottom sections
+        minHeight: "calc(100vh - 200px)", // Adjust height to leave space for bottom sections
         overflow: "auto", // ตั้งค่า maxHeight เป็น 'unset' เพื่อให้ตารางไม่จำกัดความสูง
       },
     },

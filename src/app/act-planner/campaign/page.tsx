@@ -139,7 +139,7 @@ export default function Page() {
   if (isLoading || !isMount)
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading Campaign...
+        <CircularProgress />
       </div>
     );
 

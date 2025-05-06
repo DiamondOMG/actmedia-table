@@ -2,7 +2,7 @@
 import Table5 from "@/components/table/Table5";
 import { type MRT_ColumnDef } from "material-react-table";
 import { useGetTable, type BookingData } from "@/hook/useBookings";
-import { Button, Menu, Stack } from "@mui/material";
+import { Button, CircularProgress, Menu, Stack } from "@mui/material";
 import { useViewStore } from "@/zustand/useViewStore";
 import { format } from "date-fns";
 import Navbar from "@/components/navbar/Navbar";
@@ -155,7 +155,7 @@ export default function Page() {
   if (isLoadingBookings || !isMount)
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading Bookings...
+        <CircularProgress />
       </div>
     );
 

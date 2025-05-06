@@ -3,9 +3,12 @@
 import Table4 from "@/components/table/Table4";
 import { type MRT_ColumnDef } from "material-react-table";
 import { useGetTable, type RequestFormData } from "@/hook/useRequestForm";
-import { Button, Stack } from "@mui/material";
+import { Button, CircularProgress, Stack } from "@mui/material";
 import { useViewStore } from "@/zustand/useViewStore";
 import { format } from "date-fns";
+import Navbar from "@/components/navbar/Navbar";
+import PlannerBar from "@/components/navbar/PlannerBar";
+import { useEffect, useState } from "react";
 
 const columns: MRT_ColumnDef<RequestFormData>[] = [
   {
@@ -96,38 +99,27 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
 
 export default function Page() {
   const { data: requests = [], isLoading: isLoadingRequests } = useGetTable();
-  const setView = useViewStore((state) => state.setView);
-  const currentView = useViewStore((state) => state.currentView);
+  const [isMount, setIsMount] = useState(false); // เพิ่ม state สำหรับตรวจสอบการ mount
+  // ตั้งค่า isMount เป็น true เมื่อ component mount เสร็จ
+  useEffect(() => {
+    setIsMount(true);
+    return () => {
+      setIsMount(false); // Cleanup เมื่อ component unmount
+    };
+  }, []);
 
-  const handleClick = () => {
-    setView({
-      filter: [{ id: "requestType", value: "Change" }],
-      sorting: [],
-      group: [],
-    });
-  };
-
-  const handlePrintView = () => {
-    console.log("Current Table State:", {
-      filters: currentView.filter,
-      sorting: currentView.sorting,
-      grouping: currentView.group,
-    });
-  };
-
-  if (isLoadingRequests) return <div>Loading Requests...</div>;
+  if (isLoadingRequests || !isMount)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <CircularProgress />
+      </div>
+    );
 
   return (
-    <>
-      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-        <Button variant="contained" onClick={handleClick}>
-          Set View
-        </Button>
-        <Button variant="contained" onClick={handlePrintView}>
-          Print View
-        </Button>
-      </Stack>
+    <div className="h-screen flex flex-col">
+      <Navbar />
+      <PlannerBar className="flex-grow" />
       <Table4 columns={columns} initialData={requests} />
-    </>
+    </div>
   );
 }

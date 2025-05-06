@@ -28,10 +28,7 @@ import {
   IconButton,
   Stack,
   TextField,
-  Tooltip,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { type Campaign } from "@/types/campaigns";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -90,6 +87,7 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
     muiTableContainerProps: {
       sx: {
         maxHeight: "calc(100vh - 200px)", // Adjust height to leave space for bottom sections
+        minHeight: "calc(100vh - 200px)", // Adjust height to leave space for bottom sections
         overflow: "auto", // ตั้งค่า maxHeight เป็น 'unset' เพื่อให้ตารางไม่จำกัดความสูง
       },
     },
