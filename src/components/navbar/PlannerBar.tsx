@@ -11,8 +11,8 @@ const menuItems = [
   { label: "Campaign", path: "/act-planner/campaign" },
   { label: "Bookings", path: "/act-planner/bookings" },
   { label: "Requests", path: "/act-planner/requests" },
-  { label: "Form", path: "/act-planner/form" },
   { label: "Sequence", path: "/act-planner/sequence" },
+  { label: "Form", path: "/act-planner/form" },
 ];
 
 const PlannerBar: React.FC<Props> = ({ className = "" }) => {

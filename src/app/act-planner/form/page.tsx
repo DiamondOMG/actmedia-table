@@ -24,6 +24,8 @@ import Swal from "sweetalert2";
 import { useCreateTable, type RequestFormData } from "@/hook/useRequestForm";
 
 import Autocomplete from "@mui/material/Autocomplete";
+import Navbar from "@/components/navbar/Navbar";
+import PlannerBar from "@/components/navbar/PlannerBar";
 
 // Dropdown Options
 const retailerOptions = ["MAKRO", "Other"];
@@ -237,6 +239,9 @@ export default function DigitalMediaRequestForm() {
   }
 
   return (
+    <div>
+      <Navbar/>
+      <PlannerBar/>
     <Container maxWidth="md" sx={{ py: 8 }}>
       <Paper
         elevation={3}
@@ -515,5 +520,6 @@ export default function DigitalMediaRequestForm() {
         </form>
       </Paper>
     </Container>
+    </div>
   );
 }
