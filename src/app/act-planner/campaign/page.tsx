@@ -6,7 +6,7 @@ import { useCampaigns } from "@/hook/useCampaigns";
 import { type Campaign } from "@/types/campaigns";
 import { Box, CircularProgress } from "@mui/material";
 import Navbar from "@/components/navbar/Navbar";
-import MenuBar from "@/components/navbar/MenuBar";
+import PlannerBar from "@/components/navbar/PlannerBar";
 import { useState, useEffect } from "react"; // เพิ่ม import สำหรับ useState และ useEffect
 
 const columns: MRT_ColumnDef<Campaign>[] = [
@@ -136,12 +136,17 @@ export default function Page() {
     };
   }, []);
 
-  if (isLoading || !isMount) return <div className="flex justify-center items-center h-screen">Loading Campaign...</div>;
+  if (isLoading || !isMount)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading Campaign...
+      </div>
+    );
 
   return (
     <div className="h-screen flex flex-col">
       <Navbar />
-      <MenuBar className="flex-grow" />
+      <PlannerBar className="flex-grow" />
       <Table2 columns={columns} initialData={campaigns} />
     </div>
   );

@@ -6,7 +6,7 @@ import { Button, Menu, Stack } from "@mui/material";
 import { useViewStore } from "@/zustand/useViewStore";
 import { format } from "date-fns";
 import Navbar from "@/components/navbar/Navbar";
-import MenuBar from "@/components/navbar/MenuBar";
+import PlannerBar from "@/components/navbar/PlannerBar";
 import { useEffect, useState } from "react";
 
 const columns: MRT_ColumnDef<BookingData>[] = [
@@ -152,12 +152,17 @@ export default function Page() {
     });
   };
 
-  if (isLoadingBookings || !isMount) return <div className="flex justify-center items-center h-screen">Loading Bookings...</div>;
+  if (isLoadingBookings || !isMount)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading Bookings...
+      </div>
+    );
 
   return (
     <div className="h-screen flex flex-col">
       <Navbar />
-      <MenuBar className="flex-grow" />
+      <PlannerBar className="flex-grow" />
       <Table5 columns={columns} initialData={bookings} />
     </div>
   );

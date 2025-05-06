@@ -15,12 +15,14 @@ const menuItems = [
   { label: "Sequence", path: "/act-planner/sequence" },
 ];
 
-const MenuBar: React.FC<Props> = ({ className = "" }) => {
+const PlannerBar: React.FC<Props> = ({ className = "" }) => {
   const router = useRouter();
   const pathname = usePathname();
 
   return (
-    <div className={`w-full flex items-center justify-center gap-4 ${className}`}>
+    <div
+      className={`w-full flex items-center justify-center gap-4 ${className}`}
+    >
       {menuItems.map((item) => {
         const isActive = pathname === item.path;
 
@@ -42,4 +44,4 @@ const MenuBar: React.FC<Props> = ({ className = "" }) => {
   );
 };
 
-export default MenuBar;
+export default PlannerBar;
