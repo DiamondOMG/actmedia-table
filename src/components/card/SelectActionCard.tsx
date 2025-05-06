@@ -16,13 +16,6 @@ const cards = [
     background: "/Planning-2.png",
   },
   {
-    id: 2,
-    title: "Act Asset",
-    description: "Monitor the assets.",
-    link: "/act-asset",
-    background: "/assets.jpg",
-  },
-  {
     id: 3,
     title: "Act Sign",
     description: "Monitor the signage.",
