@@ -187,10 +187,10 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 color={passwordError ? "error" : "primary"}
               />
             </FormControl>
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
-            />
+            /> */}
             <ForgotPassword open={open} handleClose={handleClose} />
             <Button
               type="submit"
