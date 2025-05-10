@@ -7,7 +7,7 @@ const redis = Redis.fromEnv();
 
 const username = process.env.USERNAMEOMG!;
 const password = process.env.PASSWORDOMG!;
-const CACHE_KEY = "Act Planner - Campaigns";
+const CACHE_KEY = "Act Planner - Campaign";
 const CACHE_DURATION_SECONDS = 10 * 60; // 10 minutes
 
 async function fetchSeqCampaigns() {
@@ -137,6 +137,8 @@ function summarizeData(normalizedData: any[], seqCampaigns: any[]) {
               (endMillis - nowDate) / (1000 * 60 * 60 * 24)
             );
             status = `Content End in ${daysUntilOffline} days`;
+          } else if (nowDate > endMillis) {
+            status = "Finished";
           } else {
             return null;
           }

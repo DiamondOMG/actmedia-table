@@ -42,7 +42,7 @@ interface Table2Props {
 const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
   //!----------------table state------------------!//
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
-    []
+    [{"id": "status", "value": "content"}]
   );
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<MRT_SortingState>([]);

@@ -49,8 +49,9 @@ const columns: MRT_ColumnDef<Campaign>[] = [
       const value = cell.getValue<string>();
       let bgColor = "transparent";
       if (value.includes("Error")) bgColor = "#ffcccc";
-      else if (value.includes("Start")) bgColor = "#66bb6a";
-      else if (value.includes("End")) bgColor = "#fdd835";
+      else if (value.includes("Start")) bgColor = "#fdd835";
+      else if (value.includes("End")) bgColor = "#66bb6a";
+      else if (value.includes("Finish")) bgColor = "#1976d2";
       return (
         <Box
           sx={{
