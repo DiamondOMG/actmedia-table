@@ -8,7 +8,7 @@ import { verifyToken } from "@/lib/auth/verifyToken"; // 👈 เพิ่ม im
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Users";
 const redis = Redis.fromEnv();
-const CACHE_KEY = "Users";
+const CACHE_KEY = "User";
 const CACHE_DURATION = 60 * 10;
 
 // ✅ GET users (all or by id)

@@ -19,6 +19,8 @@ import MoreIcon from "@mui/icons-material/MoreVert";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import LogoutIcon from "@mui/icons-material/Logout";
+import SecurityIcon from "@mui/icons-material/Security"; // เพิ่ม import
+import { useEffect, useState } from "react";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -65,6 +67,19 @@ export default function Navbar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
+  const [hasPermission, setHasPermission] = useState(false);
+
+  useEffect(() => {
+    const userData = localStorage.getItem("userData");
+    if (userData) {
+      const parsedData = JSON.parse(userData);
+      const user = parsedData.user; // เข้าถึง user object
+      const userPermission = user.permissions?.find(
+        (p: any) => p.menu === "user"
+      );
+      setHasPermission(userPermission?.level >= 3);
+    }
+  }, []);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -90,7 +105,7 @@ export default function Navbar() {
     try {
       await axios.post("/api/users/logout");
       // เคลียร์ข้อมูลใน localStorage
-      localStorage.removeItem("user");
+      localStorage.removeItem("userData");
 
       // ปิดเมนู
       handleMenuClose();
@@ -100,6 +115,11 @@ export default function Navbar() {
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  };
+
+  const handlePermissionClick = () => {
+    router.push("/permission");
+    handleMenuClose();
   };
 
   const menuId = "primary-search-account-menu";
@@ -121,6 +141,14 @@ export default function Navbar() {
     >
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      {hasPermission && (
+        <MenuItem onClick={handlePermissionClick}>
+          <IconButton size="small" sx={{ mr: 1 }} color="inherit">
+            <SecurityIcon />
+          </IconButton>
+          Permissions
+        </MenuItem>
+      )}
       <MenuItem onClick={handleLogout}>
         <IconButton size="small" sx={{ mr: 1 }} color="inherit">
           <LogoutIcon />
