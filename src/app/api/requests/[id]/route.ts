@@ -11,10 +11,13 @@ const redis = Redis.fromEnv();
 const CACHE_KEY = "Act Planner - Requests";
 
 // ✅ PUT - แก้ไขข้อมูลโดยใช้ id
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   const sheets = await getSheetsClient();
-  const id = params.id;
-
+  const { id } = context.params;
+  
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
   const response = await sheets.spreadsheets.values.get({
@@ -66,9 +69,12 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // ✅ DELETE - ลบข้อมูลแบบ soft-delete โดยใช้ id
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   const sheets = await getSheetsClient();
-  const id = params.id;
+  const { id } = context.params;
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
