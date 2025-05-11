@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 import { verifyToken } from "@/lib/auth/verifyToken";
@@ -14,6 +14,17 @@ const CACHE_KEY = "Users";
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const sheets = await getSheetsClient();
+
+    // ✅ 1. ตรวจสอบ token และ permission
+  try {
+    await verifyToken(req, "user", 3);
+    console.log("Authenticated user:");
+  } catch (err) {
+    return NextResponse.json(
+      { error: (err as Error).message },
+      { status: 401 }
+    );
+  }
 
   if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
@@ -59,8 +70,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   const sheets = await getSheetsClient();
   // ✅ 1. ตรวจสอบ token และ permission
   try {
-    const user = await verifyToken(req, "user", 2);
-    console.log("Authenticated user:", user.username);
+    await verifyToken(req, "user", 3);
+    console.log("Authenticated user:");
   } catch (err) {
     return NextResponse.json(
       { error: (err as Error).message },

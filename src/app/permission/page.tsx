@@ -28,7 +28,6 @@ export default function PermissionPage() {
 
   const fetchUsers = async () => {
     try {
-      // Show loading
       Swal.fire({
         title: "กำลังโหลดข้อมูล",
         allowOutsideClick: false,
@@ -38,9 +37,37 @@ export default function PermissionPage() {
       });
 
       const response = await axios.get("/api/users");
-      setUsers(response.data.data);
 
-      // Close loading
+      const userData = localStorage.getItem("userData");
+      if (userData) {
+        const parsedData = JSON.parse(userData);
+        const currentUser = parsedData.user;
+        const currentUserId = currentUser.id;
+        const userPermission = currentUser.permissions?.find(
+          (p: any) => p.menu === "user"
+        );
+
+        if (userPermission?.level >= 4) {
+          const filteredUsers = response.data.data.filter((u: any) => {
+            const userMenu = u.permissions.find((p: any) => p.menu === "user");
+            return (
+              u.id === currentUserId || // แสดงตัวเองเสมอ
+              (userMenu && userMenu.level < 4) // แสดงเฉพาะคนที่มี user level < 4
+            );
+          });
+          setUsers(filteredUsers);
+        } else if (userPermission?.level >= 3) {
+          const filteredUsers = response.data.data.filter((u: any) => {
+            const userMenu = u.permissions.find((p: any) => p.menu === "user");
+            return (
+              u.id === currentUserId || // แสดงตัวเองเสมอ
+              (userMenu && userMenu.level < 3) // แสดงเฉพาะคนที่มี user level < 3
+            );
+          });
+          setUsers(filteredUsers);
+        }
+      }
+
       Swal.close();
     } catch (error) {
       console.error("Failed to fetch users:", error);
