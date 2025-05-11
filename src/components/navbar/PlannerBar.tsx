@@ -9,8 +9,8 @@ interface Props {
 
 const menuItems = [
   { label: "Campaign", path: "/act-planner/campaign" },
-  { label: "Bookings", path: "/act-planner/bookings" },
-  { label: "Requests", path: "/act-planner/requests" },
+  { label: "Booking", path: "/act-planner/booking" },
+  { label: "Request", path: "/act-planner/request" },
   { label: "Sequence", path: "/act-planner/sequence" },
   { label: "Form", path: "/act-planner/form" },
 ];
