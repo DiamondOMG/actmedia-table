@@ -42,6 +42,8 @@ import {
   type BookingData,
 } from "@/hook/useBookings";
 import { useViewStore } from "@/zustand/useViewStore"; //view
+import { usePathname } from "next/navigation";
+import { verifyPermission } from "@/lib/auth/verifyPermission";
 
 // Props ที่รับเข้ามาสำหรับตาราง
 interface Table5Props {
@@ -62,6 +64,15 @@ const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
   });
   const [grouping, setGrouping] = useState<MRT_GroupingState>([]);
   const [isEditing, setIsEditing] = useState(true);
+  //!------------------ จัดการ verifyPermission ------------------!//
+  const pathname = usePathname();
+  useEffect(() => {
+    if (pathname) {
+      const hasEditPermission = verifyPermission(pathname);
+      console.log("hasEditPermission", hasEditPermission);
+      setIsEditing(hasEditPermission);
+    }
+  }, []);
 
   //!------------------ จัดการ View ------------------!//
   const view = useViewStore((state) => state.view);
@@ -306,7 +317,7 @@ const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
             padding: "2px",
             flexWrap: "wrap",
             justifyContent: "space-between",
-            backgroundColor: "#e3f2fd" 
+            backgroundColor: "#e3f2fd",
           }}
         >
           {/* ฝั่งซ้าย: UI */}

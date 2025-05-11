@@ -5,6 +5,7 @@ import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 import { v4 as uuidv4 } from "uuid";
 import { RequestFormData } from "@/hook/useRequestForm";
+import { verifyToken } from "@/lib/auth/verifyToken";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Act Planner - Requests";
@@ -16,6 +17,16 @@ const CACHE_DURATION_SECONDS = 60 * 10; // 10 นาที
 export async function POST(req: NextRequest) {
   const sheets = await getSheetsClient();
   const formData: RequestFormData = await req.json();
+
+  try {
+    await verifyToken(req, "request", 2);
+    console.log("Authenticated user:");
+  } catch (err) {
+    return NextResponse.json(
+      { error: (err as Error).message },
+      { status: 401 }
+    );
+  }
 
   const submissionData = [
     uuidv4(),

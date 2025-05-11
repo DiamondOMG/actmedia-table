@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 import { RequestFormData } from "@/hook/useRequestForm";
+import { verifyToken } from "@/lib/auth/verifyToken";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Act Planner - Requests";
@@ -14,6 +15,16 @@ const CACHE_KEY = "Act Planner - Requests";
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const sheets = await getSheetsClient();
+
+    try {
+      await verifyToken(req, "request", 2);
+      console.log("Authenticated user:");
+    } catch (err) {
+      return NextResponse.json(
+        { error: (err as Error).message },
+        { status: 401 }
+      );
+    }
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
@@ -69,6 +80,16 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const sheets = await getSheetsClient();
+
+      try {
+      await verifyToken(req, "request", 2);
+      console.log("Authenticated user:");
+    } catch (err) {
+      return NextResponse.json(
+        { error: (err as Error).message },
+        { status: 401 }
+      );
+    }
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 

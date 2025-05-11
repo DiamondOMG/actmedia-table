@@ -5,6 +5,7 @@ import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 import { v4 as uuidv4 } from "uuid";
 import { BookingData } from "@/hook/useBookings";
+import { verifyToken } from "@/lib/auth/verifyToken";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Act Planner - Bookings";
@@ -16,6 +17,16 @@ const CACHE_DURATION_SECONDS = 60 * 10; // 10 minutes
 export async function POST(req: NextRequest) {
   const sheets = await getSheetsClient();
   const formData: BookingData = await req.json();
+
+  try {
+    await verifyToken(req, "booking", 2);
+    console.log("Authenticated user:");
+  } catch (err) {
+    return NextResponse.json(
+      { error: (err as Error).message },
+      { status: 401 }
+    );
+  }
 
   const submissionData = [
     uuidv4(),
@@ -75,7 +86,14 @@ export async function GET() {
       const formattedRow: Partial<BookingData> = {};
       headers.forEach((header, index) => {
         let value = row[index];
-        if (["bigcTvSignage", "bigcTvKiosk", "bigcCategorySignage", "mbc"].includes(header)) {
+        if (
+          [
+            "bigcTvSignage",
+            "bigcTvKiosk",
+            "bigcCategorySignage",
+            "mbc",
+          ].includes(header)
+        ) {
           value = value === "TRUE" ? true : false;
         }
         if (["createdOn", "lastModified"].includes(header)) {

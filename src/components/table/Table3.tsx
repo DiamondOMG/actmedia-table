@@ -53,8 +53,6 @@ interface Table3Props {
 }
 
 const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
-  const pathname = usePathname();
-
   //!----------------table state------------------!//
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     []
@@ -70,7 +68,8 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
   // Change isEditing initialization to use useEffect
   const [isEditing, setIsEditing] = useState(false);
 
-  // Add this useEffect near the top of the component
+  //!------------------ จัดการ verifyPermission ------------------!//
+  const pathname = usePathname();
   useEffect(() => {
     if (pathname) {
       const hasEditPermission = verifyPermission(pathname);

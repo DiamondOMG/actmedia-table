@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 import { BookingData } from "@/hook/useBookings";
+import { verifyToken } from "@/lib/auth/verifyToken";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Act Planner - Bookings";
@@ -12,11 +13,22 @@ const CACHE_KEY = "Act Planner - Bookings";
 
 // PUT - Update booking by id
 
-
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   const sheets = await getSheetsClient();
 
+  try {
+    await verifyToken(req, "booking", 2);
+    console.log("Authenticated user:");
+  } catch (err) {
+    return NextResponse.json(
+      { error: (err as Error).message },
+      { status: 401 }
+    );
+  }
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
@@ -76,10 +88,22 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 // DELETE - Soft-delete booking by id
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   const sheets = await getSheetsClient();
 
+  try {
+    await verifyToken(req, "booking", 2);
+    console.log("Authenticated user:");
+  } catch (err) {
+    return NextResponse.json(
+      { error: (err as Error).message },
+      { status: 401 }
+    );
+  }
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
