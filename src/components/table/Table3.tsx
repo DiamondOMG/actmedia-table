@@ -42,7 +42,9 @@ import {
   useUpdateSequence,
   useDeleteSequence,
 } from "@/hook/useSequences";
-import { useViewStore } from "@/zustand/useViewStore";//view
+import { useViewStore } from "@/zustand/useViewStore"; //view
+import { verifyPermission } from "@/lib/auth/verifyPermission";
+import { usePathname } from "next/navigation";
 
 // Props ที่รับเข้ามาสำหรับตาราง
 interface Table3Props {
@@ -51,6 +53,8 @@ interface Table3Props {
 }
 
 const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
+  const pathname = usePathname();
+
   //!----------------table state------------------!//
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     []
@@ -62,7 +66,18 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
     pageSize: 30,
   });
   const [grouping, setGrouping] = useState<MRT_GroupingState>([]);
-  const [isEditing, setIsEditing] = useState(true);
+
+  // Change isEditing initialization to use useEffect
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Add this useEffect near the top of the component
+  useEffect(() => {
+    if (pathname) {
+      const hasEditPermission = verifyPermission(pathname);
+      console.log("hasEditPermission", hasEditPermission);
+      setIsEditing(hasEditPermission);
+    }
+  }, []);
 
   //!------------------ จัดการ View ------------------!//
   const view = useViewStore((state) => state.view);
@@ -310,7 +325,7 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
             padding: "2px",
             flexWrap: "wrap",
             justifyContent: "space-between",
-            backgroundColor: "#e3f2fd" 
+            backgroundColor: "#e3f2fd",
           }}
         >
           {/* ฝั่งซ้าย: UI */}
@@ -369,7 +384,7 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
           </Stack>
         </Box>
       );
-    }
+    },
   });
 
   return (

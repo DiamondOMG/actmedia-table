@@ -51,7 +51,6 @@ export default function PermissionPage() {
           const filteredUsers = response.data.data.filter((u: any) => {
             const userMenu = u.permissions.find((p: any) => p.menu === "user");
             return (
-              u.id === currentUserId || // แสดงตัวเองเสมอ
               (userMenu && userMenu.level < 4) // แสดงเฉพาะคนที่มี user level < 4
             );
           });
@@ -60,7 +59,6 @@ export default function PermissionPage() {
           const filteredUsers = response.data.data.filter((u: any) => {
             const userMenu = u.permissions.find((p: any) => p.menu === "user");
             return (
-              u.id === currentUserId || // แสดงตัวเองเสมอ
               (userMenu && userMenu.level < 3) // แสดงเฉพาะคนที่มี user level < 3
             );
           });
