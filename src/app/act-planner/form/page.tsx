@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   TextField,
   Button,
@@ -51,7 +51,6 @@ export default function DigitalMediaRequestForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
 
   const submitRequestForm = useCreateTable();
 
@@ -229,14 +228,6 @@ export default function DigitalMediaRequestForm() {
       </Button>
     </Box>
   );
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <div>
