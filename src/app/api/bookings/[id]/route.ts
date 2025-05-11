@@ -11,9 +11,12 @@ const redis = Redis.fromEnv();
 const CACHE_KEY = "Act Planner - Bookings";
 
 // PUT - Update booking by id
-export async function PUT(req: NextRequest) {
+
+
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const sheets = await getSheetsClient();
-  const id = req.url.split("/").pop();
+
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
@@ -73,9 +76,10 @@ export async function PUT(req: NextRequest) {
 }
 
 // DELETE - Soft-delete booking by id
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const sheets = await getSheetsClient();
-  const id = req.url.split("/").pop();
+
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 

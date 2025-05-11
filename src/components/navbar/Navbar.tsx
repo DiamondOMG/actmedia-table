@@ -101,20 +101,16 @@ export default function Navbar() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  const handleLogout = async () => {
-    try {
-      await axios.post("/api/users/logout");
-      // เคลียร์ข้อมูลใน localStorage
-      localStorage.removeItem("userData");
+  const handleLogout = () => {
+    axios.post("/api/users/logout")
+    // เคลียร์ข้อมูลใน localStorage
+    localStorage.removeItem("userData");
 
-      // ปิดเมนู
-      handleMenuClose();
+    // ปิดเมนู
+    handleMenuClose();
 
-      // redirect ไปหน้า login
-      router.push("/");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+    // redirect ไปหน้า login
+    router.push("/");
   };
 
   const handlePermissionClick = () => {
@@ -139,8 +135,13 @@ export default function Navbar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleMenuClose}>
+        {" "}
+        <IconButton size="small" sx={{ mr: 1 }} color="inherit">
+          <AccountCircle />
+        </IconButton>
+        Profile
+      </MenuItem>
       {hasPermission && (
         <MenuItem onClick={handlePermissionClick}>
           <IconButton size="small" sx={{ mr: 1 }} color="inherit">
@@ -220,7 +221,7 @@ export default function Navbar() {
             px: 2,
           }}
         >
-          <IconButton
+          {/* <IconButton
             size="large"
             edge="start"
             color="inherit"
@@ -228,16 +229,17 @@ export default function Navbar() {
             sx={{ mr: 2 }}
           >
             <MenuIcon />
-          </IconButton>
-          <Typography
+          </IconButton> */}
+            <Typography
             variant="h6"
             noWrap
             component="div"
-            sx={{ display: { xs: "none", sm: "block" } }}
-          >
-            MUI
-          </Typography>
-          <Search>
+            sx={{ display: { xs: "none", sm: "block" }, cursor: "pointer" }}
+            onClick={() => router.push("/home")}
+            >
+            ACT TABLE
+            </Typography>
+          {/* <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
@@ -245,10 +247,10 @@ export default function Navbar() {
               placeholder="Search…"
               inputProps={{ "aria-label": "search" }}
             />
-          </Search>
+          </Search> */}
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
+            {/* <IconButton
               size="large"
               aria-label="show 4 new mails"
               color="inherit"
@@ -256,16 +258,16 @@ export default function Navbar() {
               <Badge badgeContent={4} color="error">
                 <MailIcon />
               </Badge>
-            </IconButton>
-            <IconButton
+            </IconButton> */}
+            {/* <IconButton
               size="large"
-              aria-label="show 17 new notifications"
+              aria-label="show new notifications"
               color="inherit"
             >
-              <Badge badgeContent={17} color="error">
+              <Badge badgeContent={3} color="error">
                 <NotificationsIcon />
               </Badge>
-            </IconButton>
+            </IconButton> */}
             <IconButton
               size="large"
               edge="end"

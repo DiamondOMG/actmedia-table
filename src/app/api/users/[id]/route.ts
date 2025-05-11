@@ -11,9 +11,9 @@ const redis = Redis.fromEnv();
 const CACHE_KEY = "Users";
 
 // ✅ PUT update user
-export async function PUT(req: NextRequest) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const sheets = await getSheetsClient();
-  const id = req.url.split("/").pop(); // Now works because req is NextRequest
 
   if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
@@ -54,9 +54,9 @@ export async function PUT(req: NextRequest) {
 }
 
 // ✅ DELETE soft-delete user
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const sheets = await getSheetsClient();
-  const id = req.url.split("/").pop(); // Now works because req is NextRequest{
   // ✅ 1. ตรวจสอบ token และ permission
   try {
     const user = await verifyToken(req, "user", 2);

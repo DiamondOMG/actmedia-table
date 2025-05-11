@@ -11,9 +11,9 @@ const redis = Redis.fromEnv();
 const CACHE_KEY = "cached_request_form_data2";
 
 // ✅ PUT - แก้ไขข้อมูลโดยใช้ id
-export async function PUT(req: NextRequest) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const sheets = await getSheetsClient();
-  const id = req.url.split("/").pop(); // Now works because req is NextRequest
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
@@ -66,9 +66,9 @@ export async function PUT(req: NextRequest) {
 }
 
 // ✅ DELETE - ลบข้อมูลแบบ soft-delete โดยใช้ id
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const sheets = await getSheetsClient();
-  const id = req.url.split("/").pop(); // Now works because req is NextRequest
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
