@@ -84,17 +84,26 @@ export default function PermissionPage() {
     menu: string,
     newLevel: number
   ) => {
-    setChanges((prev) => ({
-      ...prev,
-      [userId]: {
-        ...prev[userId],
-        permissions: users
-          .find((u) => u.id === userId)
-          ?.permissions.map((p: any) =>
-            p.menu === menu ? { ...p, level: newLevel } : p
-          ),
-      },
-    }));
+    console.log("Level changed:", userId, menu, newLevel);
+    setChanges((prev) => {
+      const userPermissions =
+        users.find((u) => u.id === userId)?.permissions || [];
+      const updatedPermissions = userPermissions.some(
+        (p: any) => p.menu === menu
+      )
+        ? userPermissions.map((p: any) =>
+            p.menu === menu ? { ...p, level: newLevel } : { ...p }
+          )
+        : [...userPermissions, { menu, level: newLevel }];
+
+      return {
+        ...prev,
+        [userId]: {
+          ...prev[userId],
+          permissions: updatedPermissions,
+        },
+      };
+    });
   };
 
   const handleSave = async (userId: string) => {
@@ -107,7 +116,7 @@ export default function PermissionPage() {
           Swal.showLoading();
         },
       });
-
+      console.log("Changes to save:", changes[userId]);
       await axios.put(`/api/users/permission/${userId}`, changes[userId]);
       await fetchUsers();
       setChanges((prev) => {
@@ -170,6 +179,7 @@ export default function PermissionPage() {
               <TableCell>Request</TableCell>
               <TableCell>Sequence</TableCell>
               <TableCell>Customer</TableCell>
+              <TableCell>Booking</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -180,36 +190,50 @@ export default function PermissionPage() {
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.department}</TableCell>
                 <TableCell>{user.position}</TableCell>
-                {["user", "campaign", "request", "sequence", "customer"].map(
-                  (menu) => (
-                    <TableCell key={menu}>
-                      <Select
-                        value={
-                          changes[user.id]?.permissions?.find(
-                            (p: any) => p.menu === menu
-                          )?.level ||
-                          user.permissions.find((p: any) => p.menu === menu)
-                            ?.level ||
-                          1
-                        }
-                        onChange={(e) =>
-                          handleLevelChange(
-                            user.id,
-                            menu,
-                            Number(e.target.value)
-                          )
-                        }
-                        size="small"
-                      >
-                        {[1, 2, 3, 4].map((level) => (
+                {[
+                  "user",
+                  "campaign",
+                  "request",
+                  "sequence",
+                  "customer",
+                  "booking",
+                ].map((menu) => (
+                  <TableCell key={menu}>
+                    <Select
+                      value={
+                        changes[user.id]?.permissions?.find(
+                          (p: any) => p.menu === menu
+                        )?.level ||
+                        user.permissions.find((p: any) => p.menu === menu)
+                          ?.level ||
+                        1
+                      }
+                      onChange={(e) =>
+                        handleLevelChange(user.id, menu, Number(e.target.value))
+                      }
+                      size="small"
+                    >
+                      {(() => {
+                        const userData = localStorage.getItem("userData");
+                        const currentUserPermission = userData
+                          ? JSON.parse(userData).user.permissions?.find(
+                              (p: any) => p.menu === "user"
+                            )?.level
+                          : 1;
+                        const levels =
+                          menu === "user" && currentUserPermission >= 4
+                            ? [1, 2, 3, ]
+                            : [1, 2];
+
+                        return levels.map((level) => (
                           <MenuItem key={level} value={level}>
                             {level}
                           </MenuItem>
-                        ))}
-                      </Select>
-                    </TableCell>
-                  )
-                )}
+                        ));
+                      })()}
+                    </Select>
+                  </TableCell>
+                ))}
                 <TableCell>
                   <Button
                     variant="contained"
