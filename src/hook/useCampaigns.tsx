@@ -16,6 +16,7 @@ export const useCampaigns = () => {
       console.log("Query All campaigns");
       return data;
     },
+    refetchOnWindowFocus: false, // ปิด refetch ตอน focus
   });
 };
 

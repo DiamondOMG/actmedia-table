@@ -48,6 +48,7 @@ export const useGetTable = () => {
       console.log("Query All bookings");
       return data;
     },
+    refetchOnWindowFocus: false, // ปิด refetch ตอน focus
   });
 };
 

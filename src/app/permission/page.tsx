@@ -36,7 +36,7 @@ export default function PermissionPage() {
         },
       });
 
-      const response = await axios.get("/api/users");
+      const response = await axios.get("/api/users/permission");
 
       const userData = localStorage.getItem("userData");
       if (userData) {
@@ -108,7 +108,7 @@ export default function PermissionPage() {
         },
       });
 
-      await axios.put(`/api/users/${userId}`, changes[userId]);
+      await axios.put(`/api/users/permission/${userId}`, changes[userId]);
       await fetchUsers();
       setChanges((prev) => {
         const { [userId]: _, ...rest } = prev;
@@ -140,7 +140,7 @@ export default function PermissionPage() {
         cancelButtonText: "ไม่",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          await axios.delete(`/api/users/${userId}`);
+          await axios.delete(`/api/users/permission/${userId}`);
           fetchUsers();
           Swal.fire("สำเร็จ", "ลบผู้ใช้เรียบร้อยแล้ว", "success");
         }

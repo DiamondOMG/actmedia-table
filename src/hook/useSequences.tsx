@@ -22,6 +22,7 @@ export const useSequences = () => {
       console.log("useSequences called");
       return response.data.data as Sequence[];
     },
+    refetchOnWindowFocus: false, // ปิด refetch ตอน focus
   });
 };
 

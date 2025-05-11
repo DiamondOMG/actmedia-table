@@ -40,6 +40,7 @@ export const useGetTable = () => {
       console.log("Query All requests");
       return data;
     },
+    refetchOnWindowFocus: false, // ปิด refetch ตอน focus
   });
 };
 
