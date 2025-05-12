@@ -49,5 +49,7 @@ export const config = {
   matcher: [
     "/act-planner/:path*",
     "/act-signup/:path*",
+    "/permission/:path*",
+    "/home/:path*",
   ],
 };

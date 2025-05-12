@@ -7,6 +7,7 @@ const CACHE_KEYS = [
   "Act Planner - Bookings",
   "Act Planner - Requests",
   "cached_request_form_data2",
+  "Act Planner - Campaign",
   "Users",
 ];
 

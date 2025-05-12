@@ -41,6 +41,7 @@ async function fetchSequences(seqCampaigns: any[]) {
   };
 
   const response = await axios.get(apiUrl, options);
+  console.log("Response from Targetr API:")
   return response.data;
 }
 
