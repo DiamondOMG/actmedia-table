@@ -1,11 +1,38 @@
-// src/app/test/view
+//src/app/media-planner-sequence/page.tsx
 "use client";
-
+import Table3 from "@/components/table/Table3";
+import { type MRT_ColumnDef } from "material-react-table";
+import { useSequences } from "@/hook/useSequences";
+import { type Sequence } from "@/types/sequences";
+import { Button, Stack } from "@mui/material";
 import { useViewStore } from "@/zustand/useViewStore";
-import { Button } from "@mui/material";
 
-export default function TestViewPage() {
+const columns: MRT_ColumnDef<Sequence>[] = [
+  {
+    accessorKey: "label",
+    header: "Label",
+  },
+  {
+    accessorKey: "retailer",
+    header: "Retailer",
+    size: 80,
+  },
+  {
+    accessorKey: "mediaType",
+    header: "Media Type",
+    size: 80,
+  },
+  {
+    accessorKey: "sequenceId",
+    header: "Sequence Id",
+    size: 80,
+  },
+];
+
+export default function Page() {
+  const { data: sequence = [], isLoading: isLoadingSequence } = useSequences();
   const setView = useViewStore((state) => state.setView);
+  const currentView = useViewStore((state) => state.currentView);
 
   const handleClick = () => {
     setView({
@@ -15,11 +42,27 @@ export default function TestViewPage() {
     });
   };
 
+  const handlePrintView = () => {
+    console.log("Current Table State:", {
+      filters: currentView.filter,
+      sorting: currentView.sorting,
+      grouping: currentView.group,
+    });
+  };
+
+  if (isLoadingSequence) return <div>Loading Sequencess...</div>;
+
   return (
-    <div>
-      <Button variant="contained" onClick={handleClick}>
-        Set View
-      </Button>
-    </div>
+    <>
+      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+        <Button variant="contained" onClick={handleClick}>
+          Set View
+        </Button>
+        <Button variant="contained" onClick={handlePrintView}>
+          Print View
+        </Button>
+      </Stack>
+      <Table3 columns={columns} initialData={sequence} />
+    </>
   );
 }

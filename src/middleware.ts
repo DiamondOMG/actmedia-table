@@ -47,7 +47,9 @@ export async function middleware(req: NextRequest) {
 // 🔒 ระบุ path ที่ต้องการปกป้อง
 export const config = {
   matcher: [
-    // "/signup",
-    "/form",
+    "/act-planner/:path*",
+    "/act-signup/:path*",
+    "/permission/:path*",
+    "/home/:path*",
   ],
 };

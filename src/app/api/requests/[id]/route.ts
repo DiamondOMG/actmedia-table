@@ -1,79 +1,30 @@
 export const dynamic = "force-dynamic";
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
-import { v4 as uuidv4 } from "uuid";
-import { RequestForm } from "@/types/requestform";
-
+import { RequestFormData } from "@/hook/useRequestForm";
+import { verifyToken } from "@/lib/auth/verifyToken";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
-const SHEET_NAME = "Request Form";
+const SHEET_NAME = "Act Planner - Requests";
 const redis = Redis.fromEnv();
-const CACHE_KEY = "cached_request_form_data";
-const CACHE_DURATION_SECONDS = 60 * 10; // 10 นาที
-
-// ✅ POST - สร้างข้อมูลใหม่
-export async function POST(req: Request) {
-  const sheets = await getSheetsClient();
-  const formData: RequestForm = await req.json();
-
-  const submissionData = [
-    uuidv4(),
-    formData.requestType,
-    formData.requesterName,
-    formData.requesterEmail,
-    JSON.stringify(formData.retailerTypes),
-    JSON.stringify(formData.bookings),
-    formData.existingCampaign,
-    formData.startDate || "",
-    formData.endDate || "",
-    formData.duration,
-    formData.mediaLinks,
-    formData.notes,
-    formData.linkedCampaigns,
-    JSON.stringify(formData.campaigns),
-    Date.now(),
-    "0", // isDelete
-  ];
-
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A2`,
-    valueInputOption: "USER_ENTERED",
-    requestBody: { values: [submissionData] },
-  });
-
-  await redis.del(CACHE_KEY);
-  return NextResponse.json({ message: "Form submitted successfully" });
-}
-
-// ✅ GET - ดึงข้อมูลที่ยังไม่ลบ (isDelete = 0)
-export async function GET() {
-  const sheets = await getSheetsClient();
-
-  const cached = await redis.get(CACHE_KEY);
-  if (cached) {
-    return NextResponse.json({ source: "cache", data: cached });
-  }
-
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A2:P`,
-  });
-
-  const rows = (response.data.values || []).filter((row) => row[15] !== "1");
-
-  await redis.set(CACHE_KEY, rows, { ex: CACHE_DURATION_SECONDS });
-
-  return NextResponse.json({ source: "google", data: rows });
-}
+const CACHE_KEY = "Act Planner - Requests";
 
 // ✅ PUT - แก้ไขข้อมูลโดยใช้ id
-export async function PUT(req: Request) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const sheets = await getSheetsClient();
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
+
+    try {
+      await verifyToken(req, "request", 2);
+      console.log("Authenticated user:");
+    } catch (err) {
+      return NextResponse.json(
+        { error: (err as Error).message },
+        { status: 401 }
+      );
+    }
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
@@ -93,7 +44,7 @@ export async function PUT(req: Request) {
   const existingRow = rows[rowIndex];
   const isDelete = existingRow[15] || "0";
 
-  const formData: RequestForm = await req.json();
+  const formData: RequestFormData = await req.json();
 
   const updatedRow = [
     id,
@@ -126,10 +77,19 @@ export async function PUT(req: Request) {
 }
 
 // ✅ DELETE - ลบข้อมูลแบบ soft-delete โดยใช้ id
-export async function DELETE(req: Request) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const sheets = await getSheetsClient();
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
+
+      try {
+      await verifyToken(req, "request", 2);
+      console.log("Authenticated user:");
+    } catch (err) {
+      return NextResponse.json(
+        { error: (err as Error).message },
+        { status: 401 }
+      );
+    }
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 

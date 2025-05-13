@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   TextField,
   Button,
@@ -21,25 +21,28 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import Swal from "sweetalert2";
-import { useSubmitRequestForm } from "@/hook/useRequestForm";
-import { RequestForm } from "@/types/requestform";
+import { useCreateTable, type RequestFormData } from "@/hook/useRequestForm";
+
 import Autocomplete from "@mui/material/Autocomplete";
+import Navbar from "@/components/navbar/Navbar";
+import PlannerBar from "@/components/navbar/PlannerBar";
 
 // Dropdown Options
 const retailerOptions = ["MAKRO", "Other"];
 const bookingOptions = ["1", "2", "3"];
 const campaignOptions = ["1", "2", "3"];
 
+
 export default function DigitalMediaRequestForm() {
-  const [formData, setFormData] = useState<RequestForm>({
+  const [formData, setFormData] = useState<RequestFormData>({
     requestType: "New",
     requesterName: "",
     requesterEmail: "",
     retailerTypes: [""],
     bookings: [""],
     existingCampaign: "",
-    startDate: null,
-    endDate: null,
+    startDate: 0,
+    endDate: 0,
     duration: "",
     mediaLinks: "",
     notes: "",
@@ -48,9 +51,8 @@ export default function DigitalMediaRequestForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
 
-  const submitRequestForm = useSubmitRequestForm();
+  const submitRequestForm = useCreateTable();
 
   // Handlers
   const handleInputChange = (
@@ -147,8 +149,8 @@ export default function DigitalMediaRequestForm() {
       // แปลงวันที่เป็น unixtime (milliseconds) โดยตรง
       const formDataWithUnixTime = {
         ...formData,
-        startDate: formData.startDate?.valueOf() || null,
-        endDate: formData.endDate?.valueOf() || null,
+        startDate: formData.startDate?.valueOf() ,
+        endDate: formData.endDate?.valueOf() ,
       };
 
       console.log(
@@ -165,8 +167,8 @@ export default function DigitalMediaRequestForm() {
         retailerTypes: [""],
         bookings: [""],
         existingCampaign: "",
-        startDate: null,
-        endDate: null,
+        startDate: 0,
+        endDate: 0,
         duration: "",
         mediaLinks: "",
         notes: "",
@@ -227,15 +229,10 @@ export default function DigitalMediaRequestForm() {
     </Box>
   );
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
-
   return (
+    <div>
+      <Navbar/>
+      <PlannerBar/>
     <Container maxWidth="md" sx={{ py: 8 }}>
       <Paper
         elevation={3}
@@ -514,5 +511,6 @@ export default function DigitalMediaRequestForm() {
         </form>
       </Paper>
     </Container>
+    </div>
   );
 }

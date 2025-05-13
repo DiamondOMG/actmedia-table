@@ -9,12 +9,40 @@ import { Redis } from "@upstash/redis";
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Users";
 const redis = Redis.fromEnv();
-const CACHE_KEY = "cached_users_data";
+const CACHE_KEY = "Users";
 
 export async function POST(req: Request) {
   const sheets = await getSheetsClient();
   const { email, password, name, department, position } = await req.json();
 
+  // 🔍 ตรวจสอบ email domain
+  if (!email.endsWith("@omgthailand.com")) {
+    return NextResponse.json(
+      { error: "กรุณาใช้ Email @omgthailand.com ในการสมัครสมาชิก" },
+      { status: 400 }
+    );
+  }
+  // 🔍 ตรวจสอบความถูกต้องของ email ผ่าน WhoisXML API
+  try {
+    const apiKey = process.env.WHOISXML_API_KEY;
+    const verifyUrl = `https://emailverification.whoisxmlapi.com/api/v3?emailAddress=${email}&apiKey=${apiKey}`;
+    
+    const response = await fetch(verifyUrl);
+    const data = await response.json();
+
+    if (data.smtpCheck === "false") {
+      return NextResponse.json(
+        { error: "ไม่พบบัญชีอีเมลนี้ในระบบ กรุณาตรวจสอบอีเมลอีกครั้ง" },
+        { status: 400 }
+      );
+    }
+  } catch (error) {
+    console.error('Email verification error:', error);
+    return NextResponse.json(
+      { error: "เกิดข้อผิดพลาดในการตรวจสอบอีเมล กรุณาลองใหม่อีกครั้ง" },
+      { status: 500 }
+    );
+  }
   // ✅ Default permissions
   const defaultPermissions = [
     { menu: "user", level: 1 },
@@ -22,6 +50,7 @@ export async function POST(req: Request) {
     { menu: "request", level: 1 },
     { menu: "sequence", level: 1 },
     { menu: "customer", level: 1 },
+    { menu: "booking", level: 1 },
   ];
 
   // 🔍 ตรวจสอบ email ซ้ำ

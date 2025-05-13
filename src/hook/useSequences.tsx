@@ -2,9 +2,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { type Sequence } from "@/types/sequences";
-
-const BASE_URL = `https://script.google.com/macros/s/AKfycbzfRMpRmPuLiaQmqDgWiJRTc5hnO0PxXXIXsZTw2AY6tWLplbLq7ARn0BuDcOfuoksb/exec`;
-
+                  
+const BASE_URL = `https://script.google.com/macros/s/AKfycby6U-0jdXynLOtSr751SuOKE6OygtMieLRaPZWYN8V6hZRnXNYNxm1pzPolKvqGq1i9/exec`;
 type SequenceResponse = {
   status: string;
   data: Sequence[] | Sequence | null;
@@ -13,14 +12,17 @@ type SequenceResponse = {
 
 // 🟢 GET (ดึงข้อมูลทั้งหมด)
 export const useSequences = () => {
+  
   return useQuery({
     queryKey: ["sequences"],
     queryFn: async () => {
       const response = await axios.get<SequenceResponse>(
         BASE_URL + "?action=get&all=true"
       );
+      console.log("useSequences called");
       return response.data.data as Sequence[];
     },
+    refetchOnWindowFocus: false, // ปิด refetch ตอน focus
   });
 };
 

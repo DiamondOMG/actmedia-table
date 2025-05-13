@@ -7,13 +7,11 @@ const redis = Redis.fromEnv();
 
 const username = process.env.USERNAMEOMG!;
 const password = process.env.PASSWORDOMG!;
-const CACHE_KEY = "summarized_data_v1";
+const CACHE_KEY = "Act Planner - Campaign";
 const CACHE_DURATION_SECONDS = 10 * 60; // 10 minutes
 
 async function fetchSeqCampaigns() {
-  const url =
-    "https://script.google.com/macros/s/AKfycbzfRMpRmPuLiaQmqDgWiJRTc5hnO0PxXXIXsZTw2AY6tWLplbLq7ARn0BuDcOfuoksb/exec?action=get&all=true";
-
+  const url ="https://script.google.com/macros/s/AKfycby6U-0jdXynLOtSr751SuOKE6OygtMieLRaPZWYN8V6hZRnXNYNxm1pzPolKvqGq1i9/exec?action=get&all=true"
   const res = await axios.get(url, {
     headers: { "Cache-Control": "no-store" },
   });
@@ -43,6 +41,7 @@ async function fetchSequences(seqCampaigns: any[]) {
   };
 
   const response = await axios.get(apiUrl, options);
+  console.log("Response from Targetr API:")
   return response.data;
 }
 
@@ -139,6 +138,8 @@ function summarizeData(normalizedData: any[], seqCampaigns: any[]) {
               (endMillis - nowDate) / (1000 * 60 * 60 * 24)
             );
             status = `Content End in ${daysUntilOffline} days`;
+          } else if (nowDate > endMillis) {
+            status = "Finished";
           } else {
             return null;
           }

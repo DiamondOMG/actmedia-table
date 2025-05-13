@@ -47,7 +47,7 @@ const Table1 = memo(function Table1({ columns, initialData }: Table1Props) {
   });
   const [grouping, setGrouping] = useState<MRT_GroupingState>([]);
   //!------------------ ส่วนแสดงผล ------------------!//
-  console.log(` Table render `);
+  console.log(` Table render 1 `);
 
   //!------------------ การแปลงข้อมูล ------------------!//
   // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า

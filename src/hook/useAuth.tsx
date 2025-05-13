@@ -13,19 +13,22 @@ interface RegisterData extends LoginData {
   position: string;
 }
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  permissions: any[];
-}
-
 export function useAuth() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const login = useMutation({
     mutationFn: async (data: LoginData) => {
+      // Show loading alert
+      Swal.fire({
+        title: "กำลังเข้าสู่ระบบ",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const response = await fetch("/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,28 +43,49 @@ export function useAuth() {
       return response.json();
     },
     onSuccess: (data) => {
-      // เก็บข้อมูล user ไว้ใน React Query cache
+      // Store user data in React Query cache
       queryClient.setQueryData(["user"], data.user);
+
+      // Store in localStorage
+      localStorage.setItem(
+        "userData",
+        JSON.stringify({
+          user: data.user,
+          token: data.token, // assuming you have a token in response
+          lastLogin: new Date().toISOString(),
+        })
+      );
 
       Swal.fire({
         icon: "success",
         title: "เข้าสู่ระบบสำเร็จ",
         timer: 1500,
+        showConfirmButton: false,
+      }).then(() => {
+        router.push("/home");
       });
-
-      router.push("/home");  // เปลี่ยนเส้นทางไปยังหน้า home
     },
     onError: (error: Error) => {
       Swal.fire({
         icon: "error",
         title: "เข้าสู่ระบบไม่สำเร็จ",
         text: error.message,
+        confirmButtonText: "ตกลง",
       });
     },
   });
 
   const register = useMutation({
     mutationFn: async (data: RegisterData) => {
+      Swal.fire({
+        title: "กำลังเข้าสู่ระบบ",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const response = await fetch("/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

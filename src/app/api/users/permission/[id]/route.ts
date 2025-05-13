@@ -1,94 +1,31 @@
-// app/api/users/route.ts
 export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
-import { verifyToken } from "@/lib/auth/verifyToken"; // 👈 เพิ่ม import
-import { cookies } from "next/headers";
+import { verifyToken } from "@/lib/auth/verifyToken";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Users";
 const redis = Redis.fromEnv();
-const CACHE_KEY = "cached_users_data";
-const CACHE_DURATION = 60 * 10;
-
-interface User {
-  id: string;
-  email: string;
-  password: string;
-  name: string;
-  department: string;
-  position: string;
-  level: number;
-  isDelete: number;
-}
-
-// ✅ GET users (all or by id)
-export async function GET(req: Request) {
-  const sheets = await getSheetsClient();
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-
-  const cached = await redis.get(CACHE_KEY);
-
-  if (id) {
-    if (cached) {
-      const users = cached as any[];
-      const user = users.find((u) => u.id === id);
-      if (user) return NextResponse.json({ source: "cache", data: user });
-    }
-
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!A2:I`,
-    });
-
-    const users = response.data.values || [];
-    const user = users.find((row) => row[0] === id && row[8] !== "1");
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-    const userData = {
-      id: user[0],
-      username: user[1],
-      name: user[3],
-      department: user[4],
-      position: user[5],
-      permissions: JSON.parse(user[6] || "[]"),
-      createdOn: user[7],
-    };
-
-    return NextResponse.json({ source: "google", data: userData });
-  }
-
-  if (cached) return NextResponse.json({ source: "cache", data: cached });
-
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A2:I`,
-  });
-
-  const users = (response.data.values || [])
-    .filter((row) => row[8] !== "1")
-    .map((row) => ({
-      id: row[0],
-      username: row[1],
-      name: row[3],
-      department: row[4],
-      position: row[5],
-      permissions: JSON.parse(row[6] || "[]"),
-      createdOn: row[7],
-    }));
-
-  await redis.set(CACHE_KEY, users, { ex: CACHE_DURATION });
-  return NextResponse.json({ source: "google", data: users });
-}
+const CACHE_KEY = "Users";
 
 // ✅ PUT update user
-export async function PUT(req: Request) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const sheets = await getSheetsClient();
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
+
+    // ✅ 1. ตรวจสอบ token และ permission
+  try {
+    await verifyToken(req, "user", 3);
+    console.log("Authenticated user:");
+  } catch (err) {
+    return NextResponse.json(
+      { error: (err as Error).message },
+      { status: 401 }
+    );
+  }
+
   if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
   const body = await req.json();
@@ -128,11 +65,13 @@ export async function PUT(req: Request) {
 }
 
 // ✅ DELETE soft-delete user
-export async function DELETE(req: Request) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const sheets = await getSheetsClient();
   // ✅ 1. ตรวจสอบ token และ permission
   try {
-    const user = await verifyToken(req, "user", 2); // ต้องมี user.level >= 2
-    console.log("Authenticated user:", user.username);
+    await verifyToken(req, "user", 3);
+    console.log("Authenticated user:");
   } catch (err) {
     return NextResponse.json(
       { error: (err as Error).message },
@@ -140,9 +79,6 @@ export async function DELETE(req: Request) {
     );
   }
 
-  const sheets = await getSheetsClient();
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
   const response = await sheets.spreadsheets.values.get({

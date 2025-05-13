@@ -13,17 +13,25 @@ import {
   MRT_SortingState,
   MRT_ColumnFiltersState,
   MRT_GroupingState,
+  MRT_GlobalFilterTextField,
+  MRT_ToggleFiltersButton,
+  MRT_ShowHideColumnsButton,
+  MRT_ToggleDensePaddingButton,
+  MRT_ToggleFullScreenButton,
 } from "material-react-table";
 import {
   Box,
   Button,
+  Chip,
   DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
+  Stack,
   TextField,
   Tooltip,
 } from "@mui/material";
+import { Search as SearchIcon } from "@mui/icons-material"; // ไอคอนแว่นขยาย
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { type Sequence } from "@/types/sequences";
@@ -34,7 +42,9 @@ import {
   useUpdateSequence,
   useDeleteSequence,
 } from "@/hook/useSequences";
-import { useViewStore } from "@/zustand/useViewStore";//view
+import { useViewStore } from "@/zustand/useViewStore"; //view
+import { verifyPermission } from "@/lib/auth/verifyPermission";
+import { usePathname } from "next/navigation";
 
 // Props ที่รับเข้ามาสำหรับตาราง
 interface Table3Props {
@@ -54,7 +64,19 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
     pageSize: 30,
   });
   const [grouping, setGrouping] = useState<MRT_GroupingState>([]);
-  const [isEditing, setIsEditing] = useState(true);
+
+  // Change isEditing initialization to use useEffect
+  const [isEditing, setIsEditing] = useState(false);
+
+  //!------------------ จัดการ verifyPermission ------------------!//
+  const pathname = usePathname();
+  useEffect(() => {
+    if (pathname) {
+      const hasEditPermission = verifyPermission(pathname);
+      console.log("hasEditPermission", hasEditPermission);
+      setIsEditing(hasEditPermission);
+    }
+  }, []);
 
   //!------------------ จัดการ View ------------------!//
   const view = useViewStore((state) => state.view);
@@ -77,10 +99,10 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
   }, [view]);
 
   //!------------------ ส่วนแสดงผล ------------------!//
-  console.log(` Table render `);
+  console.log(` Table3 render `);
 
   //!------------------ การแปลงข้อมูล ------------------!//
-  // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า
+  // แปลงข้อมูลเริ่มต้นให้อยู่ในรูปแบบที่ต้องการ โดยใช้ useMemo เพื่อ cache ค่า5
   const newData: Sequence[] = useMemo(() => {
     return initialData;
   }, [initialData]);
@@ -132,7 +154,6 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
     data: newData,
     createDisplayMode: "modal", // กำหนดให้การสร้างข้อมูลแสดงเป็น modal
     enableEditing: isEditing, // เปิดใช้การแก้ไขข้อมูล
-    muiTableContainerProps: { sx: { minHeight: "500px" } }, // กำหนดความสูงของ table
     enableColumnOrdering: true, // เปิดใช้การเรียงลำดับคอลัมน์
     enableBottomToolbar: true, // แสดง toolbar ด้านล่าง
     positionPagination: "bottom", // ตำแหน่งของ toolbar ด้านล่าง
@@ -141,6 +162,18 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
     // กำหนดสไตล์ให้ toolbar ด้านบน
     muiTopToolbarProps: {
       sx: { backgroundColor: "#e3f2fd" },
+    },
+    muiTableBodyProps: {
+      sx: {
+        overflow: "auto", // ยกเลิกการเลื่อนอัตโนมัติในแนวตั้ง
+      },
+    },
+    muiTableContainerProps: {
+      sx: {
+        maxHeight: "calc(100vh - 200px)", // Adjust height to leave space for bottom sections
+        minHeight: "calc(100vh - 200px)", // Adjust height to leave space for bottom sections
+        overflow: "auto", // ตั้งค่า maxHeight เป็น 'unset' เพื่อให้ตารางไม่จำกัดความสูง
+      },
     },
     onColumnFiltersChange: setColumnFilters, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงคอลัมน์
     onGlobalFilterChange: setGlobalFilter, // ฟังชั่นเมื่อมีการเปลี่ยนแปลงคอลัมน์
@@ -279,18 +312,78 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
       ) : null,
 
     // ปุ่มสร้างข้อมูลใหม่ที่ด้านบนตาราง
-    renderTopToolbarCustomActions: ({ table }) => (
-      <Box sx={{ display: "flex", gap: "1rem" }}>
-        {isEditing && (
-          <Button
-            variant="contained"
-            onClick={() => table.setCreatingRow(true)}
-          >
-            สร้าง
-          </Button>
-        )}
-      </Box>
-    ),
+    renderTopToolbar: ({ table }) => {
+      const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "2px",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            backgroundColor: "#e3f2fd",
+          }}
+        >
+          {/* ฝั่งซ้าย: UI */}
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Box sx={{ display: "flex", gap: "1rem" }}>
+              {isEditing && (
+                <Button
+                  variant="contained"
+                  onClick={() => table.setCreatingRow(true)}
+                >
+                  สร้าง
+                </Button>
+              )}
+            </Box>
+            <Box component="span">Group By</Box>
+            {table.getState().grouping.length > 0 && (
+              <>
+                {table.getState().grouping.map((columnId, index) => (
+                  <Chip
+                    key={index} // ใช้ index เป็น key ถ้าไม่มี unique ID อื่น
+                    label={table.getColumn(columnId).columnDef.header}
+                    onDelete={() => {
+                      const newGrouping = table
+                        .getState()
+                        .grouping.filter((id) => id !== columnId);
+                      table.setGrouping(newGrouping);
+                    }}
+                    color="primary"
+                    variant="outlined"
+                    sx={{ backgroundColor: "#e3f2fd", marginRight: "4px" }}
+                  />
+                ))}
+              </>
+            )}
+          </Stack>
+
+          {/* ฝั่งขวา: ปุ่มเครื่องมือและช่องค้นหา */}
+          <Stack direction="row" spacing={1}>
+            {isSearchVisible && (
+              <MRT_GlobalFilterTextField
+                table={table}
+                sx={{ minWidth: "200px" }}
+              />
+            )}
+            <IconButton
+              onClick={() => setIsSearchVisible(!isSearchVisible)}
+              color={isSearchVisible ? "primary" : "default"}
+              aria-label="Toggle search"
+            >
+              <SearchIcon />
+            </IconButton>
+            <MRT_ToggleFiltersButton table={table} />
+            <MRT_ShowHideColumnsButton table={table} />
+            <MRT_ToggleDensePaddingButton table={table} />
+            <MRT_ToggleFullScreenButton table={table} />
+          </Stack>
+        </Box>
+      );
+    },
   });
 
   return (

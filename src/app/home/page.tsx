@@ -1,20 +1,14 @@
-"use client"
-import React from 'react'
+import SelectActionCard from "@/components/card/SelectActionCard";
+import Navbar from "@/components/navbar/Navbar";
+import React from "react";
 
-
-// import layout from '@/components/Layout'
-import Header from '@/components/Layout/Header'
-import SidebarLeft from '@/components/Layout/SidebarLeft'
-import Footer from '@/components/Layout/Footer'
-
-function page() {
+const ComponentName: React.FC = () => {
   return (
     <div>
-        <Header/>
-        <SidebarLeft/>
-        <Footer/>   
+      <Navbar />
+      <SelectActionCard />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default ComponentName;
