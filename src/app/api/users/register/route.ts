@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     "0", // I: isDelete
   ];
 
-  // ➕ เพิ่มผู้ใช้ใหม่ 1
+  // ➕ เพิ่มผู้ใช้ใหม่
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
     range: `${SHEET_NAME}!A2`,
