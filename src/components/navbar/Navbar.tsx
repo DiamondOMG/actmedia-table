@@ -102,7 +102,7 @@ export default function Navbar() {
   };
 
   const handleLogout = () => {
-    axios.post("/api/users/logout")
+    axios.post("/api/users/logout");
     // เคลียร์ข้อมูลใน localStorage
     localStorage.removeItem("userData");
 
@@ -219,6 +219,7 @@ export default function Navbar() {
             minHeight: "56px !important",
             height: "56px !important",
             px: 2,
+            backgroundColor: "#118DCE",
           }}
         >
           {/* <IconButton
@@ -230,15 +231,23 @@ export default function Navbar() {
           >
             <MenuIcon />
           </IconButton> */}
-            <Typography
+          <Typography
             variant="h6"
             noWrap
             component="div"
-            sx={{ display: { xs: "none", sm: "block" }, cursor: "pointer" }}
+            sx={{
+              display: { xs: "block", sm: "block" },
+              cursor: "pointer",
+              fontSize: {
+                xs: "1.7rem", // ขนาดตัวอักษรในหน้าจอเล็ก
+                sm: "1.7rem", // ขนาดตัวอักษรในหน้าจอใหญ่กว่า
+              },
+               letterSpacing: "2px", // เพิ่ม letter spacing
+            }}
             onClick={() => router.push("/home")}
-            >
-            ACT TABLE
-            </Typography>
+          >
+            <span className="text-black">ACT</span>TABLE
+          </Typography>
           {/* <Search>
             <SearchIconWrapper>
               <SearchIcon />
