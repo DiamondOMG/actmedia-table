@@ -176,15 +176,15 @@ export default function Navbar() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
+      {/* <MenuItem>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
           <Badge badgeContent={4} color="error">
             <MailIcon />
           </Badge>
         </IconButton>
         <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
+      </MenuItem> */}
+      {/* <MenuItem>
         <IconButton
           size="large"
           aria-label="show 17 new notifications"
@@ -195,8 +195,28 @@ export default function Navbar() {
           </Badge>
         </IconButton>
         <p>Notifications</p>
+      </MenuItem> */}
+      <MenuItem onClick={handleMenuClose}>
+        <IconButton size="large" color="inherit">
+          <AccountCircle />
+        </IconButton>
+        <p>Profile</p>
       </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
+      {hasPermission && (
+        <MenuItem onClick={handlePermissionClick}>
+          <IconButton size="large" color="inherit">
+            <SecurityIcon />
+          </IconButton>
+          <p>Permissions</p>
+        </MenuItem>
+      )}
+      <MenuItem onClick={handleLogout}>
+        <IconButton size="large" color="inherit">
+          <LogoutIcon />
+        </IconButton>
+        <p>Logout</p>
+      </MenuItem>
+      {/* <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           size="large"
           aria-label="account of current user"
@@ -207,7 +227,7 @@ export default function Navbar() {
           <AccountCircle />
         </IconButton>
         <p>Profile</p>
-      </MenuItem>
+      </MenuItem> */}
     </Menu>
   );
 
@@ -242,7 +262,7 @@ export default function Navbar() {
                 xs: "1.7rem", // ขนาดตัวอักษรในหน้าจอเล็ก
                 sm: "1.7rem", // ขนาดตัวอักษรในหน้าจอใหญ่กว่า
               },
-               letterSpacing: "2px", // เพิ่ม letter spacing
+              letterSpacing: "2px", // เพิ่ม letter spacing
             }}
             onClick={() => router.push("/home")}
           >
@@ -258,48 +278,41 @@ export default function Navbar() {
             />
           </Search> */}
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            {/* <IconButton
-              size="large"
-              aria-label="show 4 new mails"
-              color="inherit"
-            >
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton> */}
-            {/* <IconButton
+          <Box sx={{ display: "flex" }}>
+            <IconButton
               size="large"
               aria-label="show new notifications"
               color="inherit"
             >
-              <Badge badgeContent={3} color="error">
+              <Badge badgeContent={17} color="error">
                 <NotificationsIcon />
               </Badge>
-            </IconButton> */}
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
             </IconButton>
-          </Box>
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
+            <Box sx={{ display: { xs: "none", md: "flex" } }}>
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-controls={menuId}
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+            </Box>
+            <Box sx={{ display: { xs: "flex", md: "none" } }}>
+              <IconButton
+                size="large"
+                aria-label="show more"
+                aria-controls={mobileMenuId}
+                aria-haspopup="true"
+                onClick={handleMobileMenuOpen}
+                color="inherit"
+              >
+                <MoreIcon />
+              </IconButton>
+            </Box>
           </Box>
         </Toolbar>
       </AppBar>

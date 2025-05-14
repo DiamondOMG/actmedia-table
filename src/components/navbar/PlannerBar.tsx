@@ -20,26 +20,31 @@ const PlannerBar: React.FC<Props> = ({ className = "" }) => {
   const pathname = usePathname();
 
   return (
-    <div
-      className={`w-full flex items-center justify-center gap-4 ${className}`}
-    >
-      {menuItems.map((item) => {
-        const isActive = pathname === item.path;
+    <div className={`border-b bg-[#F9FAFB] border-gray-200 ${className}`}>
+      <nav className="overflow-x-auto flex-nowrap no-scrollbar" aria-label="Tabs">
+        <div className="flex min-w-full px-2">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.path;
 
-        return (
-          <button
-            key={item.path}
-            onClick={() => router.push(item.path)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
-              isActive
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-blue-100"
-            }`}
-          >
-            {item.label}
-          </button>
-        );
-      })}
+            return (
+              <a
+                key={item.path}
+                onClick={() => router.push(item.path)}
+                className={`
+                  whitespace-nowrap group relative py-2 px-4 my-3 text-center text-sm font-medium hover:bg-gray-50 focus:z-10 cursor-pointer
+                  ${isActive 
+                    ? "text-[#118DCE] border-b-2 border-[#118DCE] bg-[#E6F4FF] hover:bg-[#E6F4FF] hover:text-[#118DCE]" 
+                    : "text-gray-500 hover:text-gray-700"
+                  }
+                `}
+                aria-current={isActive ? "page" : undefined}
+              >
+                <span>{item.label}</span>
+              </a>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 };

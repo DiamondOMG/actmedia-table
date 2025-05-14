@@ -186,7 +186,15 @@ const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
       // สร้างหน้าต่าง modal สำหรับเพิ่มข้อมูล
       return (
         <>
-          <DialogTitle variant="h3">เพิ่ม RequestForm</DialogTitle>
+          <DialogTitle
+            variant="h5"
+            sx={{
+              fontWeight: "500", // เพิ่มความหนาของตัวอักษร
+              // หรือใช้ตัวเลขได้: 500 (medium), 600 (semi-bold), 700 (bold), 800 (extra-bold)
+            }}
+          >
+            Create Booking
+          </DialogTitle>
           <DialogContent
             sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}
           >
@@ -235,7 +243,15 @@ const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
     },
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h3">แก้ไข RequestForm</DialogTitle>
+        <DialogTitle
+          variant="h5"
+          sx={{
+            fontWeight: "500", // เพิ่มความหนาของตัวอักษร
+            // หรือใช้ตัวเลขได้: 500 (medium), 600 (semi-bold), 700 (bold), 800 (extra-bold)
+          }}
+        >
+          Update Booking
+        </DialogTitle>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
         >
@@ -291,12 +307,12 @@ const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
     renderRowActions: ({ row, table }) =>
       isEditing ? (
         <Box sx={{ display: "flex", gap: "1rem" }}>
-          <Tooltip title="แก้ไข">
+          <Tooltip title="update">
             <IconButton onClick={() => table.setEditingRow(row)}>
               <EditIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="ลบ">
+          <Tooltip title="delete">
             <IconButton color="error" onClick={() => handleDelete(row)}>
               <DeleteIcon />
             </IconButton>
@@ -314,7 +330,7 @@ const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            padding: "2px",
+            padding: "7px",
             flexWrap: "wrap",
             justifyContent: "space-between",
             backgroundColor: "#e3f2fd",
@@ -327,8 +343,14 @@ const Table5 = memo(function Table5({ columns, initialData }: Table5Props) {
                 <Button
                   variant="contained"
                   onClick={() => table.setCreatingRow(true)}
+                  sx={{
+                    backgroundColor: "#118DCE",
+                    "&:hover": {
+                      backgroundColor: "#0B6CA9", // Slightly darker shade for hover
+                    },
+                  }}
                 >
-                  สร้าง
+                  Create
                 </Button>
               )}
             </Box>

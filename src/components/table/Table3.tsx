@@ -190,6 +190,7 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
     initialState: {
       density: "compact",
       expanded: true, // ปิดการขยายกรุ๊ปเริ่มต้น
+      showGlobalFilter: true, //show the global filter by default
     },
     onCreatingRowSave: handleCreate, // ฟังชั่นปุ่มเพิ่ม
     onEditingRowSave: handleUpdate, // ฟังชั่นปุ่มแก้ไข
@@ -197,7 +198,16 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
       // สร้างหน้าต่าง modal สำหรับเพิ่มข้อมูล
       return (
         <>
-          <DialogTitle variant="h3">เพิ่ม Sequence</DialogTitle>
+          <DialogTitle
+            variant="h5"
+            sx={{
+              fontWeight: "500", // เพิ่มความหนาของตัวอักษร
+              // หรือใช้ตัวเลขได้: 500 (medium), 600 (semi-bold), 700 (bold), 800 (extra-bold)
+            }}
+          >
+            Create Sequence
+          </DialogTitle>
+
           <DialogContent
             sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}
           >
@@ -246,7 +256,15 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
     },
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h3">แก้ไข Sequence</DialogTitle>
+        <DialogTitle
+          variant="h5"
+          sx={{
+            fontWeight: "500", // เพิ่มความหนาของตัวอักษร
+            // หรือใช้ตัวเลขได้: 500 (medium), 600 (semi-bold), 700 (bold), 800 (extra-bold)
+          }}
+        >
+          Update Sequence
+        </DialogTitle>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
         >
@@ -295,12 +313,12 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
     renderRowActions: ({ row, table }) =>
       isEditing ? (
         <Box sx={{ display: "flex", gap: "1rem" }}>
-          <Tooltip title="แก้ไข">
+          <Tooltip title="update">
             <IconButton onClick={() => table.setEditingRow(row)}>
               <EditIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="ลบ">
+          <Tooltip title="delete">
             <IconButton
               color="error"
               onClick={() => handleDelete(row.original.id)}
@@ -321,7 +339,7 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            padding: "2px",
+            padding: "7px",
             flexWrap: "wrap",
             justifyContent: "space-between",
             backgroundColor: "#e3f2fd",
@@ -334,8 +352,14 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
                 <Button
                   variant="contained"
                   onClick={() => table.setCreatingRow(true)}
+                  sx={{
+                    backgroundColor: "#118DCE",
+                    "&:hover": {
+                      backgroundColor: "#0B6CA9", // Slightly darker shade for hover
+                    },
+                  }}
                 >
-                  สร้าง
+                  Create
                 </Button>
               )}
             </Box>
@@ -363,9 +387,11 @@ const Table3 = memo(function Table3({ columns, initialData }: Table3Props) {
 
           {/* ฝั่งขวา: ปุ่มเครื่องมือและช่องค้นหา */}
           <Stack direction="row" spacing={1}>
+            {" "}
             {isSearchVisible && (
               <MRT_GlobalFilterTextField
                 table={table}
+                placeholder="ค้นหา..."
                 sx={{ minWidth: "200px" }}
               />
             )}

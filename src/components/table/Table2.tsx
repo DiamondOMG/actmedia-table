@@ -41,9 +41,9 @@ interface Table2Props {
 
 const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
   //!----------------table state------------------!//
-  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
-    [{"id": "status", "value": "content"}]
-  );
+  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([
+    { id: "status", value: "content" },
+  ]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
   const [pagination, setPagination] = useState<MRT_PaginationState>({
@@ -106,6 +106,7 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
     initialState: {
       density: "compact",
       expanded: true, // ปิดการขยายกรุ๊ปเริ่มต้น
+      showGlobalFilter: true, //show the global filter by default
     },
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => {
       // สร้างหน้าต่าง modal สำหรับเพิ่มข้อมูล
@@ -215,10 +216,10 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            padding: "2px",
+            padding: "7px",
             flexWrap: "wrap",
             justifyContent: "space-between",
-            backgroundColor: "#e3f2fd" 
+            backgroundColor: "#e3f2fd",
           }}
         >
           {/* ฝั่งซ้าย: UI */}
@@ -228,6 +229,12 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
                 <Button
                   variant="contained"
                   onClick={() => table.setCreatingRow(true)}
+                  sx={{
+                    backgroundColor: "#118DCE",
+                    "&:hover": {
+                      backgroundColor: "#0B6CA9", // Slightly darker shade for hover
+                    },
+                  }}
                 >
                   สร้าง
                 </Button>
@@ -260,6 +267,7 @@ const Table2 = memo(function Table2({ columns, initialData }: Table2Props) {
             {isSearchVisible && (
               <MRT_GlobalFilterTextField
                 table={table}
+                placeholder="ค้นหา..."
                 sx={{ minWidth: "200px" }}
               />
             )}
