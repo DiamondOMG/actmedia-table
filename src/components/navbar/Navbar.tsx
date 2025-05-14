@@ -118,6 +118,11 @@ export default function Navbar() {
     handleMenuClose();
   };
 
+  const handleProfileClick = () => {
+    router.push("/profile");
+    handleMenuClose();
+  };
+
   const menuId = "primary-search-account-menu";
   const renderMenu = (
     <Menu
@@ -135,7 +140,7 @@ export default function Navbar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>
+      <MenuItem onClick={handleProfileClick}>
         {" "}
         <IconButton size="small" sx={{ mr: 1 }} color="inherit">
           <AccountCircle />
@@ -196,7 +201,7 @@ export default function Navbar() {
         </IconButton>
         <p>Notifications</p>
       </MenuItem> */}
-      <MenuItem onClick={handleMenuClose}>
+      <MenuItem onClick={handleProfileClick}>
         <IconButton size="large" color="inherit">
           <AccountCircle />
         </IconButton>
