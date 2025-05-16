@@ -20,9 +20,9 @@ const PlannerBar: React.FC<Props> = ({ className = "" }) => {
   const pathname = usePathname();
 
   return (
-    <div className={`border-b bg-[#F9FAFB] border-gray-200 ${className}`}>
+    <div className={`px-2 border-b bg-[#F9FAFB] border-gray-200 ${className}`}>
       <nav className="overflow-x-auto flex-nowrap no-scrollbar" aria-label="Tabs">
-        <div className="flex min-w-full px-2">
+        <div className="flex">
           {menuItems.map((item) => {
             const isActive = pathname === item.path;
 

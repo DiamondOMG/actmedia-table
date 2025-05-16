@@ -9,9 +9,11 @@ const SHEET_NAME = "Users";
 const redis = Redis.fromEnv();
 const CACHE_KEY = "Users";
 
-
-// ✅ GET user by ID
-export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+// ✅ GET user by ID  +++++++++++++++++++++++++++++++++++++++++++++++
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params;
   const sheets = await getSheetsClient();
 
@@ -38,18 +40,18 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   return NextResponse.json(result);
 }
 
-
-
-// ✅ PUT update user
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+// ✅ PUT update user ++++++++++++++++++++++++++++++++++
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   const sheets = await getSheetsClient();
-
 
   if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
   const body = await req.json();
-  const { name, department, password, position} = body;
+  const { name, department, password, position } = body;
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
@@ -67,6 +69,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (password) {
     const bcrypt = await import("bcryptjs");
     updatedUser[2] = await bcrypt.hash(password, 10);
+    // เพิ่ม log เพื่อตรวจสอบ
+    console.log("Password updated for user:", id);
   }
   if (name) updatedUser[3] = name;
   if (department) updatedUser[4] = department;
@@ -82,7 +86,3 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   await redis.del(CACHE_KEY);
   return NextResponse.json({ message: "User updated successfully" });
 }
-
-
-
- 
