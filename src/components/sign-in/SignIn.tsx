@@ -17,6 +17,9 @@ import { styled } from "@mui/material/styles";
 import ForgotPassword from "./components/ForgotPassword";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
   GoogleIcon,
   FacebookIcon,
@@ -73,6 +76,14 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
+
+  const [showPassword, setShowPassword] = React.useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -177,7 +188,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 helperText={passwordErrorMessage}
                 name="password"
                 placeholder="••••••"
-                type="password"
+                type={showPassword ? "text" : "password"} // Show password if showPassword is true
                 id="password"
                 autoComplete="current-password"
                 autoFocus
@@ -185,6 +196,36 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 fullWidth
                 variant="outlined"
                 color={passwordError ? "error" : "primary"}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                        sx={(theme) => ({
+                          border: "none",
+                          borderRadius: "0 4px 4px 0",
+                          backgroundColor: "transparent",
+                          position: "absolute",
+                          right: 7,
+                          "&:hover": {
+                            backgroundColor: "transparent",
+                          },
+                          ...theme.applyStyles("dark", {
+                            backgroundColor: "transparent",
+                            "&:hover": {
+                              backgroundColor: "transparent",
+                            },
+                          }),
+                        })}
+                      >
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    ),
+                  },
+                }}
               />
             </FormControl>
             {/* <FormControlLabel
