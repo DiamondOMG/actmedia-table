@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 import { v4 as uuidv4 } from "uuid";
-import { BookingData } from "@/hook/useBookings";
+// import { BookingData } from "@/hook/useBookings";
 import { verifyToken } from "@/lib/auth/verifyToken";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
@@ -25,7 +25,7 @@ interface SequenceData {
     isDelete?: 0 | 1;
   }
 
-// POST - Create new booking +++++++++++++++++++++++++++++++++++++
+// POST - Create new sequence +++++++++++++++++++++++++++++++++++++
 export async function POST(req: NextRequest) {
   const sheets = await getSheetsClient();
   const formData: SequenceData = await req.json();
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ message: "Form submitted successfully" });
 }
 
-// GET - Retrieve non-deleted bookings (isDelete = 0)  ++++++++++++++++++++++++++++++++++++
+// GET - Retrieve non-deleted sequence (isDelete = 0)  ++++++++++++++++++++++++++++++++++++
 export async function GET() {
   const sheets = await getSheetsClient();
   const cached = await redis.get(CACHE_KEY);
@@ -78,7 +78,7 @@ export async function GET() {
   const headers = response.data.values?.[0] || [];
   const rows = (response.data.values || [])
     .slice(1)
-    .filter((row) => row[8] !== "1")
+    .filter((row) => row[7] !== "1")
     .map((row) => {
       const formattedRow: Partial<SequenceData> = {};
       headers.forEach((header, index) => {
