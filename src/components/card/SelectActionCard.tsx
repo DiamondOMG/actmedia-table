@@ -34,11 +34,20 @@ const cards = [
     background: "/Planning-2.png",
   },
   {
-    id: 3,
+    id: 2,
     title: "Act Sign",
     description: "Monitor the signage.",
-    link: "/act-sign",
+    link: "#",
+    // link: "/act-sign",
     background: "/tv.jpg",
+  },
+  {
+    id: 3,
+    title: "Innovative",
+    description: "Innovation in progress.",
+    link: "#",
+    // link: "/act-sign",
+    background: "/innovative.jpg",
   },
 ];
 
