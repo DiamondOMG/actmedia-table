@@ -16,12 +16,17 @@ import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
-import {
-  GoogleIcon,
-  SitemarkIcon,
-} from "./components/CustomIcons";
+import { GoogleIcon, SitemarkIcon } from "./components/CustomIcons";
 import { useAuth } from "@/hook/useAuth";
 import Swal from "sweetalert2";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+
+interface Department {
+  id: number;
+  name: string;
+  positions: string[];
+}
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -107,6 +112,45 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState("");
+  const [showPasswords, setShowPasswords] = React.useState<{
+    password: boolean;
+    confirmPassword: boolean;
+  }>({
+    password: false,
+    confirmPassword: false,
+  });
+
+  // Add the mock data
+  const mockDepartments: Department[] = [
+    {
+      id: 1,
+      name: "Digital Product Development",
+      positions: [
+        "Digital Product Manager",
+        "Software Engineer",
+        "System Engineer & Project Coordinator",
+      ],
+    },
+    {
+      id: 2,
+      name: "Operations",
+      positions: [
+        "Operations Manager",
+        "Operations Officer",
+        "Operations Coordinator",
+      ],
+    },
+    {
+      id: 3,
+      name: "Media",
+      positions: ["Media Manager", "Graphic Designer", "Video Editor"],
+    },
+    {
+      id: 4,
+      name: "Sales",
+      positions: ["Sales Director", "Sales Manager", "Sales Supervisor"],
+    },
+  ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -119,35 +163,155 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
   const validateInputs = () => {
     const email = document.getElementById("email") as HTMLInputElement;
     const password = document.getElementById("password") as HTMLInputElement;
+    const confirmPassword = document.getElementById(
+      "confirmPassword"
+    ) as HTMLInputElement;
     const name = document.getElementById("name") as HTMLInputElement;
+
+    // ตรวจสอบว่าทุกฟิลด์ต้องไม่ว่าง
+    if (
+      !email.value ||
+      !password.value ||
+      !confirmPassword.value ||
+      !name.value ||
+      !formData.department ||
+      !formData.position
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Required All Fields",
+        text: "Please fill out all fields before submitting.",
+      });
+      return false; // หยุดการตรวจสอบทันที
+    }
 
     let isValid = true;
 
+    // Validate email format  *************
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
       setEmailErrorMessage("Please enter a valid email address.");
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Email",
+        text: "Please enter a valid email address.",
+      });
       isValid = false;
     } else {
       setEmailError(false);
       setEmailErrorMessage("");
     }
 
-    if (!password.value || password.value.length < 6) {
+    // Validate password length ************
+
+    // Password validation
+    if (!password.value) {
       setPasswordError(true);
-      setPasswordErrorMessage("Password must be at least 6 characters long.");
+      setPasswordErrorMessage("Password is required.");
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Password",
+        text: "Password is required.",
+      });
       isValid = false;
     } else {
-      setPasswordError(false);
-      setPasswordErrorMessage("");
+      // Check length
+      if (password.value.length < 8) {
+        setPasswordError(true);
+        setPasswordErrorMessage("Password must be at least 8 characters long.");
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Password",
+          text: "Password must be at least 8 characters long.",
+        });
+        isValid = false;
+      }
+      // Check uppercase
+      else if (!/[A-Z]/.test(password.value)) {
+        setPasswordError(true);
+        setPasswordErrorMessage(
+          "Password must include at least one uppercase letter."
+        );
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Password",
+          text: "Password must include at least one uppercase letter.",
+        });
+        isValid = false;
+      }
+      // Check lowercase
+      else if (!/[a-z]/.test(password.value)) {
+        setPasswordError(true);
+        setPasswordErrorMessage(
+          "Password must include at least one lowercase letter."
+        );
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Password",
+          text: "Password must include at least one lowercase letter.",
+        });
+        isValid = false;
+      }
+      // Check number
+      else if (!/\d/.test(password.value)) {
+        setPasswordError(true);
+        setPasswordErrorMessage("Password must include at least one number.");
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Password",
+          text: "Password must include at least one number.",
+        });
+        isValid = false;
+      } else {
+        setPasswordError(false);
+        setPasswordErrorMessage("");
+      }
     }
 
+    // Validate name ************
     if (!name.value || name.value.length < 1) {
       setNameError(true);
       setNameErrorMessage("Name is required.");
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Name",
+        text: "Name is required.",
+      });
       isValid = false;
     } else {
       setNameError(false);
       setNameErrorMessage("");
+    }
+
+    // Validate department
+    if (!formData.department) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Department",
+        text: "Please select a department.",
+      });
+      return false; // หยุดการตรวจสอบทันที
+      // isValid = false;
+    }
+
+    // Validate position
+    if (!formData.position) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Position",
+        text: "Please select a position.",
+      });
+      return false; // หยุดการตรวจสอบทันที
+      // isValid = false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Passwords do not match",
+        text: "Please check your passwords and try again.",
+      });
+      return;
     }
 
     return isValid;
@@ -156,13 +320,9 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      Swal.fire({
-        icon: "error",
-        title: "รหัสผ่านไม่ตรงกัน",
-        text: "กรุณาตรวจสอบรหัสผ่านอีกครั้ง",
-      });
-      return;
+    // เรียก validateInputs และตรวจสอบผลลัพธ์
+    if (!validateInputs()) {
+      return; // หยุดการทำงานหากการตรวจสอบไม่ผ่าน
     }
 
     register.mutate({
@@ -194,22 +354,8 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
             sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
             <FormControl>
-              <FormLabel htmlFor="name">Full name</FormLabel>
-              <TextField
-                autoComplete="name"
-                name="name"
-                required
-                fullWidth
-                id="name"
-                placeholder="Jon Snow"
-                value={formData.name}
-                onChange={handleChange}
-              />
-            </FormControl>
-            <FormControl>
               <FormLabel htmlFor="email">Email ( @omgthailand.com )</FormLabel>
               <TextField
-                required
                 fullWidth
                 id="email"
                 name="email"
@@ -220,54 +366,171 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
               />
             </FormControl>
             <FormControl>
+              <FormLabel htmlFor="name">Full name</FormLabel>
+              <TextField
+                autoComplete="name"
+                name="name"
+                fullWidth
+                id="name"
+                placeholder="Jon Snow"
+                value={formData.name}
+                onChange={handleChange}
+              />
+            </FormControl>
+
+            <FormControl>
               <FormLabel htmlFor="password">Password</FormLabel>
               <TextField
-                required
+                // required
                 fullWidth
                 name="password"
                 placeholder="••••••"
-                type="password"
+                type={showPasswords.password ? "text" : "password"}
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <Button
+                        onClick={() =>
+                          setShowPasswords((prev) => ({
+                            ...prev,
+                            password: !prev.password,
+                          }))
+                        }
+                        sx={{
+                          minWidth: "auto", // ลดขนาดปุ่ม
+                          padding: 0, // เอา padding ออก
+                          backgroundColor: "transparent", // ไม่มีสีพื้นหลัง
+                          "&:hover": {
+                            backgroundColor: "transparent", // ไม่มีสีพื้นหลังตอน hover
+                          },
+                        }}
+                      >
+                        {showPasswords.password ? (
+                          <Visibility />
+                        ) : (
+                          <VisibilityOff />
+                        )}
+                      </Button>
+                    ),
+                  },
+                }}
               />
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
               <TextField
-                required
+                // required
                 fullWidth
                 name="confirmPassword"
                 placeholder="••••••"
-                type="password"
+                type={showPasswords.confirmPassword ? "text" : "password"}
                 id="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <Button
+                        onClick={() =>
+                          setShowPasswords((prev) => ({
+                            ...prev,
+                            confirmPassword: !prev.confirmPassword,
+                          }))
+                        }
+                        sx={{
+                          minWidth: "auto", // ลดขนาดปุ่ม
+                          padding: 0, // เอา padding ออก
+                          backgroundColor: "transparent", // ไม่มีสีพื้นหลัง
+                          "&:hover": {
+                            backgroundColor: "transparent", // ไม่มีสีพื้นหลังตอน hover
+                          },
+                        }}
+                      >
+                        {showPasswords.confirmPassword ? (
+                          <Visibility />
+                        ) : (
+                          <VisibilityOff />
+                        )}
+                      </Button>
+                    ),
+                  },
+                }}
               />
             </FormControl>
+            <p className="text-sky-800 text-sm mt-0">
+              *** Password must be at least 8 characters long and include at
+              least one lowercase letter, one uppercase letter, and one number.
+            </p>
+
             <FormControl>
               <FormLabel htmlFor="department">Department</FormLabel>
               <TextField
-                required
+                select
                 fullWidth
                 name="department"
-                placeholder="Department"
                 id="department"
                 value={formData.department}
-                onChange={handleChange}
-              />
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    department: e.target.value,
+                    position: "", // Reset position when department changes
+                  });
+                }}
+                slotProps={{
+                  select: {
+                    native: true,
+                  },
+                }}
+                sx={{
+                  "& select": {
+                    padding: "7px",
+                  },
+                }}
+              >
+                <option value="">Select Department</option>
+                {mockDepartments.map((dept) => (
+                  <option key={dept.id} value={dept.name}>
+                    {dept.name}
+                  </option>
+                ))}
+              </TextField>
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="position">Position</FormLabel>
               <TextField
-                required
+                select
                 fullWidth
                 name="position"
-                placeholder="Position"
                 id="position"
                 value={formData.position}
-                onChange={handleChange}
-              />
+                onChange={(e) =>
+                  setFormData({ ...formData, position: e.target.value })
+                }
+                disabled={!formData.department}
+                slotProps={{
+                  select: {
+                    native: true,
+                  },
+                }}
+                sx={{
+                  "& select": {
+                    padding: "7px",
+                  },
+                }}
+              >
+                <option value="">Select Position</option>
+                {mockDepartments
+                  .find((dept) => dept.name === formData.department)
+                  ?.positions.map((position) => (
+                    <option key={position} value={position}>
+                      {position}
+                    </option>
+                  ))}
+              </TextField>
             </FormControl>
             <Button
               type="submit"

@@ -322,7 +322,7 @@ export default function ProfilePage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Username
+                  Email ( @omgthailand.com )
                 </label>
                 <input
                   type="email"
@@ -337,7 +337,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Name
+                  Full name
                 </label>
                 <input
                   type="text"
