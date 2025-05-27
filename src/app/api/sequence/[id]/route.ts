@@ -6,11 +6,6 @@ import { Redis } from "@upstash/redis";
 import { BookingData } from "@/hook/useBookings";
 import { verifyToken } from "@/lib/auth/verifyToken";
 
-// const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
-// const SHEET_NAME = "Act Planner - Bookings";
-// const redis = Redis.fromEnv();
-// const CACHE_KEY = "Act Planner - Bookings";
-
 // Interface สำหรับข้อมูล Sequence
 interface SequenceData {
     id: string;
