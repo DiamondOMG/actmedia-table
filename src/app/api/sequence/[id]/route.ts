@@ -3,20 +3,20 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
-import { BookingData } from "@/hook/useBookings";
+import { SequenceData } from "@/hook/useSequences2";
 import { verifyToken } from "@/lib/auth/verifyToken";
 
 // Interface สำหรับข้อมูล Sequence
-interface SequenceData {
-    id: string;
-    date: string;
-    username: string;
-    label: string;
-    retailer: string;
-    sequenceId: string;
-    mediaType: string;
-    isDelete?: 0 | 1;
-  }
+// interface SequenceData {
+//     id: string;
+//     date: string;
+//     username: string;
+//     label: string;
+//     retailer: string;
+//     sequenceId: string;
+//     mediaType: string;
+//     isDelete?: 0 | 1;
+//   }
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Act Planner - SequenceId";

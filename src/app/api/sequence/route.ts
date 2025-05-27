@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 import { v4 as uuidv4 } from "uuid";
-// import { BookingData } from "@/hook/useBookings";
+import { SequenceData } from "@/hook/useSequences2";
 import { verifyToken } from "@/lib/auth/verifyToken";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
@@ -14,16 +14,16 @@ const CACHE_KEY = "Act Planner - SequenceId";
 const CACHE_DURATION_SECONDS = 60 * 10; // 10 minutes
 
 // Interface สำหรับข้อมูล Sequence
-interface SequenceData {
-    id: string;
-    date: string;
-    username: string;
-    label: string;
-    retailer: string;
-    sequenceId: string;
-    mediaType: string;
-    isDelete?: 0 | 1;
-  }
+// interface SequenceData {
+//     id: string;
+//     date: string;
+//     username: string;
+//     label: string;
+//     retailer: string;
+//     sequenceId: string;
+//     mediaType: string;
+//     isDelete?: 0 | 1;
+//   }
 
 // POST - Create new sequence +++++++++++++++++++++++++++++++++++++
 export async function POST(req: NextRequest) {
