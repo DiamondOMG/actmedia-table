@@ -1,13 +1,14 @@
 //src/app/media-planner-sequence/page.tsx
 "use client";
-import Table3 from "@/components/table/Table3";
+import Table6 from "@/components/table/Table6";
 import { type MRT_ColumnDef } from "material-react-table";
-import { useSequences } from "@/hook/useSequences";
-import { type Sequence } from "@/types/sequences";
-import { Button, Stack } from "@mui/material";
+import { useGetTable } from "@/hook/useSequences2";
+import { type SequenceData } from "@/hook/useSequences2";
+import { Button, CircularProgress, Stack } from "@mui/material";
 import { useViewStore } from "@/zustand/useViewStore";
+import { useEffect, useState } from "react";
 
-const columns: MRT_ColumnDef<Sequence>[] = [
+const columns: MRT_ColumnDef<SequenceData>[] = [
   {
     accessorKey: "label",
     header: "Label",
@@ -30,9 +31,17 @@ const columns: MRT_ColumnDef<Sequence>[] = [
 ];
 
 export default function Page() {
-  const { data: sequence = [], isLoading: isLoadingSequence } = useSequences();
+  const { data: sequence = [], isLoading: isLoadingSequence } = useGetTable();
+  const [isMount, setIsMount] = useState(false);
   const setView = useViewStore((state) => state.setView);
   const currentView = useViewStore((state) => state.currentView);
+
+  useEffect(() => {
+    setIsMount(true);
+    return () => {
+      setIsMount(false);
+    };
+  }, []);
 
   const handleClick = () => {
     setView({
@@ -50,7 +59,13 @@ export default function Page() {
     });
   };
 
-  if (isLoadingSequence) return <div>Loading Sequencess...</div>;
+  if (isLoadingSequence || !isMount) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -62,7 +77,7 @@ export default function Page() {
           Print View
         </Button>
       </Stack>
-      <Table3 columns={columns} initialData={sequence} />
+      <Table6 columns={columns} initialData={sequence} />
     </>
   );
 }

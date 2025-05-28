@@ -44,23 +44,36 @@ export const useCreateTable = () => {
       const { data } = await axios.post<Response>(BASE_URL, formData);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sequences"] });
-      Swal.fire({
-        title: "สำเร็จ!",
-        text: "บันทึกข้อมูลเรียบร้อยแล้ว",
-        icon: "success",
-        confirmButtonText: "ตกลง",
-      });
+    onMutate: async (newData) => {
+      // ยกเลิก queries ที่กำลังทำงานอยู่เพื่อป้องกันการ conflict
+      await queryClient.cancelQueries({ queryKey: ["sequences"] });
+
+      // เก็บข้อมูลปัจจุบันไว้เพื่อใช้ในกรณี rollback
+      const previousData = queryClient.getQueryData<SequenceData[]>(
+        ["sequences"]
+      );
+
+      // อัพเดตข้อมูลในแคชทันทีก่อนที่ API จะตอบกลับ (Optimistic Update)
+      queryClient.setQueryData<SequenceData[]>(["sequences"], (old) =>
+        old ? [...old, newData] : [newData]
+      );
+
+      // ส่งข้อมูลเดิมกลับไปเพื่อใช้ในกรณีที่ต้อง rollback
+      return { previousData };
     },
-    onError: () => {
-      queryClient.invalidateQueries({ queryKey: ["sequences"] });
+    onError: (err, newData, context: any) => {
+      // กรณีเกิด error ให้ rollback กลับไปใช้ข้อมูลเดิม
+      queryClient.setQueryData(["sequences"], context.previousData);
       Swal.fire({
         title: "เกิดข้อผิดพลาด!",
         text: "ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง",
         icon: "error",
         confirmButtonText: "ตกลง",
       });
+    },
+    onSettled: () => {
+      // รีเฟรชข้อมูลหลังจาก mutation เสร็จสิ้น (ไม่ว่าจะสำเร็จหรือไม่)
+      queryClient.invalidateQueries({ queryKey: ["sequences"] });
     },
   });
 };
@@ -78,23 +91,35 @@ export const useUpdateTable = () => {
       //   console.log("Update sequence", updatedForm.createdOn);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sequences"] });
-      Swal.fire({
-        title: "สำเร็จ!",
-        text: "อัพเดทข้อมูลเรียบร้อยแล้ว",
-        icon: "success",
-        confirmButtonText: "ตกลง",
-      });
+    onMutate: async (updatedForm) => {
+      // ยกเลิก queries ที่กำลังทำงาน
+      await queryClient.cancelQueries({ queryKey: ["sequences"] });
+
+      // บันทึกข้อมูลก่อนอัพเดต
+      const previousData = queryClient.getQueryData<SequenceData[]>(
+        ["sequences"]
+      );
+
+      // อัพเดตเฉพาะรายการที่ต้องการแก้ไขในแคช
+      queryClient.setQueryData<SequenceData[]>(["sequences"], (old) =>
+        old?.map((item) => (item.id === updatedForm.id ? updatedForm : item)) ?? []
+      );
+
+      return { previousData };
     },
-    onError: () => {
-      queryClient.invalidateQueries({ queryKey: ["sequences"] });
+    onError: (err, updatedForm, context: any) => {
+      // กรณีเกิด error ให้ rollback กลับไปใช้ข้อมูลเดิม
+      queryClient.setQueryData(["sequences"], context.previousData);
       Swal.fire({
         title: "เกิดข้อผิดพลาด!",
         text: "ไม่สามารถอัพเดทข้อมูลได้ กรุณาลองใหม่อีกครั้ง",
         icon: "error",
         confirmButtonText: "ตกลง",
       });
+    },
+    onSettled: () => {
+      // รีเฟรชข้อมูลหลังจาก mutation เสร็จสิ้น (ไม่ว่าจะสำเร็จหรือไม่)
+      queryClient.invalidateQueries({ queryKey: ["sequences"] });
     },
   });
 };
@@ -108,23 +133,35 @@ export const useDeleteTable = () => {
       const { data } = await axios.delete<Response>(`${BASE_URL}/${id}`);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sequences"] });
-      Swal.fire({
-        title: "สำเร็จ!",
-        text: "ลบข้อมูลเรียบร้อยแล้ว",
-        icon: "success",
-        confirmButtonText: "ตกลง",
-      });
+    onMutate: async (deletedId) => {
+      // ยกเลิก queries ที่กำลังทำงาน
+      await queryClient.cancelQueries({ queryKey: ["sequences"] });
+
+      // บันทึกข้อมูลก่อนลบ
+      const previousData = queryClient.getQueryData<SequenceData[]>(
+        ["sequences"]
+      );
+
+      // ลบข้อมูลออกจากแคชทันที
+      queryClient.setQueryData<SequenceData[]>(["sequences"], (old) =>
+        old?.filter((item) => item.id !== deletedId) ?? []
+      );
+
+      return { previousData };
     },
-    onError: () => {
-      queryClient.invalidateQueries({ queryKey: ["sequences"] });
+    onError: (err, deletedId, context: any) => {
+      // กรณีเกิด error ให้ rollback กลับไปใช้ข้อมูลเดิม
+      queryClient.setQueryData(["sequences"], context.previousData);
       Swal.fire({
         title: "เกิดข้อผิดพลาด!",
         text: "ไม่สามารถลบข้อมูลได้ กรุณาลองใหม่อีกครั้ง",
         icon: "error",
         confirmButtonText: "ตกลง",
       });
+    },
+    onSettled: () => {
+      // รีเฟรชข้อมูลหลังจาก mutation เสร็จสิ้น (ไม่ว่าจะสำเร็จหรือไม่)
+      queryClient.invalidateQueries({ queryKey: ["sequences"] });
     },
   });
 };
