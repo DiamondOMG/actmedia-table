@@ -7,7 +7,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ onSelect }: SidebarProps) {
-  const [selected, setSelected] = useState<string>("Bookings");
+  const [selected, setSelected] = useState<string>("Requests");
 
   const handleSelect = (section: string) => {
     setSelected(section);
@@ -15,7 +15,7 @@ export default function Sidebar({ onSelect }: SidebarProps) {
   };
 
   return (
-    <Box className="w-[250px] h-screen bg-[#00C4B4] text-white p-4">
+    <Box className="w-[250px] h-screen bg-[#118DCE] text-white p-4">
       <Typography variant="h6" className="mb-4">
         DIGITAL MEDIA PLANNER
       </Typography>

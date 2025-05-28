@@ -20,6 +20,7 @@ export type RequestFormData = {
   notes: string;
   linkedCampaigns: string;
   campaigns: string[];
+  status?: string;
 };
 
 
