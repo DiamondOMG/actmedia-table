@@ -43,58 +43,60 @@ export default function RequestsSection({ onSelect }: RequestsSectionProps) {
         </Button>
       </Link>
 
-      {requests.map((request) => (
-        <Card
-          key={request.id}
-          className={`mb-4 cursor-pointer shadow-md ${
-            selectedId === request.id ? "border-l-4 border-[#41A4D8]" : ""
-          }`}
-          onClick={() => handleSelect(request)}
-        >
-          <CardContent>
-            <Box className="flex justify-between items-center">
-              <Box>
-                <Typography variant="h6" className="text-[#1E3A8A] font-bold">
-                  {/* request.campaigns ข้อมูล demo แสดงเป็นรูปอยู่ */}
-                  {request.id} - {request.campaigns}
-                </Typography>
-                <Typography className="text-gray-600">
-                  {(request.retailerTypes &&
-                    request.retailerTypes.join(", ")) ||
-                    "-"}
-                  {" - "}
-                  {request.signageType || "Signage Type"}
-                  {" - "}
-                  {request.duration
-                    ? (() => {
-                        // แปลง m:ss เป็นวินาที
-                        const [min, sec] = String(request.duration).split(":");
-                        const totalSec = Number(min) * 60 + Number(sec || 0);
-                        return `${totalSec} s`;
-                      })()
-                    : "Duration"}
-                </Typography>
+      {/* เพิ่ม Box ครอบ Card ทั้งหมด และกำหนด maxHeight + overflowY */}
+      <Box sx={{ maxHeight: 650, overflowY: "auto", p: 1, pr: 2 }}>
+        {requests.map((request) => (
+          <Card
+            key={request.id}
+            className={`mb-4 cursor-pointer shadow-md ${
+              selectedId === request.id ? "border-l-4 border-[#41A4D8]" : ""
+            }`}
+            onClick={() => handleSelect(request)}
+          >
+            <CardContent>
+              <Box className="flex justify-between items-center">
+                <Box>
+                  <Typography variant="h6" className="text-[#1E3A8A] font-bold">
+                    {request.id} - {request.campaigns}
+                  </Typography>
+                  <Typography className="text-gray-600">
+                    {(request.retailerTypes &&
+                      request.retailerTypes.join(", ")) ||
+                      "-"}
+                    {" - "}
+                    {request.signageType || "Signage Type"}
+                    {" - "}
+                    {request.duration
+                      ? (() => {
+                          // แปลง m:ss เป็นวินาที
+                          const [min, sec] = String(request.duration).split(":");
+                          const totalSec = Number(min) * 60 + Number(sec || 0);
+                          return `${totalSec} s`;
+                        })()
+                      : "Duration"}
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
-            <Box className="mt-4 flex justify-start">
-              <Box
-                sx={{
-                  border: "1px solid #41A4D8",
-                  borderRadius: "8px",
-                  px: 2,
-                  py: 0.5,
-                  display: "inline-block",
-                  background: "#F0F8FF",
-                }}
-              >
-                <Typography className="text-gray-700" sx={{ fontWeight: 300 }}>
-                  {request.status || "status"}
-                </Typography>
+              <Box className="mt-4 flex justify-start">
+                <Box
+                  sx={{
+                    border: "1px solid #41A4D8",
+                    borderRadius: "8px",
+                    px: 2,
+                    py: 0.5,
+                    display: "inline-block",
+                    background: "#F0F8FF",
+                  }}
+                >
+                  <Typography className="text-gray-700" sx={{ fontWeight: 300 }}>
+                    {request.status || "status"}
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
-          </CardContent>
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
     </Box>
   );
 }
