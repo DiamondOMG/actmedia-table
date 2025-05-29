@@ -13,6 +13,7 @@ export type RequestFormData = {
   retailerTypes: string[];
   bookings: string[];
   existingCampaign: string;
+  existingSlot?: string; // ยังไม่มีในฐานข้อมูล
   startDate: number ;
   endDate: number ;
   duration: string;
@@ -20,7 +21,11 @@ export type RequestFormData = {
   notes: string;
   linkedCampaigns: string;
   campaigns: string[];
-  status?: string;
+  status?: string; // ยังไม่มีในฐานข้อมูล
+  assignedTo?: string; // ยังไม่มีในฐานข้อมูล
+  sequenceLink?: string; // ยังไม่มีในฐานข้อมูล
+  signageType?: any; // ยังไม่มีในฐานข้อมูล
+
 };
 
 

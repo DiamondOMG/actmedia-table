@@ -47,7 +47,7 @@ export default function RequestsSection({ onSelect }: RequestsSectionProps) {
         <Card
           key={request.id}
           className={`mb-4 cursor-pointer shadow-md ${
-            selectedId === request.id ? "border-l-4 border-blue-600" : ""
+            selectedId === request.id ? "border-l-4 border-[#41A4D8]" : ""
           }`}
           onClick={() => handleSelect(request)}
         >
@@ -55,23 +55,42 @@ export default function RequestsSection({ onSelect }: RequestsSectionProps) {
             <Box className="flex justify-between items-center">
               <Box>
                 <Typography variant="h6" className="text-[#1E3A8A] font-bold">
-                  {request.id} - {request.requesterName}
+                  {/* request.campaigns ข้อมูล demo แสดงเป็นรูปอยู่ */}
+                  {request.id} - {request.campaigns}
                 </Typography>
                 <Typography className="text-gray-600">
-                  {(request.retailerTypes && request.retailerTypes.join(", ")) ||
-                    "-"}{" "}
-                  - {request.requestType || "-"}
+                  {(request.retailerTypes &&
+                    request.retailerTypes.join(", ")) ||
+                    "-"}
+                  {" - "}
+                  {request.signageType || "Signage Type"}
+                  {" - "}
+                  {request.duration
+                    ? (() => {
+                        // แปลง m:ss เป็นวินาที
+                        const [min, sec] = String(request.duration).split(":");
+                        const totalSec = Number(min) * 60 + Number(sec || 0);
+                        return `${totalSec} s`;
+                      })()
+                    : "Duration"}
                 </Typography>
               </Box>
             </Box>
             <Box className="mt-4 flex justify-start">
-              <Typography
-                className={`${
-                  request.status === "New" ? "text-blue-600" : "text-gray-600"
-                } font-semibold`}
+              <Box
+                sx={{
+                  border: "1px solid #41A4D8",
+                  borderRadius: "8px",
+                  px: 2,
+                  py: 0.5,
+                  display: "inline-block",
+                  background: "#F0F8FF",
+                }}
               >
-                {request.status || "-"}
-              </Typography>
+                <Typography className="text-gray-700" sx={{ fontWeight: 300 }}>
+                  {request.status || "status"}
+                </Typography>
+              </Box>
             </Box>
           </CardContent>
         </Card>

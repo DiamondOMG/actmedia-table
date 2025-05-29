@@ -423,6 +423,17 @@ export default function DigitalMediaRequestForm() {
               variant="outlined"
               placeholder="0:30"
               sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1 } }}
+              slotProps={{
+                input: {
+                  inputMode: "numeric",
+                  onInput: (e: React.FormEvent<HTMLInputElement>) => {
+                    const value = (e.target as HTMLInputElement).value;
+                    // อนุญาตเฉพาะตัวเลขและเครื่องหมาย :
+                    (e.target as HTMLInputElement).value = value.replace(/[^0-9:]/g, "");
+                  },
+                },
+              }}
+              helperText="Format: m:ss (เช่น 0:15, 2:30)"
             />
           </Box>
 

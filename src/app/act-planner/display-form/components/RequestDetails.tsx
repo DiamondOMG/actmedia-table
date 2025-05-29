@@ -13,9 +13,7 @@ export default function RequestDetails({
   if (!selectedRequest) {
     return (
       <Box className="p-4">
-        <Typography className="text-gray-600">
-          Loading...
-        </Typography>
+        <Typography className="text-gray-600">Loading...</Typography>
       </Box>
     );
   }
@@ -32,11 +30,16 @@ export default function RequestDetails({
 
   return (
     <Box className="w-full">
-      <Box className="flex justify-between items-center p-4 border-b">
-        <Typography variant="h5" className="font-bold">
-          {selectedRequest.id} - {selectedRequest.requesterName || selectedRequest.name}
+      <Box className="flex justify-between items-center p-4 border-b gap-4">
+        <Typography
+          variant="h6"
+          className="font-bold flex-1 min-w-0"
+      
+          title={`${selectedRequest.id} - ${selectedRequest.campaigns || "campaigns"}`}
+        >
+          {selectedRequest.id} - {selectedRequest.campaigns || "campaigns"}
         </Typography>
-        <Box className="flex gap-2">
+        <Box className="flex gap-2 flex-shrink-0">
           <Button
             variant="outlined"
             startIcon={<AssignmentOutlinedIcon color="primary" />}
@@ -77,11 +80,11 @@ export default function RequestDetails({
             <Typography className="text-gray-500 text-sm mb-1">
               Requester
             </Typography>
-            <Typography>{selectedRequest.requesterName || selectedRequest.requester || "-"}</Typography>
+            <Typography>{selectedRequest.requesterName || "-"}</Typography>
           </Box>
-        </Box>
+        </Box> 
 
-        <Box className="bg-[#E6F7FA] p-4 rounded-md mb-6">
+        <Box className="bg-[#b2dbf198] p-4 rounded-md mb-6">
           <Box className="grid grid-cols-4 gap-4">
             <Box>
               <Typography className="text-gray-500 text-sm mb-1">
@@ -89,8 +92,8 @@ export default function RequestDetails({
               </Typography>
               <Chip
                 label={
-                  (selectedRequest.retailerTypes && selectedRequest.retailerTypes.join(", ")) ||
-                  selectedRequest.retailer ||
+                  (selectedRequest.retailerTypes &&
+                    selectedRequest.retailerTypes.join(", ")) ||
                   "-"
                 }
                 size="small"
@@ -102,7 +105,7 @@ export default function RequestDetails({
                 Signage type
               </Typography>
               <Chip
-                label={selectedRequest.signType || "-"}
+                label={selectedRequest.signageType || "-"}
                 size="small"
                 className="bg-blue-100"
               />
@@ -146,7 +149,9 @@ export default function RequestDetails({
               Booking code
             </Typography>
             <Typography className="font-mono">
-              {selectedRequest.bookingCode || "-"}
+              {Array.isArray(selectedRequest.bookings)
+                ? selectedRequest.bookings.join(", ")
+                : selectedRequest.bookings || "-"}
             </Typography>
           </Box>
         </Box>
@@ -178,11 +183,11 @@ export default function RequestDetails({
             Media
           </Typography>
           <Typography className="break-all">
-            {selectedRequest.mediaLinks || selectedRequest.media || "-"}
+            {selectedRequest.mediaLinks || "-"}
           </Typography>
         </Box>
 
-        {selectedRequest.sequence && (
+        {selectedRequest.sequenceLink && (
           <Button
             variant="contained"
             sx={{
@@ -191,7 +196,7 @@ export default function RequestDetails({
               color: "#fff",
               boxShadow: "none",
             }}
-            href={selectedRequest.sequence}
+            href={selectedRequest.sequenceLink}
             target="_blank"
           >
             Open sequence
