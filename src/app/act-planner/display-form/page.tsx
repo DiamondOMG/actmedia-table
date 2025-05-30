@@ -8,18 +8,12 @@ import CollapsibleSection from "./components/CollapsibleSection";
 import DetailsSection from "./components/DetailsSection";
 import RequestsSection from "./components/RequestsSection";
 import RequestDetails from "./components/RequestDetails";
-import { mockBookings, mockRequests, Booking, Request } from "./data";
+import { type BookingData } from "@/hook/useBookings";
 
 export default function FormPage() {
   const [selectedSection, setSelectedSection] = useState<string>("Requests");
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<BookingData | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
-  const [bookings, setBookings] = useState<Booking[]>(mockBookings);
-  const [requests, setRequests] = useState<Request[]>(mockRequests);
-
-  const handleAddBooking = (newBooking: Booking) => {
-    setBookings((prev) => [...prev, newBooking]);
-  };
 
   return (
     <Box className="flex">
@@ -32,9 +26,10 @@ export default function FormPage() {
           {/* Section 2: Collapsible Cards */}
           <Box className="w-1/3 p-4 overflow-y-auto">
             <CollapsibleSection
-              bookings={bookings}
               onSelect={setSelectedBooking}
-              onAddBooking={handleAddBooking}
+              onAddBooking={(newBooking) => {
+                // Handle adding new booking
+              }}
             />
           </Box>
 
@@ -48,7 +43,7 @@ export default function FormPage() {
           {/* Section 2: Requests */}
           <Box className="w-1/3 p-4 overflow-y-auto">
             <RequestsSection
-              requests={requests}
+              // requests={requests}
               onSelect={setSelectedRequest}
             />
           </Box>
