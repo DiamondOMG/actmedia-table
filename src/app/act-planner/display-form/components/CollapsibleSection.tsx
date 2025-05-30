@@ -17,7 +17,8 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
-import { useGetTable, type BookingData } from "@/hook/useBookings";
+import { useGetTable, type BookingData } from "@/hook/useBookings";  // Import the query hook for fetching bookings
+import { useCreateTable } from "@/hook/useBookings"; // Import the mutation hook for creating bookings
 import NewBookingDialog from "./NewBookingDialog";
 
 interface CollapsibleSectionProps {
@@ -25,10 +26,20 @@ interface CollapsibleSectionProps {
   onAddBooking: (newBooking: BookingData) => void;
 }
 
+interface NewBookingFormData {
+  customer: string;
+  bookingCode: string;
+  campaignName: string;
+  status: string;
+  campaignType: string;
+}
+
+
 export default function CollapsibleSection({
   onSelect,
   onAddBooking,
 }: CollapsibleSectionProps) {
+  const createBooking = useCreateTable();
   const { data: bookings = [] } = useGetTable();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -73,27 +84,23 @@ export default function CollapsibleSection({
     onSelect(booking);
   };
 
-  const handleAddBooking = (data: {
-    customer: string;
-    bookingCode: string;
-    campaignName: string;
-    status: string;
-    campaignType: string;
-  }) => {
+  const handleAddBooking = (formData: NewBookingFormData) => {
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
     const newBooking: BookingData = {
-      booking: data.bookingCode,
-      bookingCode: data.bookingCode,
-      campaignType: data.campaignType,
-      customer: data.customer,
-      campaignName: data.campaignName,
-      status: data.status,
+      booking: formData.bookingCode,
+      bookingCode: formData.bookingCode,
+      campaignType: formData.campaignType,
+      customer: formData.customer,
+      campaignName: formData.campaignName,
+      status: formData.status,
       bookingsToMedium: "",
       bigcTvSignage: false,
       bigcTvKiosk: false,
       bigcCategorySignage: false,
       mbc: false,
-      createdBy: "User",
-      lastModifiedBy: "User",
+      createdBy: userData.user?.name || "Unknown", // แก้ไขให้ใช้ userData
+      lastModifiedBy: userData.user?.name || "Unknown", // แก้ไขให้ใช้ userData
       createdOn: Date.now(),
       campaignStatus: "New",
       customerRecordId: "",
@@ -103,7 +110,9 @@ export default function CollapsibleSection({
       buttonCustomerReport: "",
       isDelete: 0,
     };
-    onAddBooking(newBooking);
+
+    createBooking.mutate(newBooking);
+    setOpenDialog(false);
   };
 
   return (
@@ -215,3 +224,4 @@ export default function CollapsibleSection({
     </Box>
   );
 }
+

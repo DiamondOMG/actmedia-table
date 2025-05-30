@@ -13,16 +13,18 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { mockCustomers } from "../data";
 
+interface NewBookingFormData {
+  customer: string;
+  bookingCode: string;
+  campaignName: string;
+  status: string;
+  campaignType: string;
+}
+
 interface NewBookingDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: {
-    customer: string;
-    bookingCode: string;
-    campaignName: string;
-    status: string;
-    campaignType: string;
-  }) => void;
+  onSubmit: (data: NewBookingFormData) => void;
 }
 
 export default function NewBookingDialog({
@@ -30,7 +32,7 @@ export default function NewBookingDialog({
   onClose,
   onSubmit,
 }: NewBookingDialogProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<NewBookingFormData>({
     customer: "",
     bookingCode: "",
     campaignName: "",
