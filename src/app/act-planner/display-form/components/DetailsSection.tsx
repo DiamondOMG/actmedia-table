@@ -1,127 +1,171 @@
 // /src/app/booking/components/DetailsSection.tsx
-import { Box, Card, CardContent, Typography, Grid } from "@mui/material";
+import { Box, Typography, Chip } from "@mui/material";
 import { type BookingData } from "@/hook/useBookings";
 
 interface DetailsSectionProps {
   selectedBooking: BookingData | null;
 }
 
-export default function DetailsSection({ selectedBooking }: DetailsSectionProps) {
+export default function DetailsSection({
+  selectedBooking,
+}: DetailsSectionProps) {
   if (!selectedBooking) {
     return (
       <Box className="p-4">
-        <Typography className="text-gray-600">
-          Loading...
-        </Typography>
+        <Typography className="text-gray-600">Loading...</Typography>
       </Box>
     );
   }
 
   return (
-    <Box className="p-4">
-      <Card className="shadow-md">
-        <CardContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="h5" className="text-[#1E3A8A] font-bold mb-4">
-                {selectedBooking.bookingCode}
-              </Typography>
-            </Grid>
+    <Box className="w-full">
+      <Box className="flex justify-between items-center p-4 border-b gap-4">
+        <Typography
+          variant="h6"
+          className="font-bold flex-1 min-w-0"
+          title={selectedBooking.bookingCode}
+        >
+          {selectedBooking.bookingCode} - {selectedBooking.campaignName}
+        </Typography>
+      </Box>
 
-            <Grid item xs={12} md={6}>
-              <Typography variant="h6" className="text-[#1E3A8A] mb-2">
-                Campaign Information
+      <Box className="p-6">
+        {/* Big C */}
+        <Box className="mb-6 bg-[#b2dbf198] p-4 rounded-md">
+          <Box className="grid grid-cols-4 gap-4">
+            <Box>
+              <Typography className="text-gray-500 text-sm mb-1">
+                BigC TV Signage
               </Typography>
               <Typography className="text-gray-700">
-                Campaign Name: {selectedBooking.campaignName}
+                {selectedBooking.bigcTvSignage ? "✓" : "—"}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography className="text-gray-500 text-sm mb-1">
+                BigC TV Kiosk
               </Typography>
               <Typography className="text-gray-700">
-                Campaign Type: {selectedBooking.campaignType}
+                {selectedBooking.bigcTvKiosk ? "✓" : "—"}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography className="text-gray-500 text-sm mb-1">
+                BigC Category Signage
               </Typography>
               <Typography className="text-gray-700">
-                Campaign Status: {selectedBooking.campaignStatus}
+                {selectedBooking.bigcCategorySignage ? "✓" : "—"}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography className="text-gray-500 text-sm mb-1">
+                MBC
               </Typography>
               <Typography className="text-gray-700">
-                Status:{" "}
-                <span
-                  className={`text-${
-                    selectedBooking.status === "Active" ? "green" : "blue"
-                  }-600`}
-                >
-                  {selectedBooking.status}
-                </span>
+                {selectedBooking.mbc ? "✓" : "—"}
               </Typography>
-            </Grid>
+            </Box>
+          </Box>
+        </Box>
 
-            <Grid item xs={12} md={6}>
-              <Typography variant="h6" className="text-[#1E3A8A] mb-2">
-                Customer Details
-              </Typography>
-              <Typography className="text-gray-700">
-                Customer: {selectedBooking.customer}
-              </Typography>
-              <Typography className="text-gray-700">
-                Customer Record ID: {selectedBooking.customerRecordId}
-              </Typography>
-            </Grid>
+        <Box className="grid grid-cols-2 gap-4 mb-6">
+          <Box>
+            <Typography className="text-gray-500 text-sm mb-1">
+              Campaign Name
+            </Typography>
+            <Typography>{selectedBooking.campaignName || "—"}</Typography>
+          </Box>
+          <Box>
+            <Typography className="text-gray-500 text-sm mb-1">
+              Status
+            </Typography>
+            <Chip
+              label={selectedBooking.status || "—"}
+              size="small"
+              className={`${
+                selectedBooking.status === "Active"
+                  ? "bg-green-100"
+                  : "bg-blue-100"
+              }`}
+            />
+          </Box>
+          <Box>
+            <Typography className="text-gray-500 text-sm mb-1">
+              Booking code
+            </Typography>
+            <Chip
+              label={selectedBooking.bookingCode || "—"}
+              size="small"
+              className="bg-blue-100"
+            />
+          </Box>
+          <Box>
+            <Typography className="text-gray-500 text-sm mb-1">
+              Customer
+            </Typography>
+            <Chip
+              label={selectedBooking.customer || "—"}
+              size="small"
+              className="bg-blue-100"
+            />
+          </Box>
+        </Box>
 
-            <Grid item xs={12}>
-              <Typography variant="h6" className="text-[#1E3A8A] mb-2">
-                Booking Details
+        <Box className="bg-gray-50 p-4 rounded-md mb-6">
+          <Box className="grid grid-cols-4 gap-4">
+            <Box>
+              <Typography className="text-gray-500 text-sm mb-1">
+                Created
               </Typography>
-              <Typography className="text-gray-700">
-                Booking Code: {selectedBooking.bookingCode}
+              <Typography>
+                {selectedBooking.createdOn
+                  ? (() => {
+                      const d = new Date(selectedBooking.createdOn);
+                      const day = d.toLocaleString("th-TH", { day: "2-digit" });
+                      const month = d.toLocaleString("th-TH", { month: "2-digit" });
+                      const year = d.getFullYear(); // ค.ศ.
+                      const hour = d.toLocaleString("th-TH", { hour: "2-digit", hour12: false });
+                      const minute = d.toLocaleString("th-TH", { minute: "2-digit" });
+                      return `${day}/${month}/${year} ${hour}:${minute}`;
+                    })()
+                  : "—"}
               </Typography>
-              <Typography className="text-gray-700">
-                Bookings to Medium: {selectedBooking.bookingsToMedium}
+            </Box>
+            <Box>
+              <Typography className="text-gray-500 text-sm mb-1">
+                Created By
               </Typography>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Typography variant="h6" className="text-[#1E3A8A] mb-2">
-                Media Types
+              <Typography>{selectedBooking.createdBy || "—"}</Typography>
+            </Box>
+            <Box>
+              <Typography className="text-gray-500 text-sm mb-1">
+                Last Modified
               </Typography>
-              <Typography className="text-gray-700">
-                BigC TV Signage: {selectedBooking.bigcTvSignage ? "Yes" : "No"}
+              <Typography>
+                {selectedBooking.lastModified
+                  ? (() => {
+                      const d = new Date(selectedBooking.lastModified);
+                      const day = d.toLocaleString("th-TH", { day: "2-digit" });
+                      const month = d.toLocaleString("th-TH", { month: "2-digit" });
+                      const year = d.getFullYear(); // ค.ศ.
+                      const hour = d.toLocaleString("th-TH", { hour: "2-digit", hour12: false });
+                      const minute = d.toLocaleString("th-TH", { minute: "2-digit" });
+                      return `${day}/${month}/${year} ${hour}:${minute}`;
+                    })()
+                  : "—"}
               </Typography>
-              <Typography className="text-gray-700">
-                BigC TV Kiosk: {selectedBooking.bigcTvKiosk ? "Yes" : "No"}
+            </Box>
+            <Box>
+              <Typography className="text-gray-500 text-sm mb-1">
+                Last Modified By
               </Typography>
-              <Typography className="text-gray-700">
-                BigC Category Signage:{" "}
-                {selectedBooking.bigcCategorySignage ? "Yes" : "No"}
+              <Typography>
+                {selectedBooking.lastModifiedBy || "—"}
               </Typography>
-              <Typography className="text-gray-700">
-                MBC: {selectedBooking.mbc ? "Yes" : "No"}
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Typography variant="h6" className="text-[#1E3A8A] mb-2">
-                Audit Information
-              </Typography>
-              <Typography className="text-gray-700">
-                Created By: {selectedBooking.createdBy}
-              </Typography>
-              <Typography className="text-gray-700">
-                Created On:{" "}
-                {new Date(selectedBooking.createdOn).toLocaleString()}
-              </Typography>
-              {selectedBooking.lastModified && (
-                <>
-                  <Typography className="text-gray-700">
-                    Last Modified By: {selectedBooking.lastModifiedBy}
-                  </Typography>
-                  <Typography className="text-gray-700">
-                    Last Modified:{" "}
-                    {new Date(selectedBooking.lastModified).toLocaleString()}
-                  </Typography>
-                </>
-              )}
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 }

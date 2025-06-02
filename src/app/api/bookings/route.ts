@@ -28,6 +28,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Create booking field by combining bookingCode and campaignName
+  // Trim ค่าและเช็คว่ามีค่าจริงหรือไม่
+  const bookingCode = (formData.bookingCode || "").trim();
+  const campaignName = (formData.campaignName || "").trim();
+  formData.booking =
+    bookingCode && campaignName
+      ? `${bookingCode} - ${campaignName}`
+      : campaignName || bookingCode || ""; // ถ้ามีแค่ค่าเดียวก็ใช้ค่านั้น
+
   const submissionData = [
     uuidv4(),
     formData.booking,
