@@ -1,6 +1,8 @@
 // /src/app/booking/components/DetailsSection.tsx
 import { Box, Typography, Chip } from "@mui/material";
 import { type BookingData } from "@/hook/useBookings";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 interface DetailsSectionProps {
   selectedBooking: BookingData | null;
@@ -37,33 +39,41 @@ export default function DetailsSection({
               <Typography className="text-gray-500 text-sm mb-1">
                 BigC TV Signage
               </Typography>
-              <Typography className="text-gray-700">
-                {selectedBooking.bigcTvSignage ? "✓" : "—"}
-              </Typography>
+              {selectedBooking.bigcTvSignage ? (
+                <CheckCircleIcon color="success" />
+              ) : (
+                <CancelIcon color="disabled" />
+              )}
             </Box>
             <Box>
               <Typography className="text-gray-500 text-sm mb-1">
                 BigC TV Kiosk
               </Typography>
-              <Typography className="text-gray-700">
-                {selectedBooking.bigcTvKiosk ? "✓" : "—"}
-              </Typography>
+              {selectedBooking.bigcTvKiosk ? (
+                <CheckCircleIcon color="success" />
+              ) : (
+                <CancelIcon color="disabled" />
+              )}
             </Box>
             <Box>
               <Typography className="text-gray-500 text-sm mb-1">
                 BigC Category Signage
               </Typography>
-              <Typography className="text-gray-700">
-                {selectedBooking.bigcCategorySignage ? "✓" : "—"}
-              </Typography>
+              {selectedBooking.bigcCategorySignage ? (
+                <CheckCircleIcon color="success" />
+              ) : (
+                <CancelIcon color="disabled" />
+              )}
             </Box>
             <Box>
               <Typography className="text-gray-500 text-sm mb-1">
                 MBC
               </Typography>
-              <Typography className="text-gray-700">
-                {selectedBooking.mbc ? "✓" : "—"}
-              </Typography>
+              {selectedBooking.mbc ? (
+                <CheckCircleIcon color="success" />
+              ) : (
+                <CancelIcon color="disabled" />
+              )}
             </Box>
           </Box>
         </Box>
@@ -122,10 +132,17 @@ export default function DetailsSection({
                   ? (() => {
                       const d = new Date(selectedBooking.createdOn);
                       const day = d.toLocaleString("th-TH", { day: "2-digit" });
-                      const month = d.toLocaleString("th-TH", { month: "2-digit" });
+                      const month = d.toLocaleString("th-TH", {
+                        month: "2-digit",
+                      });
                       const year = d.getFullYear(); // ค.ศ.
-                      const hour = d.toLocaleString("th-TH", { hour: "2-digit", hour12: false });
-                      const minute = d.toLocaleString("th-TH", { minute: "2-digit" });
+                      const hour = d.toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        hour12: false,
+                      });
+                      const minute = d.toLocaleString("th-TH", {
+                        minute: "2-digit",
+                      });
                       return `${day}/${month}/${year} ${hour}:${minute}`;
                     })()
                   : "—"}
@@ -146,10 +163,17 @@ export default function DetailsSection({
                   ? (() => {
                       const d = new Date(selectedBooking.lastModified);
                       const day = d.toLocaleString("th-TH", { day: "2-digit" });
-                      const month = d.toLocaleString("th-TH", { month: "2-digit" });
+                      const month = d.toLocaleString("th-TH", {
+                        month: "2-digit",
+                      });
                       const year = d.getFullYear(); // ค.ศ.
-                      const hour = d.toLocaleString("th-TH", { hour: "2-digit", hour12: false });
-                      const minute = d.toLocaleString("th-TH", { minute: "2-digit" });
+                      const hour = d.toLocaleString("th-TH", {
+                        hour: "2-digit",
+                        hour12: false,
+                      });
+                      const minute = d.toLocaleString("th-TH", {
+                        minute: "2-digit",
+                      });
                       return `${day}/${month}/${year} ${hour}:${minute}`;
                     })()
                   : "—"}
@@ -159,10 +183,29 @@ export default function DetailsSection({
               <Typography className="text-gray-500 text-sm mb-1">
                 Last Modified By
               </Typography>
-              <Typography>
-                {selectedBooking.lastModifiedBy || "—"}
-              </Typography>
+              <Typography>{selectedBooking.lastModifiedBy || "—"}</Typography>
             </Box>
+          </Box>
+        </Box>
+        
+        {/* Section Medium/Inventory type */}
+        <Box className="mb-6">
+          <Typography variant="subtitle1" className="font-semibold mb-2">
+            Medium / Inventory type
+          </Typography>
+          <Box className="flex flex-col gap-2">
+            {(selectedBooking.bookingsToMedium
+              ? selectedBooking.bookingsToMedium.split(",").map((item: string) => item.trim()).filter(Boolean)
+              : []
+            ).map((item: string, idx: number) => (
+              <Box key={idx} className="border rounded-lg p-3 bg-white">
+                <Typography className="font-medium">{item}</Typography>
+              </Box>
+            ))}
+            {(!selectedBooking.bookingsToMedium ||
+              selectedBooking.bookingsToMedium.split(",").filter(Boolean).length === 0) && (
+              <Typography className="text-gray-500">—</Typography>
+            )}
           </Box>
         </Box>
       </Box>
