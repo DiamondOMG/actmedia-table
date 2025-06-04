@@ -45,6 +45,11 @@ export async function POST(req: NextRequest) {
     JSON.stringify(formData.campaigns),
     Date.now(),
     "0", // isDelete
+    formData.existingSlot || "", // เพิ่มฟิลด์ใหม่
+    formData.status || "open", // ตั้งค่า default เป็น "open"
+    formData.assignedTo || "", // เพิ่มฟิลด์ใหม่
+    formData.sequenceLink || "", // เพิ่มฟิลด์ใหม่
+    formData.signageType || "", // เพิ่มฟิลด์ใหม่
   ];
 
   await sheets.spreadsheets.values.append({
@@ -67,12 +72,12 @@ export async function GET() {
   }
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A1:P`,
+    range: `${SHEET_NAME}!A1:U`,
   });
   const headers = response.data.values?.[0] || [];
   const rows = (response.data.values || [])
     .slice(1)
-    .filter((row) => row[15] !== "1")
+    .filter((row) => row[15] !== "1") // กรอง isDelete != 1
     .map((row) => {
       const formattedRow: any = {};
       headers.forEach((header, index) => {
@@ -90,10 +95,22 @@ export async function GET() {
         if (header === "isDelete") {
           value = Number(value || 0);
         }
+        // ตรวจสอบฟิลด์ใหม่
+        if (
+          [
+            "existingSlot",
+            "status",
+            "assignedTo",
+            "sequenceLink",
+            "signageType",
+          ].includes(header)
+        ) {
+          value = value || ""; // หากไม่มีค่า ให้ตั้งเป็น ""
+        }
         formattedRow[header] = value;
       });
       return formattedRow;
     });
   await redis.set(CACHE_KEY, rows, { ex: CACHE_DURATION_SECONDS });
-  return NextResponse.json(rows); // 👈 return as pure array
+  return NextResponse.json(rows); // return as pure array
 }

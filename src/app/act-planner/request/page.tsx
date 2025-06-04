@@ -28,7 +28,7 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
     header: "Retailer Types",
     Cell: ({ cell }) => {
       const value = cell.getValue<string[]>();
-      return value ? value.join(", ") : "";
+      return Array.isArray(value) ? value.join(", ") : value || ""; // ตรวจสอบว่า value เป็น Array หรือไม่
     },
   },
   {
@@ -36,7 +36,7 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
     header: "Bookings",
     Cell: ({ cell }) => {
       const value = cell.getValue<string[]>();
-      return value ? value.join(", ") : "";
+      return Array.isArray(value) ? value.join(", ") : value || ""; // ตรวจสอบว่า value เป็น Array หรือไม่
     },
   },
   {
@@ -44,7 +44,7 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
     header: "Campaigns",
     Cell: ({ cell }) => {
       const value = cell.getValue<string[]>();
-      return value ? value.join(", ") : "";
+      return Array.isArray(value) ? value.join(", ") : value || ""; // ตรวจสอบว่า value เป็น Array หรือไม่
     },
   },
   {
@@ -94,6 +94,46 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
   {
     accessorKey: "mediaLinks",
     header: "Linked Media",
+  },
+  {
+    accessorKey: "existingSlot",
+    header: "Existing Slot",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string>();
+      return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string>();
+      return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
+    },
+  },
+  {
+    accessorKey: "assignedTo",
+    header: "Assigned To",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string>();
+      return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
+    },
+  },
+  {
+    accessorKey: "sequenceLink",
+    header: "Sequence Link",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string>();
+      return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
+    },
+  },
+  {
+    accessorKey: "signageType",
+    header: "Signage Type",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string>();
+      return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
+    },
   },
 ];
 

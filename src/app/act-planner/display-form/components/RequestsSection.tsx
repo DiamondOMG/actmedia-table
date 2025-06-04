@@ -25,14 +25,21 @@ export default function RequestsSection({ onSelect }: RequestsSectionProps) {
     searchTerm: ""
   });
 
-  // Filter function
+  // Filter function  +++++++++++++++++++++++++++++++++++++++++++++++
   const filteredRequests = requests.filter(request => {
     const searchTerm = searchCriteria.searchTerm.toLowerCase();
-    
+
+    // กรอง status ที่ไม่ใช่ "closed"  ***************
+    if (request.status?.toLowerCase() === "closed") {
+      return false;
+    }
+
     return (
       request.id?.toLowerCase().includes(searchTerm) ||
-      request.retailerTypes?.some(retailer => 
-        retailer.toLowerCase().includes(searchTerm)) ||
+      (Array.isArray(request.retailerTypes) &&
+        request.retailerTypes.some(retailer =>
+          retailer.toLowerCase().includes(searchTerm)
+        )) ||
       request.signageType?.toLowerCase().includes(searchTerm) ||
       request.assignedTo?.toLowerCase().includes(searchTerm) ||
       request.status?.toLowerCase().includes(searchTerm) ||
@@ -40,11 +47,12 @@ export default function RequestsSection({ onSelect }: RequestsSectionProps) {
     );
   });
 
-  // Simplified search handler
+  // Simplified search handler  +++++++++++++++++++++++++++++++
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchCriteria({ searchTerm: event.target.value });
   };
 
+  // Set initial selected request when data is loaded +++++++++++++++++
   useEffect(() => {
     if (filteredRequests.length > 0 && filteredRequests[0].id) {
       setSelectedId(filteredRequests[0].id);
@@ -129,9 +137,9 @@ export default function RequestsSection({ onSelect }: RequestsSectionProps) {
                     className="text-gray-600"
                     sx={{ fontSize: '0.85rem' }}
                   >
-                    {(request.retailerTypes &&
-                      request.retailerTypes.join(", ")) ||
-                      "-"}
+                    {(request.retailerTypes && Array.isArray(request.retailerTypes)
+                      ? request.retailerTypes.join(", ")
+                      : "-")}
                     {" - "}
                     {request.signageType || "Signage Type"}
                     {" - "}
@@ -148,19 +156,41 @@ export default function RequestsSection({ onSelect }: RequestsSectionProps) {
               <Box className="mt-4 flex justify-start">
                 <Box
                   sx={{
-                    border: "1px solid #41A4D8",
+                    border: "1px solid",
                     borderRadius: "8px",
                     px: 2,
                     py: 0.5,
                     display: "inline-block",
-                    background: "#F0F8FF",
+                    background: request.status === "open"
+                      ? "#E8F5E9" // สีเขียวอ่อนสำหรับ open
+                      : request.status === "inprogress"
+                      ? "#FFF3E0" // สีส้มอ่อนสำหรับ in progress
+                      : request.status === "closed"
+                      ? "#E0E0E0" // สีเขียวอ่อนสำหรับ closed
+                      : request.status === "cancelled"
+                      ? "#FFCDD2" // สีแดงอ่อนสำหรับ cancelled
+                      : request.status === "pending"
+                      ? "#FFF3E0" // สีเหลืองอ่อนสำหรับ pending
+                      : "#E0E0E0", // สีเทาสำหรับสถานะอื่น ๆ
+                    borderColor: request.status === "open"
+                      ? "#4CAF50" // สีเขียวสำหรับ open
+                      : request.status === "inprogress"
+                      ? "#FF9800" // สีส้มสำหรับ in progress
+                      : request.status === "closed"
+                      ? "#E0E0E0" // สีเขียวเข้มสำหรับ closed
+                      : request.status === "cancelled"
+                      ? "#F44336" // สีแดงสำหรับ cancelled
+                      : request.status === "pending"
+                      ? "#FF9800" // สีเหลืองสำหรับ pending
+                      : "#9E9E9E", // สีเทาสำหรับสถานะอื่น ๆ
                   }}
                 >
-                  <Typography 
-                    className="text-gray-700" 
-                    sx={{ 
+                  <Typography
+                    className="text-gray-700"
+                    sx={{
                       fontWeight: 300,
-                      fontSize: '0.8rem'
+                      fontSize: "0.8rem",
+                      color: "#000000", // เปลี่ยนสีข้อความเป็นสีดำ
                     }}
                   >
                     {request.status || "status"}

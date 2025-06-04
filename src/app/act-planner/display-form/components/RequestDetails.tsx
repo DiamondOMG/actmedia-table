@@ -2,6 +2,7 @@
 import { Box, Typography, Button, Chip } from "@mui/material";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
+import { useUpdateTable } from "@/hook/useRequestForm";  //เรียกใช้ hook สำหรับอัปเดตข้อมูล
 
 interface RequestDetailsProps {
   selectedRequest: any; // ใช้ any เพราะข้อมูลจาก API
@@ -10,6 +11,8 @@ interface RequestDetailsProps {
 export default function RequestDetails({
   selectedRequest,
 }: RequestDetailsProps) {
+  const updateTable = useUpdateTable(); // ใช้ React Query เพื่ออัปเดตข้อมูล
+
   if (!selectedRequest) {
     return (
       <Box className="p-4">
@@ -17,6 +20,14 @@ export default function RequestDetails({
       </Box>
     );
   }
+
+  // ฟังก์ชันสำหรับเปลี่ยน status +++++++++++++++++++++++++++++++++++++++++++++++
+  // ฟังก์ชันนี้จะถูกเรียกเมื่อผู้ใช้คลิกปุ่ม "PROCESS REQUEST" หรือ "CLOSE REQUEST"
+  //ROCESS REQUEST = inprogress  /  CLOSE REQUEST = closed (จะถูกปิดไป)
+  const handleStatusChange = (newStatus: string) => {
+    const updatedRequest = { ...selectedRequest, status: newStatus };
+    updateTable.mutate(updatedRequest); // ใช้ React Query เพื่ออัปเดตข้อมูล
+  };
 
   // ฟังก์ชันสำหรับจัดรูปแบบวันที่ วว/ดด/ปป +++++++++++++++++++++
   function formatDate(dateValue?: number) {
@@ -34,7 +45,6 @@ export default function RequestDetails({
         <Typography
           variant="h6"
           className="font-bold flex-1 min-w-0"
-      
           title={`${selectedRequest.id} - ${selectedRequest.campaigns || "campaigns"}`}
         >
           {selectedRequest.id} - {selectedRequest.campaigns || "campaigns"}
@@ -43,12 +53,14 @@ export default function RequestDetails({
           <Button
             variant="outlined"
             startIcon={<AssignmentOutlinedIcon color="primary" />}
+            onClick={() => handleStatusChange("inprogress")} // เปลี่ยน status เป็น inprogress
           >
             PROCESS REQUEST
           </Button>
           <Button
             variant="outlined"
             startIcon={<HighlightOffOutlinedIcon color="error" />}
+            onClick={() => handleStatusChange("closed")} // เปลี่ยน status เป็น closed
           >
             CLOSE REQUEST
           </Button>
@@ -73,7 +85,22 @@ export default function RequestDetails({
             <Chip
               label={selectedRequest.status || "-"}
               size="small"
-              className="bg-green-100"
+              sx={{
+                backgroundColor:
+                  selectedRequest.status === "open"
+                    ? "#E8F5E9" // สีเขียวอ่อนสำหรับ open
+                    : selectedRequest.status === "inprogress"
+                    ? "#FFF3E0" // สีส้มอ่อนสำหรับ in progress
+                    : selectedRequest.status === "closed"
+                    ? "#E0E0E0" // สีเขียวอ่อนสำหรับ closed
+                    : selectedRequest.status === "cancelled"
+                    ? "#FFCDD2" // สีแดงอ่อนสำหรับ cancelled
+                    : selectedRequest.status === "pending"
+                    ? "#FFF3E0" // สีเหลืองอ่อนสำหรับ pending
+                    : "#E0E0E0", // สีเทาสำหรับสถานะอื่น ๆ
+                color: "#000000", // เปลี่ยนสีข้อความเป็นสีดำ
+                fontWeight: 300,
+              }}
             />
           </Box>
           <Box>
@@ -82,7 +109,7 @@ export default function RequestDetails({
             </Typography>
             <Typography>{selectedRequest.requesterName || "-"}</Typography>
           </Box>
-        </Box> 
+        </Box>
 
         <Box className="bg-[#b2dbf198] p-4 rounded-md mb-6">
           <Box className="grid grid-cols-4 gap-4">
@@ -92,9 +119,9 @@ export default function RequestDetails({
               </Typography>
               <Chip
                 label={
-                  (selectedRequest.retailerTypes &&
-                    selectedRequest.retailerTypes.join(", ")) ||
-                  "-"
+                  Array.isArray(selectedRequest.retailerTypes)
+                    ? selectedRequest.retailerTypes.join(", ")
+                    : selectedRequest.retailerTypes || "-"
                 }
                 size="small"
                 className="bg-green-600 text-white"
