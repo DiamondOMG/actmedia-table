@@ -34,7 +34,7 @@ export default function FormPage() {
           </Box>
 
           {/* Section 3: Details */}
-          <Box className="w-1/2 p-4 border-l border-gray-200 overflow-y-auto">
+          <Box className="flex-1 p-4 border-l border-gray-200 overflow-y-auto">
             <DetailsSection selectedBooking={selectedBooking} />
           </Box>
         </Box>
