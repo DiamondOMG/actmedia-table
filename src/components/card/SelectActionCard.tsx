@@ -9,6 +9,10 @@ import CardActionArea from "@mui/material/CardActionArea";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Divider from "@mui/material/Divider";
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import BookOnlineIcon from '@mui/icons-material/BookOnline';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 const announcements = [
   {
@@ -28,27 +32,32 @@ const announcements = [
 const cards = [
   {
     id: 1,
-    title: "Act Planner",
-    description: "Planning is the first step.",
+    title: "Digital Media Planner",
+    description: "Planning and campaign management",
     link: "/act-planner/campaign",
-    background: "/Planning-2.png",
+    icon: CalendarTodayIcon,
   },
   {
     id: 2,
-    title: "Act Sign",
-    description: "Monitor the signage.",
-    link: "#",
-    // link: "/act-sign",
-    background: "/tv.jpg",
+    title: "Requests",
+    description: "View all media requests",
+    link: "/act-planner/display-form",
+    icon: CampaignIcon,
   },
   {
     id: 3,
-    title: "Innovative",
-    description: "Innovation in progress.",
-    link: "#",
-    // link: "/act-sign",
-    background: "/innovative.jpg",
+    title: "Bookings",
+    description: "Manage media bookings",
+    link: "/act-planner/display-form?type=bookings", // เพิ่ม query parameter
+    icon: BookOnlineIcon,
   },
+  {
+    id: 4,
+    title: "Create Request",
+    description: "Submit new media request",
+    link: "/act-planner/form",
+    icon: AddCircleIcon,
+  }
 ];
 
 function SelectActionCard() {
@@ -64,7 +73,7 @@ function SelectActionCard() {
           width: "100%",
           display: "flex",
           gap: 2,
-          justifyContent: "center",
+          justifyContent: "start",
           flexWrap: "wrap",
           margin: "0 auto", // จัดกึ่งกลาง
         }}
@@ -73,64 +82,81 @@ function SelectActionCard() {
         {cards.map((card, index) => (
           <Card
             key={card.id}
+            elevation={2}
             sx={{
-              height: 150, // เพิ่มความสูง
+              height: 150,
               position: "relative",
               overflow: "hidden",
               width: {
-                xs: "100%", // เต็มจอในหน้าจอเล็ก
-                sm: "45%", // ประมาณครึ่งจอในหน้าจอกลาง
-                md: "30%", // ประมาณ 1/3 ในหน้าจอใหญ่
+                xs: "100%",
+                sm: "45%",
+                md: "30%",
               },
-              minWidth: 280, // ขนาดต่ำสุดที่ยอมให้มีได้
-              maxWidth: 600, // เพิ่มความกว้างสูงสุดเพื่อควบคุมขนาด
-              margin: "10px", // เพิ่มระยะห่างระหว่าง card
+              minWidth: 280,
+              maxWidth: 600,
+              margin: "10px",
+              backgroundColor: "#fff",
+              borderRadius: 2,
+              transition: "all 0.3s ease-in-out",
+              "&:hover": {
+                elevation: 8,
+                transform: "translateY(-4px)",
+                boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+              },
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              border: "1px solid #e0e0e0",
             }}
           >
             <CardActionArea
               onClick={() => {
                 setSelectedCard(index);
-                router.push(card.link); // 👉 ไปหน้าใหม่แบบไม่มี <a>
+                router.push(card.link);
               }}
               data-active={selectedCard === index ? "" : undefined}
               sx={{
                 height: "100%",
-                backgroundImage: `url(${card.background})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                color: "white",
+                color: "rgba(0, 0, 0, 0.87)",
                 position: "relative",
                 transition: "0.3s",
                 "&[data-active]": {
                   boxShadow: "0 0 0 4px #2196f3 inset",
                 },
                 "&:hover": {
-                  opacity: 0.9,
+                  backgroundColor: "rgba(0, 0, 0, 0.04)",
                 },
               }}
             >
-              <Box
-                sx={{
-                  position: "absolute",
-                  inset: 0,
-                  backgroundColor: "rgba(0, 0, 0, 0.4)",
-                }}
-              />
               <CardContent
                 sx={{
-                  position: "relative",
                   height: "100%",
                   display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 3,
+                  p: 3,
                 }}
               >
-                <Typography variant="h5" component="div">
-                  {card.title}
-                </Typography>
-                <Typography variant="body2" color="white">
-                  {card.description}
-                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 56,
+                    height: 56,
+                    borderRadius: 2,
+                    backgroundColor: "primary.main",
+                    color: "white",
+                  }}
+                >
+                  {React.createElement(card.icon, { sx: { fontSize: 32 } })}
+                </Box>
+                <Box>
+                  <Typography variant="h6" component="div" gutterBottom>
+                    {card.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {card.description}
+                  </Typography>
+                </Box>
               </CardContent>
             </CardActionArea>
           </Card>
