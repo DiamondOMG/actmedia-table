@@ -90,7 +90,7 @@ export default function RequestDetails({
                   selectedRequest.status === "open"
                     ? "#E8F5E9" // สีเขียวอ่อนสำหรับ open
                     : selectedRequest.status === "inprogress"
-                    ? "#FFF3E0" // สีส้มอ่อนสำหรับ in progress
+                    ? "#FFF9C4" // สีส้มอ่อนสำหรับ in progress
                     : selectedRequest.status === "closed"
                     ? "#E0E0E0" // สีเขียวอ่อนสำหรับ closed
                     : selectedRequest.status === "cancelled"
