@@ -161,6 +161,31 @@ export default function PermissionPage() {
     }
   };
 
+  // เพิ่มฟังก์ชันแปลง level เป็นคำ  +++++++++++++++++++++++++++
+  const getLevelLabel = (level: number, menu: string) => {
+    if (menu === "user") {
+      switch (level) {
+        case 1:
+          return "Viewer";
+        case 2:
+          return "Staff";
+        case 3:
+          return "Manager";
+        default:
+          return `Level ${level}`;
+      }
+    } else {
+      switch (level) {
+        case 1:
+          return "Read-only";
+        case 2:
+          return "Edit";
+        default:
+          return `Level ${level}`;
+      }
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -210,6 +235,7 @@ export default function PermissionPage() {
                         handleLevelChange(user.id, menu, Number(e.target.value))
                       }
                       size="small"
+                      sx={{ minWidth: 120 }} // เพิ่มบรรทัดนี้เพื่อกำหนดความกว้างขั้นต่ำ
                     >
                       {(() => {
                         const userData = localStorage.getItem("userData");
@@ -220,12 +246,12 @@ export default function PermissionPage() {
                           : 1;
                         const levels =
                           menu === "user" && currentUserPermission >= 4
-                            ? [1, 2, 3, ]
+                            ? [1, 2, 3]
                             : [1, 2];
 
                         return levels.map((level) => (
-                          <MenuItem key={level} value={level}>
-                            {level}
+                          <MenuItem key={level} value={level} sx={{ minWidth: 120 }}>
+                            {getLevelLabel(level, menu)}
                           </MenuItem>
                         ));
                       })()}
