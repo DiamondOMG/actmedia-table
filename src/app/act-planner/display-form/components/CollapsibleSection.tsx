@@ -1,3 +1,5 @@
+"use client";
+
 // /src/app/form/components/CollapsibleSection.tsx
 import { useState, useMemo, useEffect } from "react";
 import {

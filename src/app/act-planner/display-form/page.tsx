@@ -1,7 +1,7 @@
 // /src/app/form/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { Box } from "@mui/material";
 import Sidebar from "./components/Sidebar";
 import CollapsibleSection from "./components/CollapsibleSection";
@@ -18,7 +18,9 @@ export default function FormPage() {
   return (
     <Box className="flex">
       {/* Section 1: Sidebar */}
-      <Sidebar onSelect={setSelectedSection} />
+      <Suspense fallback={<div>Loading sidebar...</div>}>
+        <Sidebar onSelect={setSelectedSection} />
+      </Suspense>
 
       {/* Section 2 & 3: Main Content */}
       {selectedSection === "Bookings" ? (

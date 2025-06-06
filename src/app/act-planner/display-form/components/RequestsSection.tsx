@@ -1,3 +1,5 @@
+"use client";
+
 // /src/app/form/components/RequestsSection.tsx
 import { useState, useEffect } from "react";
 import {

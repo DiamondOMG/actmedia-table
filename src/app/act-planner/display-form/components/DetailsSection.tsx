@@ -1,3 +1,5 @@
+"use client";
+
 // /src/app/booking/components/DetailsSection.tsx
 import { Box, Typography, Chip } from "@mui/material";
 import { type BookingData } from "@/hook/useBookings";

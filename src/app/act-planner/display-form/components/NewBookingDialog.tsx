@@ -1,3 +1,5 @@
+"use client";
+
 // /src/app/form/components/NewBookingDialog.tsx
 import { useState } from "react";
 import {

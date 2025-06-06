@@ -1,3 +1,5 @@
+"use client";
+
 // /src/app/form/components/RequestDetails.tsx
 import { Box, Typography, Button, Chip } from "@mui/material";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
