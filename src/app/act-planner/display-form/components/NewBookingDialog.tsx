@@ -11,6 +11,10 @@ import {
   Autocomplete,
   Button,
   IconButton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { mockCustomers } from "../data";
@@ -162,14 +166,20 @@ export default function NewBookingDialog({
           />
 
           {/* Status */}
-          <TextField
-            label="Status *"
-            variant="outlined"
-            fullWidth
-            value={formData.status}
-            onChange={(e) => handleChange("status", e.target.value)}
-            error={!!error && !formData.status}
-          />
+          <FormControl fullWidth error={!!error && !formData.status}>
+            <InputLabel>Status *</InputLabel>
+            <Select
+              label="Status *"
+              value={formData.status}
+              onChange={(e) => handleChange("status", e.target.value)}
+            >
+              <MenuItem value="Booked">Booked</MenuItem>
+              <MenuItem value="Cancelled">Cancelled</MenuItem>
+              <MenuItem value="Tentative">Tentative</MenuItem>
+              <MenuItem value="Proposed">Proposed</MenuItem>
+              <MenuItem value="Booked - Moving Walls">Booked - Moving Walls</MenuItem>
+            </Select>
+          </FormControl>
 
           {/* Campaign Type */}
           <TextField

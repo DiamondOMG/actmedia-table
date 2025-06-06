@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     formData.bigcCategorySignage.toString(),
     formData.mbc.toString(),
     formData.createdBy,
-    formData.lastModifiedBy,
+    formData.lastModifiedBy="",
     Date.now().toString(),
     formData.lastModified?.toString() || "",
     formData.campaignStatus,
