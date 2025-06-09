@@ -1,10 +1,11 @@
+
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
 import { v4 as uuidv4 } from "uuid";
-// import { SequenceData } from "@/hook/useSequences2";
+import { CustomersData } from "@/hook/useCustomers";
 import { verifyToken } from "@/lib/auth/verifyToken";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
@@ -14,13 +15,13 @@ const CACHE_KEY = "Act Planner - Customer";
 const CACHE_DURATION_SECONDS = 60 * 10; // 10 minutes
 
 // Interface สำหรับข้อมูล Customers
-interface CustomersData {
-  id: string;
-  Name: string;
-  Booking: string;
-  "Customer report": string; // ใช้เครื่องหมาย "..." ครอบ key ที่มีช่องว่าง
-  isDelete?: 0 | 1;
-}
+// interface CustomersData {
+//   id: string;
+//   Name: string;
+//   Booking: string;
+//   "Customer report": string; // ใช้เครื่องหมาย "..." ครอบ key ที่มีช่องว่าง
+//   isDelete?: 0 | 1;
+// }
 
 // POST - Create new Customer +++++++++++++++++++++++++++++++++++++
 export async function POST(req: NextRequest) {

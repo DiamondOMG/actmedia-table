@@ -3,17 +3,17 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
-// import { SequenceData } from "@/hook/useSequences2";
+import { CustomersData } from "@/hook/useCustomers";
 import { verifyToken } from "@/lib/auth/verifyToken";
 
 // Interface สำหรับข้อมูล Customers
-interface CustomersData {
-  id: string;
-  Name: string;
-  Booking: string;
-  "Customer report": string; // ใช้เครื่องหมาย "..." ครอบ key ที่มีช่องว่าง
-  isDelete?: 0 | 1;
-}
+// interface CustomersData {
+//   id: string;
+//   Name: string;
+//   Booking: string;
+//   "Customer report": string; // ใช้เครื่องหมาย "..." ครอบ key ที่มีช่องว่าง
+//   isDelete?: 0 | 1;
+// }
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Act Planner - Customer";  // ชื่อแผ่นงานที่ใช้เก็บข้อมูล Customers
