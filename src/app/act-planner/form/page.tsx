@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, use } from "react";
 import {
   TextField,
   Button,
@@ -27,8 +27,8 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Navbar from "@/components/navbar/Navbar";
 import PlannerBar from "@/components/navbar/PlannerBar";
 
-// Dropdown Options
-const retailerOptions = ["MAKRO", "Other"];
+// Dropdown Options ++++++++++++++++++++++
+const retailerOptions = ["Big C", "Tops", "Other"];
 const bookingOptions = ["1", "2", "3"];
 const campaignOptions = ["1", "2", "3"];
 const signageTypeOptions = [
@@ -60,8 +60,21 @@ export default function DigitalMediaRequestForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
-
   const submitRequestForm = useCreateTable();
+
+  // Get userData name, email from localStorage ++++++++++++++++
+  useEffect(() => {
+    const userData = localStorage.getItem("userData");
+    console.log(userData);
+    if (userData) {
+      const parsedData = JSON.parse(userData);
+      setFormData((prev) => ({
+        ...prev,
+        requesterEmail: parsedData.user.email || "",
+        requesterName: parsedData.user.name || "",
+      }));
+    }
+  }, []);
 
   // Handlers
   const handleInputChange = (
@@ -104,26 +117,8 @@ export default function DigitalMediaRequestForm() {
   };
 
   const validateForm = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const errors: string[] = [];
 
-    if (formData.requesterName.trim() === "") {
-      errors.push("Requester name is required.");
-    }
-    if (formData.requesterEmail.trim() === "") {
-      errors.push("Requester email is required.");
-    } else if (!emailRegex.test(formData.requesterEmail)) {
-      errors.push("Requester email is invalid.");
-    }
-    if (formData.retailerTypes.some((rt) => rt === "")) {
-      errors.push("All retailer types must be selected.");
-    }
-    if (formData.startDate === null) {
-      errors.push("Start date is required.");
-    }
-    if (formData.endDate === null) {
-      errors.push("End date is required.");
-    }
     if (
       formData.startDate &&
       formData.endDate &&
@@ -132,11 +127,16 @@ export default function DigitalMediaRequestForm() {
       errors.push("Start date must be before end date.");
     }
 
+    // Change request specific validation
+    if (formData.requestType === "Change" && !formData.existingCampaign) {
+      errors.push("Existing campaign is required for change requests.");
+    }
+
     if (errors.length > 0) {
       Swal.fire({
-        title: "Validation Errors",
-        text: errors.join("\n"),
-        icon: "error",
+        title: "Required fields",
+        // html: errors.join("<br>"), // ใช้ html แทน text เพื่อให้แสดงเป็นบรรทัด
+        icon: "warning",
         confirmButtonText: "OK",
       });
       return false;
@@ -145,6 +145,7 @@ export default function DigitalMediaRequestForm() {
     return true;
   };
 
+  // Submit Handler ++++++++++++++++++++++++++++++++++++++++++++++++++
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -153,6 +154,16 @@ export default function DigitalMediaRequestForm() {
 
     setIsSubmitting(true);
     setSubmissionStatus(null);
+
+    // ดึงค่าจาก localStorage
+    const userData = localStorage.getItem("userData");
+    let requesterName = "";
+    let requesterEmail = "";
+    if (userData) {
+      const parsedData = JSON.parse(userData);
+      requesterName = parsedData.user.name || "";
+      requesterEmail = parsedData.user.email || "";
+    }
 
     try {
       // แปลงวันที่เป็น unixtime (milliseconds) โดยตรง
@@ -171,8 +182,8 @@ export default function DigitalMediaRequestForm() {
       // รีเซ็ตฟอร์มหลังจากส่งข้อมูลสำเร็จ
       setFormData({
         requestType: "New",
-        requesterName: "",
-        requesterEmail: "",
+        requesterName, // ใช้ค่าจาก localStorage
+        requesterEmail, // ใช้ค่าจาก localStorage
         retailerTypes: [""],
         bookings: [""],
         existingCampaign: "",
@@ -195,10 +206,20 @@ export default function DigitalMediaRequestForm() {
 
   // Clear Form Handler ++++++++++++++++++++++++++++
   const handleClearForm = () => {
+    // ดึงค่าจาก localStorage
+    const userData = localStorage.getItem("userData");
+    let requesterName = "";
+    let requesterEmail = "";
+    if (userData) {
+      const parsedData = JSON.parse(userData);
+      requesterName = parsedData.user.name || "";
+      requesterEmail = parsedData.user.email || "";
+    }
+
     setFormData({
       requestType: "New",
-      requesterName: "",
-      requesterEmail: "",
+      requesterName, // ใช้ค่าจาก localStorage
+      requesterEmail, // ใช้ค่าจาก localStorage
       retailerTypes: [""],
       bookings: [""],
       existingCampaign: "",
@@ -215,11 +236,11 @@ export default function DigitalMediaRequestForm() {
       signageType: "",
     });
     Swal.fire({
-      title: 'Cleared!',
-      text: 'The form has been cleared.',
-      icon: 'success',
+      title: "Cleared!",
+      text: "The form has been cleared.",
+      icon: "success",
       timer: 1500,
-      showConfirmButton: false
+      showConfirmButton: false,
     });
   };
 
@@ -311,22 +332,25 @@ export default function DigitalMediaRequestForm() {
             </Typography>
           </Box>
 
-          {submissionStatus && (
-            <Typography
-              sx={{
-                mb: 4,
-                p: 2,
-                borderRadius: 1,
-                backgroundColor: submissionStatus.includes("success")
-                  ? "#e6ffe6"
-                  : "#ffe6e6",
-                color: submissionStatus.includes("success") ? "green" : "red",
-              }}
-            >
-              {submissionStatus}
-            </Typography>
-          )}
+          {
+            submissionStatus && (
+              <Typography
+                sx={{
+                  mb: 4,
+                  p: 2,
+                  borderRadius: 1,
+                  backgroundColor: submissionStatus.includes("success")
+                    ? "#e6ffe6"
+                    : "#ffe6e6",
+                  color: submissionStatus.includes("success") ? "green" : "red",
+                }}
+              >
+                {submissionStatus}
+              </Typography>
+            )
 
+            /* Form ++++++++++++++++ */
+          }
           <form onSubmit={handleSubmit}>
             <Box sx={{ mb: 6 }}>
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
@@ -354,10 +378,20 @@ export default function DigitalMediaRequestForm() {
                 label="Requester's name (+ nick name)"
                 name="requesterName"
                 value={formData.requesterName}
-                onChange={handleInputChange}
+                // onChange={handleInputChange}
                 margin="normal"
                 variant="outlined"
-                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1 } }}
+                slotProps={{
+                  input: {
+                    readOnly: true, // Make the field read-only
+                  },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 1,
+                    backgroundColor: "#f5f5f5", // Light gray background for read-only
+                  },
+                }}
               />
             </Box>
 
@@ -369,10 +403,36 @@ export default function DigitalMediaRequestForm() {
                 name="requesterEmail"
                 type="email"
                 value={formData.requesterEmail}
-                onChange={handleInputChange}
+                // onChange={handleInputChange}
                 margin="normal"
                 variant="outlined"
                 helperText="Leave your email address so that you can get updates on your request."
+                slotProps={{
+                  input: {
+                    readOnly: true, // Make the field read-only
+                  },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 1,
+                    backgroundColor: "#f5f5f5", // Light gray background for read-only
+                  },
+                }}
+              />
+            </Box>
+
+            <Box sx={{ mb: 6 }}>
+              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+                Assigned To
+              </Typography>
+              <TextField
+                fullWidth
+                label="Assigned To"
+                name="assignedTo"
+                value={formData.assignedTo}
+                onChange={handleInputChange}
+                margin="normal"
+                variant="outlined"
                 sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1 } }}
               />
             </Box>
@@ -383,6 +443,31 @@ export default function DigitalMediaRequestForm() {
               retailerOptions,
               true
             )}
+            <Box sx={{ mb: 6 }}>
+              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+                Signage Type
+              </Typography>
+              <FormControl fullWidth margin="normal">
+                <Autocomplete
+                  options={signageTypeOptions}
+                  value={formData.signageType}
+                  onChange={(event, newValue) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      signageType: newValue || "",
+                    }))
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select signage type"
+                      variant="outlined"
+                    />
+                  )}
+                />
+              </FormControl>
+            </Box>
+
             {renderArrayField("bookings", "Booking", bookingOptions)}
 
             {formData.requestType === "Change" && (
@@ -470,14 +555,13 @@ export default function DigitalMediaRequestForm() {
                 sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1 } }}
                 slotProps={{
                   input: {
-                    inputMode: "numeric",
+                    inputProps: {
+                      maxLength: 5,
+                      inputMode: "numeric",
+                    },
                     onInput: (e: React.FormEvent<HTMLInputElement>) => {
                       const value = (e.target as HTMLInputElement).value;
-                      // อนุญาตเฉพาะตัวเลขและเครื่องหมาย :
-                      (e.target as HTMLInputElement).value = value.replace(
-                        /[^0-9:]/g,
-                        ""
-                      );
+                      (e.target as HTMLInputElement).value = value.replace(/[^0-9:]/g, "");
                     },
                   },
                 }}
@@ -502,26 +586,6 @@ export default function DigitalMediaRequestForm() {
                 rows={3}
                 name="mediaLinks"
                 value={formData.mediaLinks}
-                onChange={handleInputChange}
-                margin="normal"
-                variant="outlined"
-                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1 } }}
-              />
-            </Box>
-
-            <Box sx={{ mb: 6 }}>
-              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-                Notes
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 2, color: "#666" }}>
-                Provide as many details as possible.
-              </Typography>
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                name="notes"
-                value={formData.notes}
                 onChange={handleInputChange}
                 margin="normal"
                 variant="outlined"
@@ -584,22 +648,6 @@ export default function DigitalMediaRequestForm() {
 
             <Box sx={{ mb: 6 }}>
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-                Assigned To
-              </Typography>
-              <TextField
-                fullWidth
-                label="Assigned To"
-                name="assignedTo"
-                value={formData.assignedTo}
-                onChange={handleInputChange}
-                margin="normal"
-                variant="outlined"
-                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1 } }}
-              />
-            </Box>
-
-            <Box sx={{ mb: 6 }}>
-              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
                 Sequence Link
               </Typography>
               <TextField
@@ -616,30 +664,32 @@ export default function DigitalMediaRequestForm() {
 
             <Box sx={{ mb: 6 }}>
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-                Signage Type
+                Notes
               </Typography>
-              <FormControl fullWidth margin="normal">
-                <Autocomplete
-                  options={signageTypeOptions}
-                  value={formData.signageType}
-                  onChange={(event, newValue) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      signageType: newValue || "",
-                    }))
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Select signage type"
-                      variant="outlined"
-                    />
-                  )}
-                />
-              </FormControl>
+              <Typography variant="body2" sx={{ mb: 2, color: "#666" }}>
+                Provide as many details as possible.
+              </Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                name="notes"
+                value={formData.notes}
+                onChange={handleInputChange}
+                margin="normal"
+                variant="outlined"
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1 } }}
+              />
             </Box>
 
-            <Box sx={{ mt: 8, display: "flex", gap: 2, justifyContent: "space-between" }}>
+            <Box
+              sx={{
+                mt: 8,
+                display: "flex",
+                gap: 2,
+                justifyContent: "space-between",
+              }}
+            >
               <Button
                 type="submit"
                 variant="contained"

@@ -109,7 +109,15 @@ export default function DetailsSection({
         <Button
           variant="outlined"
           size="small"
-          onClick={() => setEditMode((v) => !v)}
+          onClick={() => {
+            if (editMode) {
+              setForm(selectedBooking); // รีโหลดข้อมูล
+              setNewMedium("");         // รีเซ็ต input medium
+              setEditMode(false);       // ปิดโหมดแก้ไข
+            } else {
+              setEditMode(true);        // เข้าโหมดแก้ไข
+            }
+          }}
         >
           {editMode ? "Cancel" : "Edit"}
         </Button>
@@ -320,17 +328,10 @@ export default function DetailsSection({
                   ? (() => {
                       const d = new Date(form.createdOn);
                       const day = d.toLocaleString("th-TH", { day: "2-digit" });
-                      const month = d.toLocaleString("th-TH", {
-                        month: "2-digit",
-                      });
+                      const month = d.toLocaleString("th-TH", { month: "2-digit" });
                       const year = d.getFullYear(); // ค.ศ.
-                      const hour = d.toLocaleString("th-TH", {
-                        hour: "2-digit",
-                        hour12: false,
-                      });
-                      const minute = d.toLocaleString("th-TH", {
-                        minute: "2-digit",
-                      });
+                      const hour = d.getHours().toString().padStart(2, "0");
+                      const minute = d.getMinutes().toString().padStart(2, "0");
                       return `${day}/${month}/${year} ${hour}:${minute}`;
                     })()
                   : "—"}
@@ -351,17 +352,11 @@ export default function DetailsSection({
                   ? (() => {
                       const d = new Date(form.lastModified);
                       const day = d.toLocaleString("th-TH", { day: "2-digit" });
-                      const month = d.toLocaleString("th-TH", {
-                        month: "2-digit",
-                      });
+                      const month = d.toLocaleString("th-TH", { month: "2-digit" });
                       const year = d.getFullYear(); // ค.ศ.
-                      const hour = d.toLocaleString("th-TH", {
-                        hour: "2-digit",
-                        hour12: false,
-                      });
-                      const minute = d.toLocaleString("th-TH", {
-                        minute: "2-digit",
-                      });
+                      // ใช้ getHours() และ getMinutes() เพื่อให้ได้ตัวเลข แล้วเติม 0 ข้างหน้า
+                      const hour = d.getHours().toString().padStart(2, "0");
+                      const minute = d.getMinutes().toString().padStart(2, "0");
                       return `${day}/${month}/${year} ${hour}:${minute}`;
                     })()
                   : "—"}

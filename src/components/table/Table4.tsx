@@ -112,11 +112,15 @@ const Table4 = memo(function Table4({ columns, initialData }: Table4Props) {
   const updateTable = useUpdateTable();
   const deleteTable = useDeleteTable();
 
-  // ฟังก์ชันจัดการการสร้างข้อมูลใหม่
+  // ฟังก์ชันจัดการการสร้างข้อมูลใหม่ *************************
   const handleCreate: MRT_TableOptions<RequestFormData>["onCreatingRowSave"] =
     async ({ values, table }) => {
-      console.log("Create", values);
-      createTabe.mutate(values);
+      // กำหนดค่า default ให้ status ถ้ายังไม่มีค่า
+      const newValues = {
+        ...values,
+        status: values.status || "open",
+      };
+      createTabe.mutate(newValues);
       table.setCreatingRow(null); // ปิด modal การสร้าง
     };
 

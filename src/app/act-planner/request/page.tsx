@@ -24,11 +24,27 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
     header: "Email",
   },
   {
+    accessorKey: "assignedTo",
+    header: "Assigned To",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string>();
+      return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
+    },
+  },
+  {
     accessorKey: "retailerTypes",
     header: "Retailer Types",
     Cell: ({ cell }) => {
       const value = cell.getValue<string[]>();
       return Array.isArray(value) ? value.join(", ") : value || ""; // ตรวจสอบว่า value เป็น Array หรือไม่
+    },
+  },
+  {
+    accessorKey: "signageType",
+    header: "Signage Type",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string>();
+      return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
     },
   },
   {
@@ -39,14 +55,7 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
       return Array.isArray(value) ? value.join(", ") : value || ""; // ตรวจสอบว่า value เป็น Array หรือไม่
     },
   },
-  {
-    accessorKey: "campaigns",
-    header: "Campaigns",
-    Cell: ({ cell }) => {
-      const value = cell.getValue<string[]>();
-      return Array.isArray(value) ? value.join(", ") : value || ""; // ตรวจสอบว่า value เป็น Array หรือไม่
-    },
-  },
+
   {
     accessorKey: "startDate",
     header: "Start Date",
@@ -79,25 +88,42 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
     accessorKey: "duration",
     header: "Duration",
   },
+
   {
-    accessorKey: "existingCampaign",
-    header: "Existing Campaign",
+    accessorKey: "mediaLinks",
+    header: "Linked Media",
   },
+
   {
-    accessorKey: "notes",
-    header: "Notes",
+    accessorKey: "campaigns",
+    header: "Campaigns",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string[]>();
+      return Array.isArray(value) ? value.join(", ") : value || ""; // ตรวจสอบว่า value เป็น Array หรือไม่
+    },
   },
+
   {
     accessorKey: "linkedCampaigns",
     header: "Linked Campaigns",
   },
   {
-    accessorKey: "mediaLinks",
-    header: "Linked Media",
+    accessorKey: "existingCampaign",
+    header: "Existing Campaign",
   },
+
   {
     accessorKey: "existingSlot",
     header: "Existing Slot",
+    Cell: ({ cell }) => {
+      const value = cell.getValue<string>();
+      return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
+    },
+  },
+
+  {
+    accessorKey: "sequenceLink",
+    header: "Sequence Link",
     Cell: ({ cell }) => {
       const value = cell.getValue<string>();
       return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
@@ -111,29 +137,10 @@ const columns: MRT_ColumnDef<RequestFormData>[] = [
       return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
     },
   },
+
   {
-    accessorKey: "assignedTo",
-    header: "Assigned To",
-    Cell: ({ cell }) => {
-      const value = cell.getValue<string>();
-      return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
-    },
-  },
-  {
-    accessorKey: "sequenceLink",
-    header: "Sequence Link",
-    Cell: ({ cell }) => {
-      const value = cell.getValue<string>();
-      return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
-    },
-  },
-  {
-    accessorKey: "signageType",
-    header: "Signage Type",
-    Cell: ({ cell }) => {
-      const value = cell.getValue<string>();
-      return value || ""; // หากไม่มีค่า ให้แสดงเป็น ""
-    },
+    accessorKey: "notes",
+    header: "Notes",
   },
 ];
 
