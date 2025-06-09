@@ -3,38 +3,33 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
-import { SequenceData } from "@/hook/useSequences2";
+// import { SequenceData } from "@/hook/useSequences2";
 import { verifyToken } from "@/lib/auth/verifyToken";
 
-// Interface สำหรับข้อมูล Sequence
-// interface SequenceData {
-//     id: string;
-//     date: string;
-//     username: string;
-//     label: string;
-//     retailer: string;
-//     sequenceId: string;
-//     mediaType: string;
-//     isDelete?: 0 | 1;
-//   }
+// Interface สำหรับข้อมูล Customers
+interface CustomersData {
+  id: string;
+  Name: string;
+  Booking: string;
+  "Customer report": string; // ใช้เครื่องหมาย "..." ครอบ key ที่มีช่องว่าง
+  isDelete?: 0 | 1;
+}
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
-const SHEET_NAME = "Act Planner - SequenceId";
-const redis = Redis.fromEnv();
-const CACHE_KEY = "Act Planner - SequenceId";
+const SHEET_NAME = "Act Planner - Customer";  // ชื่อแผ่นงานที่ใช้เก็บข้อมูล Customers
+const redis = Redis.fromEnv(); // สร้าง client สำหรับ Redis
+const CACHE_KEY = "Act Planner - Customer"; // คีย์สำหรับเก็บ cache ของข้อมูล Customers
 
-
-
-// PUT - Update sequence by id   ++++++++++++++++++++++++++++++++++++++++++++
+// PUT - Update Customers by id   ++++++++++++++++++++++++++++++++++++++++++++
 export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  const sheets = await getSheetsClient();
+  const { id } = await params; // ดึง id จาก params
+  const sheets = await getSheetsClient();  // สร้าง client สำหรับ Google Sheets
 
   try {
-    await verifyToken(req, "sequence", 2);
+    await verifyToken(req, "customer", 2);
     console.log("Authenticated user:");
   } catch (err) {
     return NextResponse.json(
@@ -47,7 +42,7 @@ export async function PUT(
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A2:H`,
+    range: `${SHEET_NAME}!A2:E`, // ปรับ range ให้ตรงกับจำนวนคอลัมน์ที่ต้องการ
   });
 
   const rows = response.data.values || [];
@@ -59,24 +54,21 @@ export async function PUT(
   }
 
   const existingRow = rows[rowIndex];
-  const isDelete = existingRow[7] || "0";
+  const isDelete = existingRow[4] || "0";
 
-  const formData: SequenceData = await req.json();
+  const formData: CustomersData = await req.json();
 
   const updatedRow = [
     id,  // ใช้ id จาก params
-    formData.date || new Date().toISOString(),   // เพิ่ม default value ถ้าไม่มีการส่ง date มา
-    formData.username,
-    formData.label,
-    formData.retailer,
-    formData.sequenceId,
-    formData.mediaType,
+    formData.Name,
+    formData.Booking,
+    formData["Customer report"], // ใช้เครื่องหมาย "..." ครอบ key ที่มีช่องว่าง
     isDelete, // ใช้ค่าเดิมจาก existingRow
   ];
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A${rowNumber}:H${rowNumber}`,
+    range: `${SHEET_NAME}!A${rowNumber}:E${rowNumber}`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [updatedRow] },
   });
@@ -94,7 +86,7 @@ export async function DELETE(
   const sheets = await getSheetsClient();
 
   try {
-    await verifyToken(req, "sequence", 2);
+    await verifyToken(req, "customer", 2);
     console.log("Authenticated user:");
   } catch (err) {
     return NextResponse.json(
@@ -107,7 +99,7 @@ export async function DELETE(
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A2:H`,
+    range: `${SHEET_NAME}!A2:E`,
   });
 
   const rows = response.data.values || [];
@@ -119,11 +111,11 @@ export async function DELETE(
   }
 
   const row = rows[rowIndex];
-  row[7] = "1"; // isDelete = 1
+  row[4] = "1"; // isDelete = 1
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A${rowNumber}:H${rowNumber}`,
+    range: `${SHEET_NAME}!A${rowNumber}:E${rowNumber}`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [row] },
   });
