@@ -163,7 +163,7 @@ function summarizeData(normalizedData: any[], seqCampaigns: any[]) {
 
 export async function GET() {
   try {
-    // Try reading from Redis
+    // Try reading from Uptash Redis
     const cached = await redis.get(CACHE_KEY);
     if (cached) {
       return new Response(JSON.stringify(cached), {
