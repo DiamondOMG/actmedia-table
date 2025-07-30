@@ -3,25 +3,25 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getSheetsClient } from "@/lib/googleSheetsClient";
 import { Redis } from "@upstash/redis";
-// import { CycleData } from "@/hook/useCycle";
+import { CycleData } from "@/hook/useCycle";
 import { verifyToken } from "@/lib/auth/verifyToken";
 
 
 // Interface สำหรับข้อมูล Cycle
-interface CycleData {
-  Cycle?: string;
-  "Start date"?: string;
-  "End date"?: string;
-  "Bookings - Big C - TV signage"?: string;
-  "Booked - Big C - TV signage"?: string;
-  "Bookings - Big C - Category signage"?: string;
-  "Booked - Big C - Category signage"?: string;
-  "Bookings - Big C - Kiosk"?: string;
-  "Booked - Big C - Kiosk"?: string;
-  "Bookings - MBC"?: string;
-  "Booked - MBC"?: string;
-  isDelete?: 0 | 1;
-}
+// interface CycleData {
+//   Cycle?: string;
+//   "Start date"?: string;
+//   "End date"?: string;
+//   "Bookings - Big C - TV signage"?: string;
+//   "Booked - Big C - TV signage"?: string;
+//   "Bookings - Big C - Category signage"?: string;
+//   "Booked - Big C - Category signage"?: string;
+//   "Bookings - Big C - Kiosk"?: string;
+//   "Booked - Big C - Kiosk"?: string;
+//   "Bookings - MBC"?: string;
+//   "Booked - MBC"?: string;
+//   isDelete?: 0 | 1;
+// }
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SHEET_NAME = "Act Planner - Cycle";

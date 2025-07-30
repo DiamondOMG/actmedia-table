@@ -14,6 +14,7 @@ const menuItems = [
   { label: "Sequence", path: "/act-planner/sequence" },
   { label: "Customer", path: "/act-planner/customer" },
   { label: "Medium / Inventory type", path: "/act-planner/medium" },
+  { label: "Cycle", path: "/act-planner/cycle" },
   { label: "Form request", path: "/act-planner/form" },
   { label: "Interfaces", path: "/act-planner/display-form" }
 ];

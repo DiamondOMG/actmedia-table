@@ -51,7 +51,8 @@ export async function POST(req: Request) {
     { menu: "sequence", level: 1 },
     { menu: "customer", level: 1 },
     { menu: "booking", level: 1 },
-    { menu: "medium", level: 1 }
+    { menu: "medium", level: 1 },
+    { menu: "cycle", level: 1 }
   ];
 
   // 🔍 ตรวจสอบ email ซ้ำ

@@ -67,7 +67,7 @@ importers:
         version: 9.0.2
       material-react-table:
         specifier: ^3.2.1
-        version: 3.2.1(yhoeqrcjh37ltj3ypxl3k2d3lq)
+        version: 3.2.1(74da061d9db368f74f50abbbd1923ca4)
       next:
         specifier: 15.2.0
         version: 15.2.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -2575,7 +2575,7 @@ snapshots:
 
   lru-cache@10.4.3: {}
 
-  material-react-table@3.2.1(yhoeqrcjh37ltj3ypxl3k2d3lq):
+  material-react-table@3.2.1(74da061d9db368f74f50abbbd1923ca4):
     dependencies:
       '@emotion/react': 11.14.0(@types/react@19.0.12)(react@19.0.0)
       '@emotion/styled': 11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0)

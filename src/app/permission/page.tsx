@@ -204,6 +204,7 @@ export default function PermissionPage() {
               <TableCell>Customer</TableCell>
               <TableCell>Booking</TableCell>
               <TableCell>Medium</TableCell>
+              <TableCell>Cycle</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -222,6 +223,7 @@ export default function PermissionPage() {
                   "customer",
                   "booking",
                   "medium",
+                  "cycle",
                 ].map((menu) => (
                   <TableCell key={menu}>
                     <Select
